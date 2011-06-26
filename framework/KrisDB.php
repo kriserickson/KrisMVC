@@ -184,7 +184,7 @@ abstract class KrisDB
             $whereString = '';
             foreach ($where as $whereName)
             {
-                $whereString .= (strlen($whereString) > 0 ? ', ' : '') . $this->quoteDbObject($whereName) . ' = ?';
+                $whereString .= (strlen($whereString) > 0 ? ' AND ' : '') . $this->quoteDbObject($whereName) . ' = ?';
             }
             return $whereString;
         }
