@@ -1,10 +1,11 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Kris
- * Date: 6/26/11
- * Time: 10:12 AM
- * To change this template use File | Settings | File Templates.
+/*
+ * This file is part of the KrisMvc framework.
+ *
+ * (c) Kris Erickson 
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
  
 class DateHelpers {
