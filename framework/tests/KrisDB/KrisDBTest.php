@@ -38,6 +38,107 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
             $this->_krisDB->convertClassKeyToDBKey($this->_krisDB->convertDBKeyToClassKey('record_id')));
     }
 
+    /**
+     * @test
+     */
+    function testQuoting()
+    {
+        KrisConfig::$DATABASE_QUOTE_STYLE = KrisConfig::QUOTE_STYLE_MYSQL;
+        $this->assertEquals('`test`', $this->_krisDB->quoteDbObject('test'));
+
+        KrisConfig::$DATABASE_QUOTE_STYLE = KrisConfig::QUOTE_STYLE_MSSQL;
+        $this->assertEquals('[test]', $this->_krisDB->quoteDbObject('test'));
+
+        KrisConfig::$DATABASE_QUOTE_STYLE = KrisConfig::QUOTE_STYLE_ANSI;
+        $this->assertEquals('"test"', $this->_krisDB->quoteDbObject('test'));
+
+
+    }
+
+    function testBindRecordSetNoInitialize()
+    {
+        $testResult2 = 'test_result2';
+        $testField2 = 'test_field_2';
+        $testResult1 = 'test_result_1';
+        $testField1 = 'test_field1';
+
+        $rs = array($testField1 => $testResult1, $testField2 => $testResult2);
+        $this->_krisDB->bindRecordSet($rs, $this->_krisDB);
+
+        $this->assertEquals($testResult1, $this->_krisDB->TestField1);
+        $this->assertEquals($testResult1, $this->_krisDB->get('TestField1'));
+        $this->assertEquals($testResult1, $this->_krisDB->get($testField1));
+        
+        $this->assertEquals($testResult2, $this->_krisDB->TestField2);
+        $this->assertEquals($testResult2, $this->_krisDB->get('TestField2'));
+        $this->assertEquals($testResult2, $this->_krisDB->get($testField2));
+    }
+
+    /**
+     * @test
+     */
+    function testBindRecordSetInitialize()
+    {
+        $testResult2 = 'test_result2';
+        $testField2 = 'test_field_2';
+        $testResult1 = 'test_result_1';
+        $testField1 = 'test_field1';
+
+        // We are only initializing testField1 so only it's the only member that should be accessible.
+        $this->_krisDB->initializeRecordSet(array('testField1'));
+
+        $rs = array($testField1 => $testResult1, $testField2 => $testResult2);
+        $this->_krisDB->bindRecordSet($rs, $this->_krisDB);
+
+        $this->assertEquals($testResult1, $this->_krisDB->TestField1);
+        $this->assertEquals($testResult1, $this->_krisDB->get('TestField1'));
+        $this->assertEquals($testResult1, $this->_krisDB->get($testField1));
+
+        $this->setExpectedException('DatabaseException', 'Invalid key: TestField2');
+        $res = $this->_krisDB->TestField2;
+
+    }
+
+    /**
+     * @test
+     */
+    function testAddFunctions()
+    {
+        $sql = 'SELECT * FROM table';
+
+        $this->assertEquals($sql.' LIMIT 2', $this->_krisDB->addLimit($sql, 2));
+        $this->assertEquals($sql.' ORDER BY table_id', $this->_krisDB->addOrder($sql, 'table_id'));
+    }
+
+    /**
+     * @test
+     */
+    function testGenerateWhat()
+    {
+        KrisConfig::$DATABASE_QUOTE_STYLE = KrisConfig::QUOTE_STYLE_MYSQL;
+
+        $sql = '`foo`, `bar`';
+
+        $this->assertEquals($sql, $this->_krisDB->generateWhat($sql));
+        $this->assertEquals($sql, $this->_krisDB->generateWhat(array('foo','bar')));
+    }
+
+    /**
+     * @test
+     */
+    function testGenerateWhere()
+    {
+        KrisConfig::$DATABASE_QUOTE_STYLE = KrisConfig::QUOTE_STYLE_MYSQL;
+
+        $sql = '`foo` = ? AND `bar` = ?';
+
+        $this->assertEquals($sql, $this->_krisDB->generateWhere($sql, array('bindFoo', 'bindBar')));
+        $this->assertEquals($sql, $this->_krisDB->generateWhere(array('foo','bar'), array('bindFoo', 'bindBar')));
+
+        $this->setExpectedException('DatabaseException', 'Count of where (3) does not equal the count of bindings (2)');
+        $this->_krisDB->generateWhere(array('foo','bar', 'baz'), array('bindFoo', 'bindBar'));
+    }
+
 }
 
 
@@ -53,6 +154,11 @@ class KrisDBExposeProtected extends KrisDB
         function quoteDbObject($name)
         {
             return parent::quoteDbObject($name);
+        }
+
+        function initializeRecordSet($records)
+        {
+            return parent::initializeRecordSet($records);
         }
 
         /**

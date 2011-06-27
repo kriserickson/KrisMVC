@@ -13,7 +13,7 @@
 // Represents a view of the multiple tables in the database...
 //===============================================================
  
-abstract class KrisDBView extends KrisDB
+abstract class KrisDBView  extends KrisDB
 {
 
     protected $_tables;

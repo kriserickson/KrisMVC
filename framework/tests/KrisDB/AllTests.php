@@ -11,6 +11,8 @@ class KrisDB_AllTests extends PHPUnit_Framework_TestSuite
 		$suite = new self();
 
 		$suite->addTestFile(dirname(__FILE__) . '/KrisDBTest.php');
+        $suite->addTestFile(dirname(__FILE__) . '/KrisDBViewTest.php');
+        $suite->addTestFile(dirname(__FILE__) . '/KrisModelTest.php');
 
 		return $suite;
 	}

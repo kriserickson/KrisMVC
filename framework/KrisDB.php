@@ -21,11 +21,26 @@ abstract class KrisDB
     protected $_initializedRecordSet = false;
 
 
+    /**
+     * @throws DatabaseException
+     * @param string $key
+     * @return string
+     */
     function get($key)
     {
-        return $this->_recordSet[$this->convertDBKeyToClassKey($key)];
+        $fixedKey = $this->convertDBKeyToClassKey($key);
+        if (!isset($this->_recordSet[$fixedKey]))
+        {
+            throw new DatabaseException('Invalid key: '.$key);
+        }
+
+        return $this->_recordSet[$fixedKey];
     }
 
+    /**
+     * @param array $records
+     * @return void
+     */
     protected function initializeRecordSet($records)
     {
         foreach ($records as $key)
@@ -35,6 +50,11 @@ abstract class KrisDB
         $this->_initializedRecordSet = true;
     }
 
+    /**
+     * @param string $key
+     * @param string $val
+     * @return KrisDB
+     */
     function set($key, $val)
     {
         $key = $this->convertDBKeyToClassKey($key);
@@ -45,11 +65,20 @@ abstract class KrisDB
         return $this;
     }
 
+    /**
+     * @param string $key
+     * @return string
+     */
     function __get($key)
     {
         return $this->get($key);
     }
 
+    /**
+     * @param string $key
+     * @param string $val
+     * @return KrisDB
+     */
     function __set($key, $val)
     {
         return $this->set($key, $val);
@@ -73,11 +102,11 @@ abstract class KrisDB
      */
     protected function quoteDbObject($name)
     {
-        if (KrisConfig::$DATABASE_QUOTE_STYLE == KrisConfig::QuoteStyleMysql)
+        if (KrisConfig::$DATABASE_QUOTE_STYLE == KrisConfig::QUOTE_STYLE_MYSQL)
         {
             return '`' . $name . '`';
         }
-        elseif (KrisConfig::$DATABASE_QUOTE_STYLE ==  KrisConfig::QuoteStyleMssql)
+        elseif (KrisConfig::$DATABASE_QUOTE_STYLE ==  KrisConfig::QUOTE_STYLE_MSSQL)
         {
             return '[' . $name . ']';
         }
@@ -175,7 +204,7 @@ abstract class KrisDB
             $whatString = '';
             foreach ($what as $whereName)
             {
-                $whatString .= (strlen($whatString) > 0 ? ', ' : '') . $this->quoteDbObject($whereName) . ' = ?';
+                $whatString .= (strlen($whatString) > 0 ? ', ' : '') . $this->quoteDbObject($whereName);
             }
             return $whatString;
         }
@@ -183,7 +212,7 @@ abstract class KrisDB
     }
 
     /**
-     * @throws Exception
+     * @throws DatabaseException
      * @param array|string $where
      * @param array $bindings
      * @return string
@@ -194,7 +223,7 @@ abstract class KrisDB
         {
             if (count($where) != count($bindings))
             {
-                throw new Exception('Count of where (' . count($where) . ') does not equal the count of bindings (' . count($bindings) . ')');
+                throw new DatabaseException('Count of where (' . count($where) . ') does not equal the count of bindings (' . count($bindings) . ')');
             }
             $whereString = '';
             foreach ($where as $whereName)
@@ -230,13 +259,13 @@ abstract class KrisDB
         if (strpos($key, '_') === false || $key[0] != strtolower($key[0]))
         {
             $key = strtolower(substr($key, 0, 1)).substr($key, 1);
-            return preg_replace_callback('/_?[A-Z]/', create_function('$matches', 'return \'_\'.strtolower($matches[0]);'), $key);
+            return preg_replace_callback('/_?[A-Z]/', function($matches) { return '_'.strtolower($matches[0]);}, $key);
         }
         return $key;
     }
 
     /**
-     * @throws Exception
+     * @throws DatabaseException
      * @param PDOStatement $stmt
      * @return void
      */
@@ -245,9 +274,11 @@ abstract class KrisDB
         if ($stmt->errorCode() > 0)
         {
             $info = $stmt->errorInfo();
-            throw new Exception('Invalid SQL error: ' . $info[0] . ' - ' . $info[1] . ' -- ' . $info[2]);
+            throw new DatabaseException('Invalid SQL error: ' . $info[0] . ' - ' . $info[1] . ' -- ' . $info[2]);
         }
     }
 
 
 }
+
+class DatabaseException extends Exception { }

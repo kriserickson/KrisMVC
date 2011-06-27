@@ -35,7 +35,7 @@ class KrisController
         $requestUri = $_SERVER['REQUEST_URI'];
         if (strpos($requestUri, $this->_webFolder) === 0)
         {
-            $requestUri = substr($requestUri, strlen($this->_webFolder));
+            $requestUri = substr($requestUri, strlen($this->_webFolder.'/'));
         }
         $this->_requestUriParts = $requestUri ? explode('/', $requestUri) : array();
         return $this;
