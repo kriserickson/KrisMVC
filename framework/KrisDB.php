@@ -18,7 +18,7 @@ abstract class KrisDB
 {
     protected $_dbh = null;
     protected $_recordSet = array(); // for holding all object property variables
-    protected $_compressArray = true;
+    protected $_initializedRecordSet = false;
 
 
     function get($key)
@@ -26,18 +26,19 @@ abstract class KrisDB
         return $this->_recordSet[$this->convertDBKeyToClassKey($key)];
     }
 
-    protected function clearRecordSet($records)
+    protected function initializeRecordSet($records)
     {
         foreach ($records as $key)
         {
             $this->_recordSet[$this->convertDBKeyToClassKey($key)] = '';
         }
+        $this->_initializedRecordSet = true;
     }
 
     function set($key, $val)
     {
         $key = $this->convertDBKeyToClassKey($key);
-        if (isset($this->_recordSet[$key]))
+        if (!$this->_initializedRecordSet || isset($this->_recordSet[$key]))
         {
             $this->_recordSet[$key] = $val;
         }
@@ -102,13 +103,12 @@ abstract class KrisDB
         foreach ($rs as $key => $val)
         {
             $key = $this->convertDBKeyToClassKey($key);
-            if (isset($bindTo->_recordSet[$key]))
+            if (!$this->_initializedRecordSet || isset($bindTo->_recordSet[$key]))
             {
-                $bindTo->_recordSet[$key] = is_scalar($this->_recordSet[$key]) ? $val : unserialize($this->_compressArray
-                            ? gzinflate($val) : $val);
+                $bindTo->_recordSet[$key] = $val;
             }
         }
-        return $this;
+        return $bindTo;
     }
 
     /**
@@ -233,6 +233,20 @@ abstract class KrisDB
             return preg_replace_callback('/_?[A-Z]/', create_function('$matches', 'return \'_\'.strtolower($matches[0]);'), $key);
         }
         return $key;
+    }
+
+    /**
+     * @throws Exception
+     * @param PDOStatement $stmt
+     * @return void
+     */
+    public function ValidateStatement($stmt)
+    {
+        if ($stmt->errorCode() > 0)
+        {
+            $info = $stmt->errorInfo();
+            throw new Exception('Invalid SQL error: ' . $info[0] . ' - ' . $info[1] . ' -- ' . $info[2]);
+        }
     }
 
 

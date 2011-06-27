@@ -70,6 +70,21 @@ abstract class KrisDBView extends KrisDB
      */
     public function retrieveMultiple($where, $bindings, $count = 0, $order = '', $distinct = false)
     {
+        return $this->returnMultiple($this->returnStatement($bindings, $where, $count, $order, $distinct));
+    }
+
+    /**
+     * @param array|string $where
+     * @param array $bindings
+     * @return KrisDBView
+     */
+    public function retrieveOne($where, $bindings)
+    {
+        return $this->bindRecordSet($this->returnStatement($bindings, $where, 1, '', false)->fetch(PDO::FETCH_ASSOC), $this);
+    }
+
+    protected function returnStatement($bindings, $where, $count, $order, $distinct)
+    {
         $dbh = $this->getDatabaseHandler();
 
         if (is_scalar($bindings))
@@ -83,8 +98,10 @@ abstract class KrisDBView extends KrisDB
 
         $stmt->execute($bindings);
 
-        return $this->returnMultiple($stmt);
+        $this->ValidateStatement($stmt);
+        return $stmt;
     }
+
 
     /**
      * @param string|array $where

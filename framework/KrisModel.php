@@ -19,11 +19,10 @@ abstract class KrisModel extends KrisDB
     protected $_primaryKeyName;
     protected $_tableName;
 
-    function __construct($primaryKeyName = '', $tableName = '', $compressArray = true)
+    function __construct($primaryKeyName = '', $tableName = '')
     {
         $this->_primaryKeyName = $primaryKeyName; //Name of auto-incremented Primary Key
         $this->_tableName = $tableName; //Corresponding table in database
-        $this->_compressArray = $compressArray;
     }
 
     /**
@@ -50,10 +49,13 @@ abstract class KrisModel extends KrisDB
         {
             if ($key != $this->_primaryKeyName || $value)
             {
-                $stmt->bindValue($i++, is_scalar($value) ? $value : ($this->_compressArray ? gzdeflate(serialize($value)) : serialize($value)));
+                $stmt->bindValue($i++, $value);
             }
         }
         $stmt->execute();
+
+        $this->ValidateStatement($stmt);
+
         if (!$stmt->rowCount())
         {
             return false;
@@ -74,16 +76,16 @@ abstract class KrisModel extends KrisDB
     }
 
 
-
     /**
      * @param array|string $where
      * @param array $bindings
      * @param int $count
+     * @param string $orderBy
      * @return bool|KrisModel
      */
-    public function retrieveMultiple($where, $bindings, $count = 0)
+    public function retrieveMultiple($where, $bindings, $count = 0, $orderBy = '')
     {
-        return $this->returnMultiple($this->generateStatement('*', $where, $bindings, $count));
+        return $this->returnMultiple($this->generateStatement('*', $where, $bindings, $count, $orderBy));
     }
 
 
@@ -105,10 +107,14 @@ abstract class KrisModel extends KrisDB
         $i = 1;
         foreach ($this->_recordSet as $value)
         {
-            $stmt->bindValue($i++, is_scalar($value) ? $value : ($this->_compressArray ? gzdeflate(serialize($value)) : serialize($value)));
+            $stmt->bindValue($i++, $value);
         }
         $stmt->bindValue($i, $this->_recordSet[$this->_primaryKeyName]);
-        return $stmt->execute();
+        $res = $stmt->execute();
+
+        $this->ValidateStatement($stmt);
+
+        return $res;
     }
 
     /**
@@ -121,7 +127,10 @@ abstract class KrisModel extends KrisDB
         $dbh = $this->getDatabaseHandler();
         $stmt = $dbh->prepare('DELETE FROM ' . $this->quoteDbObject($this->_tableName) . ' WHERE ' . $this->quoteDbObject($this->_primaryKeyName) . '=?');
         $stmt->bindValue(1, $this->_recordSet[$this->_primaryKeyName]);
-        return $stmt->execute();
+        $res = $stmt->execute();
+        $this->ValidateStatement($stmt);
+
+        return $res;
     }
 
     /**
@@ -187,6 +196,8 @@ abstract class KrisModel extends KrisDB
         $stmt = $dbh->prepare($this->addOrder($this->addLimit($sql, $count), $order));
 
         $stmt->execute($bindings);
+
+        $this->ValidateStatement($stmt);
 
         return $stmt;
     }
