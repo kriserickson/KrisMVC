@@ -1,13 +1,19 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Kris
- * Date: 6/25/11
- * Time: 6:52 PM
- * To change this template use File | Settings | File Templates.
+/*
+ * This file is part of the KrisMvc framework.
+ *
+ * (c) Kris Erickson
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
+
+//===============================================================
+// KrisDBView
+// Represents a view of the multiple tables in the database...
+//===============================================================
  
-abstract class KrisJoinedModel extends KrisDB
+abstract class KrisDBView extends KrisDB
 {
 
     protected $_tables;
@@ -24,7 +30,7 @@ abstract class KrisJoinedModel extends KrisDB
      * @param array $tables
      * @param array $joins
      * @param array $alias
-     * @return \KrisJoinedModel
+     * @return \KrisDBView
      *
      */
     function __construct($tables, $joins, $alias = array())

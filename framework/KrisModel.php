@@ -1,15 +1,18 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Kris
- * Date: 6/25/11
- * Time: 5:50 PM
- * To change this template use File | Settings | File Templates.
-
+/*
+ * This file is part of the KrisMvc framework.
+ *
+ * (c) Kris Erickson
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
-
- 
+//===============================================================
+// Model
+// Simplistic ORM that represents a table in the database...
+// TODO: Replace with something a little better
+//===============================================================
 abstract class KrisModel extends KrisDB
 {
 
