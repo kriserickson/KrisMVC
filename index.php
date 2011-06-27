@@ -14,7 +14,7 @@ require('config/KrisConfig.php');
 require('framework/KrisController.php');
 require('framework/KrisDB.php');
 require('framework/KrisModel.php');
-require('framework/KrisJoinedModel.php');
+require('framework/KrisDBView.php');
 require('framework/KrisView.php');
 
 
@@ -36,7 +36,7 @@ function __autoload($className)
     }   
     else
     {
-        require_once(KrisConfig::$APP_PATH . 'models/' . $className . '.php');
+        require_once(KrisConfig::APP_PATH . 'models/' . $className . '.php');
     }
     
 }
@@ -45,4 +45,4 @@ function __autoload($className)
 //===============================================
 // Start the controller
 //===============================================
-$controller = new KrisController(KrisConfig::$APP_PATH . 'controllers/', KrisConfig::$WEB_FOLDER, 'main', 'index');
+$controller = new KrisController(KrisConfig::APP_PATH . 'controllers/', KrisConfig::WEB_FOLDER, 'main', 'index');
