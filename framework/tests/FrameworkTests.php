@@ -9,8 +9,8 @@ require('../../framework/lib/KrisDBView.php');
 require('../../framework/lib/KrisView.php');
 
 
-require_once 'KrisDB/AllTests.php';
-require_once 'KrisView/AllTests.php';
+require 'KrisDB/AllTests.php';
+require 'KrisView/AllTests.php';
 
 class AllUnitTests extends PHPUnit_Framework_TestSuite
 {
