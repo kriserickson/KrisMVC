@@ -36,7 +36,14 @@ function __autoload($className)
     }   
     else
     {
-        require_once(KrisConfig::APP_PATH . 'models/' . $className . '.php');
+        if (substr($className, -5) == 'Model')
+        {
+            require(KrisConfig::APP_PATH . 'models/Generated' . $className . '.php');
+        }
+        else
+        {
+            require(KrisConfig::APP_PATH . 'models/' . $className . '.php');
+        }
     }
     
 }
