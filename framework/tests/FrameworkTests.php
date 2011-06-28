@@ -2,11 +2,11 @@
 
 require('../../config/KrisConfig.php');
 
-require('../../framework/KrisController.php');
-require('../../framework/KrisDB.php');
-require('../../framework/KrisModel.php');
-require('../../framework/KrisDBView.php');
-require('../../framework/KrisView.php');
+require('../../framework/lib/KrisController.php');
+require('../../framework/lib/KrisDB.php');
+require('../../framework/lib/KrisModel.php');
+require('../../framework/lib/KrisDBView.php');
+require('../../framework/lib/KrisView.php');
 
 
 require_once 'KrisDB/AllTests.php';
