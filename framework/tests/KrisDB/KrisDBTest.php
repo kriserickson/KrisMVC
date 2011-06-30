@@ -43,13 +43,16 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
      */
     function testQuoting()
     {
-        KrisConfig::$DATABASE_QUOTE_STYLE = KrisConfig::QUOTE_STYLE_MYSQL;
+        KrisConfig::$DATABASE_TYPE = KrisConfig::DB_TYPE_MYSQL;
         $this->assertEquals('`test`', $this->_krisDB->quoteDbObject('test'));
 
-        KrisConfig::$DATABASE_QUOTE_STYLE = KrisConfig::QUOTE_STYLE_MSSQL;
+        KrisConfig::$DATABASE_TYPE = KrisConfig::DB_TYPE_MSSQL;
         $this->assertEquals('[test]', $this->_krisDB->quoteDbObject('test'));
 
-        KrisConfig::$DATABASE_QUOTE_STYLE = KrisConfig::QUOTE_STYLE_ANSI;
+        KrisConfig::$DATABASE_TYPE = KrisConfig::DB_TYPE_SQLITE;
+        $this->assertEquals('"test"', $this->_krisDB->quoteDbObject('test'));
+
+        KrisConfig::$DATABASE_TYPE = KrisConfig::DB_TYPE_POSTGRESQL;
         $this->assertEquals('"test"', $this->_krisDB->quoteDbObject('test'));
 
 
@@ -115,7 +118,7 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
      */
     function testGenerateWhat()
     {
-        KrisConfig::$DATABASE_QUOTE_STYLE = KrisConfig::QUOTE_STYLE_MYSQL;
+        KrisConfig::$DATABASE_TYPE = KrisConfig::DB_TYPE_MYSQL;
 
         $sql = '`foo`, `bar`';
 
@@ -128,7 +131,7 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
      */
     function testGenerateWhere()
     {
-        KrisConfig::$DATABASE_QUOTE_STYLE = KrisConfig::QUOTE_STYLE_MYSQL;
+        KrisConfig::$DATABASE_TYPE = KrisConfig::DB_TYPE_MYSQL;
 
         $sql = '`foo` = ? AND `bar` = ?';
 

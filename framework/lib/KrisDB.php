@@ -116,11 +116,11 @@ abstract class KrisDB
      */
     protected function quoteDbObject($name)
     {
-        if (KrisConfig::$DATABASE_QUOTE_STYLE == KrisConfig::QUOTE_STYLE_MYSQL)
+        if (KrisConfig::$DATABASE_TYPE == KrisConfig::DB_TYPE_MYSQL)
         {
             return '`' . $name . '`';
         }
-        elseif (KrisConfig::$DATABASE_QUOTE_STYLE ==  KrisConfig::QUOTE_STYLE_MSSQL)
+        elseif (KrisConfig::$DATABASE_TYPE ==  KrisConfig::DB_TYPE_MSSQL)
         {
             return '[' . $name . ']';
         }

@@ -16,6 +16,8 @@ require __DIR__ . '/../lib/KrisDB.php';
 class KrisCG extends KrisDB
 {
 
+    const UNDERSCORE_PLACEHOLDER = '::';
+    
     public function GenerateModel($tableName)
     {
         $tableName = strtolower($tableName);
@@ -34,17 +36,19 @@ class KrisCG extends KrisDB
         }
 
         $className = $this->convertDBKeyToClassKey($tableName);
-        $safeClassName = $this->GenerateClassNameFromTableName($className);
 
         echo 'Generating class '.$className.PHP_EOL;
+        
+        $safeClassName = $this->GenerateClassNameFromTableName($className);
 
-        $filename = $className . '.php';
 
-        list($properties, $primaryKey, $initializeFields) = $this->GetPropertiesPrimaryKey($columnNames);
+        list($properties, $primaryKey, $initializeFields, $fakeFields) = $this->GetPropertiesPrimaryKey($columnNames, $foreignKeys);
 
         $foreignKeyString = $this->GetForeignKeyString($foreignKeys);
 
-        $this->GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields, $primaryKey,
+        $filename = $className . '.php';
+
+        $this->GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields, $fakeFields, $primaryKey,
             $generatedDir, $baseModelDir);
 
         // Don't overwrite a class that has changes....
@@ -70,11 +74,13 @@ class KrisCG extends KrisDB
         return $className;
     }
 
-    private function GetPropertiesPrimaryKey($columnNames)
+    private function GetPropertiesPrimaryKey($columnNames, $foreignKeys)
     {
         $properties = '';
         $primaryKey = '';
         $initializeFields = '';
+        $fakeFields = '';
+
         foreach ($columnNames as $columnName => $columnData)
         {
             $dbKey = $this->convertDBKeyToClassKey($columnName);
@@ -85,15 +91,28 @@ class KrisCG extends KrisDB
                 $primaryKey = $columnName;
             }
         }
+
+        foreach ($foreignKeys as $foreignKeyData)
+        {
+            $dbKey = str_replace(self::UNDERSCORE_PLACEHOLDER, '_', $this->convertDBKeyToClassKey($foreignKeyData['alias']));
+            $properties .= '* @property string $' . $dbKey . PHP_EOL;
+            $initializeFields .= (strlen($initializeFields) > 0 ? ', ' : '')."'$dbKey'";
+            $fakeFields .= (strlen($fakeFields) > 0 ? ', ' : '')."'$dbKey' => true";
+        }
+
         $initializeFields = '$this->initializeRecordSet(array('.$initializeFields.'));'.PHP_EOL;
-        return array($properties, $primaryKey, $initializeFields);
+        if (strlen($fakeFields) > 0)
+        {
+            $fakeFields = 'protected $_fakeFields = array('.$fakeFields.');';
+        }
+        return array($properties, $primaryKey, $initializeFields, $fakeFields);
     }
 
     private function GetForeignKeyString($foreignKeys)
     {
         if (count($foreignKeys) > 0)
         {
-            $foreignKeyString = 'public $_foreignKeys = array(';
+            $foreignKeyString = 'protected $_foreignKeys = array(';
             $first = true;
             foreach ($foreignKeys as $foreignKey => $foreignKeyProperties)
             {
@@ -101,7 +120,9 @@ class KrisCG extends KrisDB
                 {
                     $foreignKeyString .= ', ' . PHP_EOL . '       ';
                 }
-                $foreignKeyString .= "'$foreignKey' => array('table' => '" . $foreignKeyProperties['table'] . "', 'field' => '" . $foreignKeyProperties['field'] . "')";
+                $foreignKeyString .= "'$foreignKey' => array('table' => '" . $foreignKeyProperties['table'] . "', ".
+                    "'field' => '" . $foreignKeyProperties['field'] . "', 'display' => '".$foreignKeyProperties['display']."', ".
+                    "'alias' => '" . $foreignKeyProperties['alias'] . "')";
                 $first = false;
             }
             $foreignKeyString .= ');' . PHP_EOL;
@@ -111,7 +132,8 @@ class KrisCG extends KrisDB
     }
 
 
-    private function GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields, $primaryKey, $generatedDir, $baseModelDir)
+    private function GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields,
+        $fakeFields, $primaryKey, $generatedDir, $baseModelDir)
     {
         $output = <<<EOT
 <?php
@@ -122,9 +144,10 @@ class KrisCG extends KrisDB
 /**
 ${properties}
  */
-class ${className}Model extends KrisModel
+class ${className}Model extends KrisCrudModel
 {
     ${foreignKeyString}
+    ${fakeFields}
 
     function __construct()
     {
@@ -201,6 +224,9 @@ EOT;
         $this->ValidateStatement($stmt);
 
         $foreignKeys = array();
+
+        $usedColumnNames = array();
+
         if ($stmt->execute(array('FOREIGN KEY', KrisConfig::DB_DATABASE, $table)))
         {
             $this->ValidateStatement($stmt);
@@ -211,6 +237,31 @@ EOT;
             {
                 $foreignKeys[$foreign_key['COLUMN_NAME']] = array('table' => $foreign_key['REFERENCED_TABLE_NAME'],
                     'field' => $foreign_key['REFERENCED_COLUMN_NAME']);
+                $usedColumnNames[$foreign_key['COLUMN_NAME']] = true;
+            }
+        }
+
+
+
+        foreach ($foreignKeys as $column => $colData)
+        {
+            $referencedTableColumns = $this->GetColumnMetadata($colData['table']);
+            $alias = '';
+            $aliasCount = 1;
+            foreach ($referencedTableColumns as $columnName => $columnData)
+            {
+                $foreignKeys[$column]['display'] = $columnName;
+                while (isset($usedColumnNames[$columnName.$alias]))
+                {
+                    $alias = self::UNDERSCORE_PLACEHOLDER.$aliasCount++;
+                }
+                $foreignKeys[$column]['alias'] = $columnName.$alias;
+                $usedColumnNames[$columnName.$alias] = true;
+                if (!$columnData['primary'] && $columnData['type'] == 'string')
+                {
+                    break;
+                }
+
             }
         }
 
@@ -239,6 +290,7 @@ EOT;
 
         }
     }
+
 
 }
 
