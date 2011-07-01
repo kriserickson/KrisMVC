@@ -35,11 +35,12 @@ class KrisCrudModel extends KrisModel
      * @param array $bindings
      * @param int $count
      * @param string $orderBy
+     * @param int $offset
      * @return bool|KrisModel
      */
-    public function retrieveMultiple($where, $bindings, $count = 0, $orderBy = '')
+    public function retrieveMultiple($where, $bindings, $count = 0, $orderBy = '', $offset = 0)
     {
-        return $this->returnMultiple($this->generateStatement('*', $where, $bindings, $count, $orderBy));
+        return $this->returnMultiple($this->generateStatement($where, $bindings, $count, $orderBy, $offset));
     }
 
     /**
@@ -47,9 +48,10 @@ class KrisCrudModel extends KrisModel
      * @param array $bindings
      * @param int $count
      * @param array|string $order
+     * @param int $offset
      * @return PDOStatement
      */
-    private function generateStatement($where, $bindings, $count = 0, $order = '')
+    private function generateStatement($where, $bindings, $count = 0, $order = '', $offset = 0)
     {
         $dbh = $this->getDatabaseHandle();
         if (is_scalar($bindings))
@@ -57,7 +59,7 @@ class KrisCrudModel extends KrisModel
             $bindings = $bindings ? array($bindings) : array();
         }
 
-        $tableFields = $this->getTableFields();
+        $tableFields = $this->GetTableFields();
         for ($i = 0; $i < count($tableFields); $i++)
         {
             $tableFields[$i] = 't1.'.$this->convertClassKeyToDBKey($tableFields[$i]);
@@ -82,12 +84,12 @@ class KrisCrudModel extends KrisModel
 
         $sql =  $select.$from;
 
-        if ((is_array($where) && count($where) > 0) || strlen($where) > 0)
+        if ((is_array($where) && count($where) > 0) || (!is_array($where) && strlen($where) > 0))
         {
             $sql .= ' WHERE ' . $this->generateWhere($where, $bindings);
         }
 
-        $stmt = $dbh->prepare($this->addOrder($this->addLimit($sql, $count), $order));
+        $stmt = $dbh->prepare($this->addOrder($this->addLimit($sql, $count, $offset), $order));
 
         $stmt->execute($bindings);
 
@@ -100,7 +102,7 @@ class KrisCrudModel extends KrisModel
     /**
      * @return array
      */
-    private function getTableFields()
+    public function GetTableFields()
     {
         $fields = array();
         foreach (array_keys($this->_recordSet) as $field)
@@ -115,6 +117,58 @@ class KrisCrudModel extends KrisModel
     }
 
     /**
+     * Gets the display fields (TableId, Name, etc) rather than the database fields (table_id, name, etc)
+     *
+     * @return array
+     */
+    public function GetDisplayFields()
+    {
+        $fields = array();
+        foreach (array_keys($this->_recordSet) as $field)
+        {
+            if (!$this->isForeignKeyField($field))
+            {
+                $fields[] = $field;
+            }
+        }
+
+        return $fields;
+    }
+
+
+    /**
+     * Gets the database fields (table_id, name, etc) rather than display fields  (TableId, Name, etc)
+     *
+     * @return array
+     */
+    public function GetDatabaseFields()
+    {
+        $fields = array();
+        foreach (array_keys($this->_recordSet) as $field)
+        {
+            $fields[] = $this->convertClassKeyToDBKey($field);
+        }
+
+        return $fields;
+    }
+
+     /**
+     * Gets the display fields  (TableId, Name, etc) indexed by the database fields (table_id, name, etc)
+     *
+     * @return array
+     */
+    public function GetDisplayAndDatabaseFields()
+    {
+        $fields = array();
+        foreach (array_keys($this->_recordSet) as $field)
+        {
+            $fields[$field] = $this->convertClassKeyToDBKey($field);
+        }
+
+        return $fields;
+    }
+
+    /**
      * @param string $fieldName
      * @return bool
      */
@@ -122,4 +176,10 @@ class KrisCrudModel extends KrisModel
     {
         return is_array($this->_fakeFields) && isset($this->_fakeFields[$fieldName]);
     }
+
+    private function isForeignKeyField($fieldName)
+    {
+        return is_array($this->_foreignKeys) && isset($this->_foreignKeys[$fieldName]);
+    }
+
 }

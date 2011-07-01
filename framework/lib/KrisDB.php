@@ -304,6 +304,13 @@ abstract class KrisDB
         }
     }
 
+    /**
+     * @return array
+     */
+    public function GetAllFields()
+    {
+        return array_keys($this->_recordSet);
+    }
 
 }
 
