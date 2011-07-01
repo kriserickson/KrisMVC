@@ -108,7 +108,7 @@ class KrisController
             $this->request_not_found('Controller class ('.$controllerClass.') not found');
         }
 
-        $controller = new $controllerClass();
+        $controller = new $controllerClass($this->_action, $this->_params);
 
         if (!method_exists($controller, $function))
         {

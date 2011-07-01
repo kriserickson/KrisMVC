@@ -120,9 +120,7 @@ abstract class KrisDBView  extends KrisDB
             $sql .= ' WHERE ' . $this->generateWhere($where, $bindings);
         }
 
-        $sql = $this->addLimit($sql, $count);
-
-        return $this->addOrder($sql, $order);
+        return $this->addLimit($this->addOrder($sql, $order), $count);
 
     }
 

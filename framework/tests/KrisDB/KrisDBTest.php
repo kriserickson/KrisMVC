@@ -38,6 +38,19 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
             $this->_krisDB->convertClassKeyToDBKey($this->_krisDB->convertDBKeyToClassKey('record_id')));
     }
 
+     /**
+     * @test
+     */
+    function convertClassKeyToDisplayTest()
+    {
+        $this->assertEquals('Record Id', $this->_krisDB->convertClassKeyToDisplayField('RecordId'));
+        $this->assertEquals('Sub Category Id', $this->_krisDB->convertClassKeyToDisplayField('SubCategoryId'));
+        $this->assertEquals('Sub Category Id', $this->_krisDB->convertClassKeyToDisplayField('sub_category_id'));
+
+        $this->assertEquals($this->_krisDB->convertClassKeyToDisplayField('RecordId'),
+            $this->_krisDB->convertClassKeyToDisplayField($this->_krisDB->convertDBKeyToClassKey('record_id')));
+    }
+
     /**
      * @test
      */
@@ -245,6 +258,11 @@ class KrisDBExposeProtected extends KrisDB
         function convertClassKeyToDBKey($key)
         {
             return parent::convertClassKeyToDBKey($key);
+        }
+
+        function convertClassKeyToDisplayField($key)
+        {
+            return parent::convertClassKeyToDisplayField($key);
         }
 
 

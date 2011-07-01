@@ -25,6 +25,11 @@ abstract class KrisModel extends KrisDB
         $this->_tableName = $tableName; //Corresponding table in database
     }
 
+    function PrimaryKey()
+    {
+        return $this->get($this->_primaryKeyName);
+    }
+
     /**
      * Inserts record into database with a new auto-incremented primary key
      * If the primary key is empty, then the PK column should have been set to auto increment
@@ -87,6 +92,7 @@ abstract class KrisModel extends KrisDB
     {
         return $this->returnMultiple($this->generateStatement('*', $where, $bindings, $count, $orderBy));
     }
+
 
 
     /**
@@ -155,7 +161,12 @@ abstract class KrisModel extends KrisDB
 
     }
 
-
+    public function totalRecords($where = '', $bindings = '')
+    {
+        $res = $this->select('count('.$this->_primaryKeyName.') AS num_records', $where, $bindings);
+        $row = current($res);
+        return $row['num_records'];
+    }
 
     /**
      * Returns an array of what/where
@@ -193,7 +204,7 @@ abstract class KrisModel extends KrisDB
             $sql .= ' WHERE ' . $this->generateWhere($where, $bindings);
         }
 
-        $stmt = $dbh->prepare($this->addOrder($this->addLimit($sql, $count), $order));
+        $stmt = $dbh->prepare($this->addLimit($this->addOrder($sql, $order), $count));
 
         $stmt->execute($bindings);
 

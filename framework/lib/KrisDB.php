@@ -52,7 +52,9 @@ abstract class KrisDB
         $key = $this->convertDBKeyToClassKey($key);
         if (!$this->_initializedRecordSet || isset($this->_recordSet[$key]))
         {
-            $this->_recordSet[$key] = $val;
+            // If $val is null then isset will return false.  We don't want that cause get uses isset to determin
+            // whether the field is valid or not..
+            $this->_recordSet[$key] = is_null($val) ? '' : $val;
         }
         return $this;
     }
@@ -148,7 +150,9 @@ abstract class KrisDB
             $key = $this->convertDBKeyToClassKey($key);
             if (!$this->_initializedRecordSet || isset($bindTo->_recordSet[$key]))
             {
-                $bindTo->_recordSet[$key] = $val;
+                // If $val is null then isset will return false.  We don't want that cause get uses isset to determin
+                // whether the field is valid or not..
+                $bindTo->_recordSet[$key] = is_null($val) ? '' : $val;
             }
         }
         return $bindTo;
@@ -288,6 +292,15 @@ abstract class KrisDB
         return $key;
     }
 
+    protected function convertClassKeyToDisplayField($key)
+    {
+        if (strpos($key, '_') > 0 && $key[0] == strtolower($key[0]))
+        {
+            $key = $this->convertDBKeyToClassKey($key);
+        }
+        return $key[0].preg_replace('/[A-Z]/', ' $0',substr($key,1));
+    }
+
     /**
      * Validates
      *
@@ -300,7 +313,8 @@ abstract class KrisDB
         if ($stmt->errorCode() > 0)
         {
             $info = $stmt->errorInfo();
-            throw new DatabaseException('Invalid SQL error: ' . $info[0] . ' - ' . $info[1] . ' -- ' . $info[2]);
+            throw new DatabaseException('Invalid SQL ['.$stmt->queryString.']'.PHP_EOL.
+                        'Error: ' . $info[0] . ' - ' . $info[1] . ' -- ' . $info[2]);
         }
     }
 

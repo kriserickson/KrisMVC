@@ -63,13 +63,13 @@ class KrisDBViewTest extends PHPUnit_Framework_TestCase
         $stmtMock->expects($this->once())->method('errorCode')->will($this->returnValue(1));
         $stmtMock->expects($this->once())->method('errorInfo')->will($this->returnValue($info));
 
-
-
         $dbViewMock = $this->getMock('ClassCategoryTest', array('getDatabaseHandle'));
 
         $dbViewMock->expects($this->once())->method('getDatabaseHandle')->will($this->returnValue($PDOMock));
 
-        $this->setExpectedException('DatabaseException', 'Invalid SQL error: ' . $info[0] . ' - ' . $info[1] . ' -- ' . $info[2]);
+        // Can't seem to mock the queryString property of stmtMock...
+        $this->setExpectedException('DatabaseException', 'Invalid SQL ['.null.']'.PHP_EOL.'Error: ' .
+                $info[0] . ' - ' . $info[1] . ' -- ' . $info[2]);
 
         $dbViewMock->retrieveOne('', array(0));
         

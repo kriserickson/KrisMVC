@@ -10,8 +10,9 @@
  
 class KrisCrudModel extends KrisModel
 {
-    protected $_foreignKeys;
-    protected $_fakeFields;
+    protected $_foreignKeys = array();
+    protected $_fakeFields = array();
+    public $DisplayName;
 
     function __construct($primaryKeyName, $tableName)
     {
@@ -89,7 +90,7 @@ class KrisCrudModel extends KrisModel
             $sql .= ' WHERE ' . $this->generateWhere($where, $bindings);
         }
 
-        $stmt = $dbh->prepare($this->addOrder($this->addLimit($sql, $count, $offset), $order));
+        $stmt = $dbh->prepare($this->addLimit($this->addOrder($sql, $order), $count, $offset));
 
         $stmt->execute($bindings);
 
@@ -126,7 +127,7 @@ class KrisCrudModel extends KrisModel
         $fields = array();
         foreach (array_keys($this->_recordSet) as $field)
         {
-            if (!$this->isForeignKeyField($field))
+            if (!$this->isForeignKeyField($field) && $this->convertClassKeyToDBKey($field) != $this->_primaryKeyName)
             {
                 $fields[] = $field;
             }
@@ -160,9 +161,9 @@ class KrisCrudModel extends KrisModel
     public function GetDisplayAndDatabaseFields()
     {
         $fields = array();
-        foreach (array_keys($this->_recordSet) as $field)
+        foreach ($this->GetDisplayFields() as $field)
         {
-            $fields[$field] = $this->convertClassKeyToDBKey($field);
+            $fields[$this->convertClassKeyToDBKey($field)] = $this->convertClassKeyToDisplayField($field);
         }
 
         return $fields;
@@ -179,7 +180,7 @@ class KrisCrudModel extends KrisModel
 
     private function isForeignKeyField($fieldName)
     {
-        return is_array($this->_foreignKeys) && isset($this->_foreignKeys[$fieldName]);
+        return is_array($this->_foreignKeys) && isset($this->_foreignKeys[$this->convertClassKeyToDBKey($fieldName)]);
     }
 
 }
