@@ -5,7 +5,7 @@ class MockPDO
 
 }
 
-require(__DIR__.'/ClassModel.php');
+require(__DIR__.'/ClassModelTest.php');
 
 /**
  * Test class for KrisModel.
@@ -59,13 +59,13 @@ class KrisCrudModelTest extends PHPUnit_Framework_TestCase
             'description_id' => $descriptionId, 'offered' => $offered, 'multiple' => $multiple, 'drop_in_cost' => $dropInCost, 'description' => $description,
             'name' => $name, 'first_name' => $firstName, 'name_c1' => $name1)));
 
-        $crudMock = $this->getMock('ClassModel', array('getDatabaseHandle'));
+        $crudMock = $this->getMock('ClassModelTest', array('getDatabaseHandle'));
 
 
 
         $crudMock->expects($this->once())->method('getDatabaseHandle')->will($this->returnValue($PDOMock));
 
-        /** @var $crudMock ClassModel */
+        /** @var $crudMock ClassModelTest */
         $crudMock->retrieve($classId);
 
 

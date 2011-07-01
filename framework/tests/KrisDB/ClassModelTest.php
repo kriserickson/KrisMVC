@@ -2,7 +2,7 @@
 /**
  * Example generated CrudModel for testing
  *
- * Generated Code, do not edit, edit the file Class.php in app\models
+ * Generated Code, do not edit, edit the file ClassClass.php in app\models
  */
 
 /**
@@ -27,7 +27,7 @@
 * @property string $NameC1
 
  */
-class ClassModel extends KrisCrudModel
+class ClassModelTest extends KrisCrudModel
 {
     protected $_foreignKeys = array('description_id' => array('table' => 'class_description', 'field' => 'class_description_id', 'display' => 'description', 'alias' => 'description'), 
        'category_id' => array('table' => 'category', 'field' => 'category_id', 'display' => 'name', 'alias' => 'name'), 

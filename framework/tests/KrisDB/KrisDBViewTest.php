@@ -1,7 +1,7 @@
 <?php
 
 
-require(__DIR__.'/ClassCategory.php');
+require(__DIR__ . '/ClassCategoryTest.php');
 
 /**
  * Test class for KrisDBView.
@@ -34,7 +34,7 @@ class KrisDBViewTest extends PHPUnit_Framework_TestCase
         $stmtMock->expects($this->once())->method('fetch')->with(PDO::FETCH_ASSOC)->will($this->returnValue(array('category_id' => $category_id,
             'name' => $name, 'image' => $image, 'code' => $code, 'short_description' => $short_description)));
 
-        $dbViewMock = $this->getMock('ClassCategory', array('getDatabaseHandle'));
+        $dbViewMock = $this->getMock('ClassCategoryTest', array('getDatabaseHandle'));
 
 
 
@@ -65,7 +65,7 @@ class KrisDBViewTest extends PHPUnit_Framework_TestCase
 
 
 
-        $dbViewMock = $this->getMock('ClassCategory', array('getDatabaseHandle'));
+        $dbViewMock = $this->getMock('ClassCategoryTest', array('getDatabaseHandle'));
 
         $dbViewMock->expects($this->once())->method('getDatabaseHandle')->will($this->returnValue($PDOMock));
 

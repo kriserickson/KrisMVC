@@ -11,7 +11,7 @@
  * @property string Image
  * @property int Multiple
  */
-class StoreItem extends KrisModel
+class StoreItemTest extends KrisModel
 {
     public $StoreItems = array();
 

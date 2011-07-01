@@ -9,7 +9,7 @@
  * @property string $Code
  * @property string $ShortDescription
  */
-class ClassCategory extends KrisDBView
+class ClassCategoryTest extends KrisDBView
 {
     function __construct()
     {

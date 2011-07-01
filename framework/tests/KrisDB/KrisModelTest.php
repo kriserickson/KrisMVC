@@ -1,7 +1,7 @@
 <?php
 
 
-require(__DIR__.'/StoreItem.php');
+require(__DIR__ . '/StoreItemTest.php');
 
 /**
  * Test class for KrisModel.
@@ -38,7 +38,7 @@ class KrisModelTest extends PHPUnit_Framework_TestCase
             'store_id' => $store_id, 'name' => $name, 'description' => $description, 'price' => $price,
             'image' => $image, 'multiple' => $multiple)));
 
-        $modelMock = $this->getMock('StoreItem', array('getDatabaseHandle'));
+        $modelMock = $this->getMock('StoreItemTest', array('getDatabaseHandle'));
 
 
         $modelMock->expects($this->once())->method('getDatabaseHandle')->will($this->returnValue($PDOMock));
