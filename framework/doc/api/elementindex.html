@@ -198,11 +198,44 @@
 							<div class="index-item-description">Used to get a field from the Model/DBView</div>
 					</dd>
 			<dt class="field">
+						<span class="method-title">GetAllFields</span>
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="default/KrisDB.html#methodGetAllFields">KrisDB::GetAllFields()</a> in KrisDB.php</div>
+					</dd>
+			<dt class="field">
+						<span class="method-title">GetDatabaseFields</span>
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="default/KrisCrudModel.html#methodGetDatabaseFields">KrisCrudModel::GetDatabaseFields()</a> in KrisCrudModel.php</div>
+							<div class="index-item-description">Gets the database fields (table_id, name, etc) rather than display fields  (TableId, Name, etc)</div>
+					</dd>
+			<dt class="field">
 						<span class="method-title">getDatabaseHandle</span>
 					</dt>
 		<dd class="index-item-body">
 			<div class="index-item-details"><a href="default/KrisDB.html#methodgetDatabaseHandle">KrisDB::getDatabaseHandle()</a> in KrisDB.php</div>
 							<div class="index-item-description">Keeps a cache of the the databaseHandle..</div>
+					</dd>
+			<dt class="field">
+						<span class="method-title">GetDisplayAndDatabaseFields</span>
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="default/KrisCrudModel.html#methodGetDisplayAndDatabaseFields">KrisCrudModel::GetDisplayAndDatabaseFields()</a> in KrisCrudModel.php</div>
+							<div class="index-item-description">Gets the display fields  (TableId, Name, etc) indexed by the database fields (table_id, name, etc)</div>
+					</dd>
+			<dt class="field">
+						<span class="method-title">GetDisplayFields</span>
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="default/KrisCrudModel.html#methodGetDisplayFields">KrisCrudModel::GetDisplayFields()</a> in KrisCrudModel.php</div>
+							<div class="index-item-description">Gets the display fields (TableId, Name, etc) rather than the database fields (table_id, name, etc)</div>
+					</dd>
+			<dt class="field">
+						<span class="method-title">GetTableFields</span>
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="default/KrisCrudModel.html#methodGetTableFields">KrisCrudModel::GetTableFields()</a> in KrisCrudModel.php</div>
 					</dd>
 		</dl>
 	<a name="i"></a>
@@ -238,6 +271,18 @@
 					</dt>
 		<dd class="index-item-body">
 			<div class="index-item-details"><a href="default/_KrisController.php.html">KrisController.php</a> in KrisController.php</div>
+					</dd>
+			<dt class="field">
+						KrisCrudModel
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="default/KrisCrudModel.html">KrisCrudModel</a> in KrisCrudModel.php</div>
+					</dd>
+			<dt class="field">
+						<span class="include-title">KrisCrudModel.php</span>
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="default/_KrisCrudModel.php.html">KrisCrudModel.php</a> in KrisCrudModel.php</div>
 					</dd>
 			<dt class="field">
 						KrisDB
@@ -334,6 +379,13 @@
 						<span class="method-title">retrieve</span>
 					</dt>
 		<dd class="index-item-body">
+			<div class="index-item-details"><a href="default/KrisCrudModel.html#methodretrieve">KrisCrudModel::retrieve()</a> in KrisCrudModel.php</div>
+							<div class="index-item-description">Retrieves (hopefully) one record from the table based on the primary key...</div>
+					</dd>
+			<dt class="field">
+						<span class="method-title">retrieve</span>
+					</dt>
+		<dd class="index-item-body">
 			<div class="index-item-details"><a href="default/KrisModel.html#methodretrieve">KrisModel::retrieve()</a> in KrisModel.php</div>
 							<div class="index-item-description">Retrieves (hopefully) one record from the table based on the primary key...</div>
 					</dd>
@@ -341,13 +393,19 @@
 						<span class="method-title">retrieveMultiple</span>
 					</dt>
 		<dd class="index-item-body">
-			<div class="index-item-details"><a href="default/KrisModel.html#methodretrieveMultiple">KrisModel::retrieveMultiple()</a> in KrisModel.php</div>
+			<div class="index-item-details"><a href="default/KrisDBView.html#methodretrieveMultiple">KrisDBView::retrieveMultiple()</a> in KrisDBView.php</div>
 					</dd>
 			<dt class="field">
 						<span class="method-title">retrieveMultiple</span>
 					</dt>
 		<dd class="index-item-body">
-			<div class="index-item-details"><a href="default/KrisDBView.html#methodretrieveMultiple">KrisDBView::retrieveMultiple()</a> in KrisDBView.php</div>
+			<div class="index-item-details"><a href="default/KrisCrudModel.html#methodretrieveMultiple">KrisCrudModel::retrieveMultiple()</a> in KrisCrudModel.php</div>
+					</dd>
+			<dt class="field">
+						<span class="method-title">retrieveMultiple</span>
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="default/KrisModel.html#methodretrieveMultiple">KrisModel::retrieveMultiple()</a> in KrisModel.php</div>
 					</dd>
 			<dt class="field">
 						<span class="method-title">retrieveOne</span>
@@ -472,10 +530,22 @@
 			<div class="index-item-details"><a href="default/KrisDB.html#var$_dbh">KrisDB::$_dbh</a> in KrisDB.php</div>
 					</dd>
 			<dt class="field">
+						<span class="var-title">$_fakeFields</span>
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="default/KrisCrudModel.html#var$_fakeFields">KrisCrudModel::$_fakeFields</a> in KrisCrudModel.php</div>
+					</dd>
+			<dt class="field">
 						<span class="var-title">$_file</span>
 					</dt>
 		<dd class="index-item-body">
 			<div class="index-item-details"><a href="default/KrisView.html#var$_file">KrisView::$_file</a> in KrisView.php</div>
+					</dd>
+			<dt class="field">
+						<span class="var-title">$_foreignKeys</span>
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="default/KrisCrudModel.html#var$_foreignKeys">KrisCrudModel::$_foreignKeys</a> in KrisCrudModel.php</div>
 					</dd>
 			<dt class="field">
 						<span class="var-title">$_initializedRecordSet</span>
@@ -541,7 +611,13 @@
 						<span class="method-title">__construct</span>
 					</dt>
 		<dd class="index-item-body">
-			<div class="index-item-details"><a href="default/KrisModel.html#method__construct">KrisModel::__construct()</a> in KrisModel.php</div>
+			<div class="index-item-details"><a href="default/KrisCrudModel.html#method__construct">KrisCrudModel::__construct()</a> in KrisCrudModel.php</div>
+					</dd>
+			<dt class="field">
+						<span class="method-title">__construct</span>
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="default/KrisView.html#method__construct">KrisView::__construct()</a> in KrisView.php</div>
 					</dd>
 			<dt class="field">
 						<span class="method-title">__construct</span>
@@ -554,13 +630,13 @@
 						<span class="method-title">__construct</span>
 					</dt>
 		<dd class="index-item-body">
-			<div class="index-item-details"><a href="default/KrisController.html#method__construct">KrisController::__construct()</a> in KrisController.php</div>
+			<div class="index-item-details"><a href="default/KrisModel.html#method__construct">KrisModel::__construct()</a> in KrisModel.php</div>
 					</dd>
 			<dt class="field">
 						<span class="method-title">__construct</span>
 					</dt>
 		<dd class="index-item-body">
-			<div class="index-item-details"><a href="default/KrisView.html#method__construct">KrisView::__construct()</a> in KrisView.php</div>
+			<div class="index-item-details"><a href="default/KrisController.html#method__construct">KrisController::__construct()</a> in KrisController.php</div>
 					</dd>
 			<dt class="field">
 						<span class="method-title">__get</span>
