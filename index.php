@@ -38,7 +38,7 @@ function __autoload($className)
     {
         if (substr($className, -5) == 'Model')
         {
-            require(KrisConfig::APP_PATH . 'models/Generated' . $className . '.php');
+            require(KrisConfig::APP_PATH . 'models/Generated/' . $className . '.php');
         }
         else
         {
