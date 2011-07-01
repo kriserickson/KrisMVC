@@ -8,21 +8,25 @@ class KrisConfig
 
     // Change Database connections here... TODO: Load these from some config file
     const DB_HOST = 'localhost';
-    const DB_DATABASE = 'ammara';
-    const DB_USER = 'root';
-    const DB_PASSWORD = 'myssirk34';
+    const DB_DATABASE = '';
+    const DB_USER = '';
+    const DB_PASSWORD = '';
 
     // Quote style
-    public static $DATABASE_QUOTE_STYLE = KrisConfig::QUOTE_STYLE_MYSQL;
+    public static $DATABASE_TYPE = KrisConfig::DB_TYPE_MYSQL;
 
     const DATE_STR = 'l jS \of F Y';
 
     /**
      * Database quote style enumeration.
      */
-    const QUOTE_STYLE_MYSQL = 'MYSQL';
-    const QUOTE_STYLE_MSSQL = 'MSSQL';
-    const QUOTE_STYLE_ANSI = 'ANSI';
+    const DB_TYPE_MYSQL = 'MYSQL';
+
+    // Currently only MySql has been tested...
+    const DB_TYPE_MSSQL = 'MSSQL';
+    const DB_TYPE_SQLITE = 'SQLITE';
+    const DB_TYPE_POSTGRESQL = 'POSTGRESQL';
+
 
 
 
