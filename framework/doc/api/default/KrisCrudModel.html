@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos -->
+			<title>Docs For Class KrisCrudModel</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+			<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+		</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name">Class KrisCrudModel</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+		<p class="notes">
+			Located in <a class="field" href="_KrisCrudModel.php.html">/KrisCrudModel.php</a> (line <span class="field">11</span>)
+		</p>
+		
+				
+		<pre><a href="../default/KrisDB.html">KrisDB</a>
+   |
+   --<a href="../default/KrisModel.html">KrisModel</a>
+      |
+      --KrisCrudModel</pre>
+	
+			</div>
+</div>
+
+
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_fakeFields" title="details" class="var-name">$_fakeFields</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_foreignKeys" title="details" class="var-name">$_foreignKeys</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+																		<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																												
+												<div class="method-definition">
+											<span class="method-result">KrisCrudModel</span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$primaryKeyName</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$tableName</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">array</span>
+										<a href="#GetDatabaseFields" title="details" class="method-name">GetDatabaseFields</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">array</span>
+										<a href="#GetDisplayAndDatabaseFields" title="details" class="method-name">GetDisplayAndDatabaseFields</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">array</span>
+										<a href="#GetDisplayFields" title="details" class="method-name">GetDisplayFields</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">array</span>
+										<a href="#GetTableFields" title="details" class="method-name">GetTableFields</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">bool|<a href="../default/KrisDB.html">KrisDB</a></span>
+										<a href="#retrieve" title="details" class="method-name">retrieve</a>
+											(<span class="var-type">$primaryKeyValue</span>&nbsp;<span class="var-name">$primaryKeyValue</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">bool|<a href="../default/KrisModel.html">KrisModel</a></span>
+										<a href="#retrieveMultiple" title="details" class="method-name">retrieveMultiple</a>
+											(<span class="var-type">array</span>&nbsp;<span class="var-name">$where</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$bindings</span>, [<span class="var-type">int</span>&nbsp;<span class="var-name">$count</span> = <span class="var-default">0</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$orderBy</span> = <span class="var-default">''</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$offset</span> = <span class="var-default">0</span>])
+									</div>
+								</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$_fakeFields" id="$_fakeFields"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_fakeFields</span>
+						(line <span class="line-number">14</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_foreignKeys" id="$_foreignKeys"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_foreignKeys</span>
+						(line <span class="line-number">13</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+							<h4>Inherited Variables</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../default/KrisModel.html">KrisModel</a></span></p>
+					<blockquote>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/KrisModel.html#var$_primaryKeyName">KrisModel::$_primaryKeyName</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/KrisModel.html#var$_tableName">KrisModel::$_tableName</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../default/KrisDB.html">KrisDB</a></span></p>
+					<blockquote>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/KrisDB.html#var$_dbh">KrisDB::$_dbh</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/KrisDB.html#var$_initializedRecordSet">KrisDB::$_initializedRecordSet</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/KrisDB.html#var$_recordSet">KrisDB::$_recordSet</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">16</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	<div class="method-signature">
+		<span class="method-result">KrisCrudModel</span>
+		<span class="method-name">
+			__construct
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$primaryKeyName</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$tableName</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$primaryKeyName</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$tableName</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../default/KrisModel.html#method__construct">KrisModel::__construct()</a></dt>
+					</dl>
+			
+	</div>
+<a name="methodGetDatabaseFields" id="GetDatabaseFields"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">GetDatabaseFields</span> (line <span class="line-number">144</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets the database fields (table_id, name, etc) rather than display fields  (TableId, Name, etc)</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			GetDatabaseFields
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodGetDisplayAndDatabaseFields" id="GetDisplayAndDatabaseFields"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">GetDisplayAndDatabaseFields</span> (line <span class="line-number">160</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets the display fields  (TableId, Name, etc) indexed by the database fields (table_id, name, etc)</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			GetDisplayAndDatabaseFields
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodGetDisplayFields" id="GetDisplayFields"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">GetDisplayFields</span> (line <span class="line-number">124</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Gets the display fields (TableId, Name, etc) rather than the database fields (table_id, name, etc)</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			GetDisplayFields
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodGetTableFields" id="GetTableFields"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">GetTableFields</span> (line <span class="line-number">105</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			GetTableFields
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodretrieve" id="retrieve"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">retrieve</span> (line <span class="line-number">27</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieves (hopefully) one record from the table based on the primary key...</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">bool|<a href="../default/KrisDB.html">KrisDB</a></span>
+		<span class="method-name">
+			retrieve
+		</span>
+					(<span class="var-type">$primaryKeyValue</span>&nbsp;<span class="var-name">$primaryKeyValue</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">$primaryKeyValue</span>
+				<span class="var-name">$primaryKeyValue</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../default/KrisModel.html#methodretrieve">KrisModel::retrieve()</a></dt>
+						<dd>Retrieves (hopefully) one record from the table based on the primary key...</dd>
+					</dl>
+			
+	</div>
+<a name="methodretrieveMultiple" id="retrieveMultiple"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">retrieveMultiple</span> (line <span class="line-number">41</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">bool|<a href="../default/KrisModel.html">KrisModel</a></span>
+		<span class="method-name">
+			retrieveMultiple
+		</span>
+					(<span class="var-type">array</span>&nbsp;<span class="var-name">$where</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$bindings</span>, [<span class="var-type">int</span>&nbsp;<span class="var-name">$count</span> = <span class="var-default">0</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$orderBy</span> = <span class="var-default">''</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$offset</span> = <span class="var-default">0</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$where</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$bindings</span>			</li>
+					<li>
+				<span class="var-type">int</span>
+				<span class="var-name">$count</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$orderBy</span>			</li>
+					<li>
+				<span class="var-type">int</span>
+				<span class="var-name">$offset</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../default/KrisModel.html#methodretrieveMultiple">KrisModel::retrieveMultiple()</a></dt>
+					</dl>
+			
+	</div>
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../default/KrisModel.html">KrisModel</a></span></p>
+					<blockquote>
+													<span class="method-name"><a href="../default/KrisModel.html#method__construct">KrisModel::__construct()</a></span><br>
+													<span class="method-name"><a href="../default/KrisModel.html#methodcreate">KrisModel::create()</a></span><br>
+													<span class="method-name"><a href="../default/KrisModel.html#methoddelete">KrisModel::delete()</a></span><br>
+													<span class="method-name"><a href="../default/KrisModel.html#methodexists">KrisModel::exists()</a></span><br>
+													<span class="method-name"><a href="../default/KrisModel.html#methodretrieve">KrisModel::retrieve()</a></span><br>
+													<span class="method-name"><a href="../default/KrisModel.html#methodretrieveMultiple">KrisModel::retrieveMultiple()</a></span><br>
+													<span class="method-name"><a href="../default/KrisModel.html#methodselect">KrisModel::select()</a></span><br>
+													<span class="method-name"><a href="../default/KrisModel.html#methodupdate">KrisModel::update()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../default/KrisDB.html">KrisDB</a></span></p>
+					<blockquote>
+													<span class="method-name"><a href="../default/KrisDB.html#methodaddLimit">KrisDB::addLimit()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodaddOrder">KrisDB::addOrder()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodbindRecordSet">KrisDB::bindRecordSet()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodconvertClassKeyToDBKey">KrisDB::convertClassKeyToDBKey()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodconvertDBKeyToClassKey">KrisDB::convertDBKeyToClassKey()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodgenerateWhat">KrisDB::generateWhat()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodgenerateWhere">KrisDB::generateWhere()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodget">KrisDB::get()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodGetAllFields">KrisDB::GetAllFields()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodgetDatabaseHandle">KrisDB::getDatabaseHandle()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodinitializeRecordSet">KrisDB::initializeRecordSet()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodquoteDbObject">KrisDB::quoteDbObject()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodreturnMultiple">KrisDB::returnMultiple()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodset">KrisDB::set()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#methodValidateStatement">KrisDB::ValidateStatement()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#method__get">KrisDB::__get()</a></span><br>
+													<span class="method-name"><a href="../default/KrisDB.html#method__set">KrisDB::__set()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+
+	<p class="notes" id="credit">
+		Documentation generated on Fri, 01 Jul 2011 16:00:21 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>
