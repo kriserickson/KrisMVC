@@ -5,6 +5,7 @@ require('../../config/KrisConfig.php');
 require('../../framework/lib/KrisController.php');
 require('../../framework/lib/KrisDB.php');
 require('../../framework/lib/KrisModel.php');
+require('../../framework/lib/KrisCrudModel.php');
 require('../../framework/lib/KrisDBView.php');
 require('../../framework/lib/KrisView.php');
 

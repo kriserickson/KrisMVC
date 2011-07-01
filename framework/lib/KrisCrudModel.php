@@ -10,28 +10,15 @@
  
 class KrisCrudModel extends KrisModel
 {
-    
+    protected $_foreignKeys;
+    protected $_fakeFields;
 
-    /**
-     * Used by the model to set variables, they can be stored later with Insert/Update.
-     *
-     * @param string $key
-     * @param string $val
-     * @return KrisDB
-     */
-    public function set($key, $val)
+    function __construct($primaryKeyName, $tableName)
     {
-        $fixedKey = $this->convertDBKeyToClassKey($key);
-        if (!isset($this->_recordSet[$fixedKey]) || $this->isFakeField($fixedKey))
-        {
-            throw new DatabaseException('Invalid key: '.$key);
-        }
-
-        $this->_recordSet[$fixedKey] = $val;
-        return $this;
+        parent::__construct($primaryKeyName, $tableName);
     }
 
-        /**
+    /**
      * Retrieves (hopefully) one record from the table based on the primary key...
      *
      * @param $primaryKeyValue
@@ -40,6 +27,19 @@ class KrisCrudModel extends KrisModel
     public function retrieve($primaryKeyValue)
     {
         return $this->bindRecordSet($this->generateStatement(array($this->_primaryKeyName), array($primaryKeyValue))->fetch(PDO::FETCH_ASSOC), $this);
+    }
+
+
+    /**
+     * @param array $where
+     * @param array $bindings
+     * @param int $count
+     * @param string $orderBy
+     * @return bool|KrisModel
+     */
+    public function retrieveMultiple($where, $bindings, $count = 0, $orderBy = '')
+    {
+        return $this->returnMultiple($this->generateStatement('*', $where, $bindings, $count, $orderBy));
     }
 
     /**
@@ -60,15 +60,27 @@ class KrisCrudModel extends KrisModel
         $tableFields = $this->getTableFields();
         for ($i = 0; $i < count($tableFields); $i++)
         {
-            $tableFields[$i] = 't1.'.$tableFields[$i];
+            $tableFields[$i] = 't1.'.$this->convertClassKeyToDBKey($tableFields[$i]);
         }
 
-        $sql = 'SELECT '.(implode(',', $tableFields)).' FROM ' . $this->_tableName.' t1';
+        $select = 'SELECT '.(implode(',', $tableFields));
+        $from = ' FROM ' . $this->_tableName.' t1';
 
-        foreach ($this->$_foreignKeys as $columnName => $foreignFieldData)
+        $tableIndex = 2;
+
+        foreach ($this->_foreignKeys as $columnName => $foreignFieldData)
         {
-            /// array('description_id' => array('table' => 'class_description', 'field' => 'class_description_id', 'display' => 'description', 'alias' => 'description'),)
+            if (!isset($tableAliases[$foreignFieldData['table']]))
+            {
+                $tableAlias = $tableAliases[$foreignFieldData['table']] = 't'.$tableIndex++;
+                $from .= ' INNER JOIN '.$foreignFieldData['table'].' '.$tableAlias.' ON (t1.'.$columnName.' = '.$tableAlias.'.'.$foreignFieldData['field'].') ';
+                        
+
+            }
+            $select .= ', '.$tableAliases[$foreignFieldData['table']].'.'.$foreignFieldData['display'].' AS '.$foreignFieldData['alias'];
         }
+
+        $sql =  $select.$from;
 
         if ((is_array($where) && count($where) > 0) || strlen($where) > 0)
         {
@@ -86,17 +98,8 @@ class KrisCrudModel extends KrisModel
 
 
     /**
-     * @param array $where
-     * @param array $bindings
-     * @param int $count
-     * @param string $orderBy
-     * @return bool|KrisModel
+     * @return array
      */
-    public function retrieveMultiple($where, $bindings, $count = 0, $orderBy = '')
-    {
-        return $this->returnMultiple($this->generateStatement('*', $where, $bindings, $count, $orderBy));
-    }
-
     private function getTableFields()
     {
         $fields = array();
@@ -111,8 +114,12 @@ class KrisCrudModel extends KrisModel
         return $fields;
     }
 
+    /**
+     * @param string $fieldName
+     * @return bool
+     */
     private function isFakeField($fieldName)
     {
-        return isset($this->_fakeFields) && isset($this->_fakeFields[$fieldName]);
+        return is_array($this->_fakeFields) && isset($this->_fakeFields[$fieldName]);
     }
 }

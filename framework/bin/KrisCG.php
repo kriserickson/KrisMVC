@@ -16,14 +16,14 @@ require __DIR__ . '/../lib/KrisDB.php';
 class KrisCG extends KrisDB
 {
 
-    const UNDERSCORE_PLACEHOLDER = '::';
+    const UNDERSCORE_PLACEHOLDER = '+=+';
     
     public function GenerateModel($tableName)
     {
         $tableName = strtolower($tableName);
         $columnNames = $this->GetColumnMetadata($tableName);
 
-        $foreignKeys = $this->GetForeignKeys($tableName);
+        $foreignKeys = $this->GetForeignKeys($tableName, array_keys($columnNames));
 
         $appPath = str_replace('/', DIRECTORY_SEPARATOR, KrisConfig::APP_PATH);
         $baseModelDir = $appPath . 'models';
@@ -94,7 +94,7 @@ class KrisCG extends KrisDB
 
         foreach ($foreignKeys as $foreignKeyData)
         {
-            $dbKey = str_replace(self::UNDERSCORE_PLACEHOLDER, '_', $this->convertDBKeyToClassKey($foreignKeyData['alias']));
+            $dbKey = $this->convertDBKeyToClassKey($foreignKeyData['alias']);
             $properties .= '* @property string $' . $dbKey . PHP_EOL;
             $initializeFields .= (strlen($initializeFields) > 0 ? ', ' : '')."'$dbKey'";
             $fakeFields .= (strlen($fakeFields) > 0 ? ', ' : '')."'$dbKey' => true";
@@ -212,7 +212,7 @@ EOT;
 
     }
 
-    private function GetForeignKeys($table)
+    private function GetForeignKeys($table, $usedColumnNames)
     {
         $dbh = $this->getDatabaseHandle();
 
@@ -225,8 +225,6 @@ EOT;
 
         $foreignKeys = array();
 
-        $usedColumnNames = array();
-
         if ($stmt->execute(array('FOREIGN KEY', KrisConfig::DB_DATABASE, $table)))
         {
             $this->ValidateStatement($stmt);
@@ -237,7 +235,7 @@ EOT;
             {
                 $foreignKeys[$foreign_key['COLUMN_NAME']] = array('table' => $foreign_key['REFERENCED_TABLE_NAME'],
                     'field' => $foreign_key['REFERENCED_COLUMN_NAME']);
-                $usedColumnNames[$foreign_key['COLUMN_NAME']] = true;
+
             }
         }
 
@@ -253,12 +251,12 @@ EOT;
                 $foreignKeys[$column]['display'] = $columnName;
                 while (isset($usedColumnNames[$columnName.$alias]))
                 {
-                    $alias = self::UNDERSCORE_PLACEHOLDER.$aliasCount++;
+                    $alias = '_c'.$aliasCount++;
                 }
                 $foreignKeys[$column]['alias'] = $columnName.$alias;
-                $usedColumnNames[$columnName.$alias] = true;
                 if (!$columnData['primary'] && $columnData['type'] == 'string')
                 {
+                    $usedColumnNames[$columnName.$alias] = true;
                     break;
                 }
 
