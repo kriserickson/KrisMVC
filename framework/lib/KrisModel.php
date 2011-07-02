@@ -190,7 +190,7 @@ abstract class KrisModel extends KrisDB
      * @param array|string $order
      * @return PDOStatement
      */
-    private function generateStatement($what, $where, $bindings, $count = 0, $order = '')
+    private function generateStatement($what, $where, $bindings, $count = 0, $offset = 0, $order = '', $orderAscending = true)
     {
         $dbh = $this->getDatabaseHandle();
         if (is_scalar($bindings))
@@ -204,7 +204,7 @@ abstract class KrisModel extends KrisDB
             $sql .= ' WHERE ' . $this->generateWhere($where, $bindings);
         }
 
-        $stmt = $dbh->prepare($this->addLimit($this->addOrder($sql, $order), $count));
+        $stmt = $dbh->prepare($this->addLimit($this->addOrder($sql, $order, $orderAscending), $count, $offset));
 
         $stmt->execute($bindings);
 

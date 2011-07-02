@@ -202,17 +202,26 @@ abstract class KrisDB
      *
      * @param string $sql
      * @param string|array $order
+     * @param bool $orderAscending
      * @return string
      */
-    protected function addOrder($sql, $order)
+    protected function addOrder($sql, $order, $orderAscending = true)
     {
         if ((is_array($order) && count($order) > 0) || strlen($order) > 0)
         {
             if (is_array($order))
             {
-                $order = implode(',' , $order);
+                $orderBy = '';
+                foreach ($order as $orderKey)
+                {
+                    $orderBy .= (strlen($orderBy) > 0 ? ', ' : '').$this->convertClassKeyToDBKey($orderKey);
+                }
             }
-            return $sql.' ORDER BY '.$order;
+            else
+            {
+                $orderBy = $this->convertClassKeyToDBKey($order);
+            }
+            $sql .= ' ORDER BY '.$orderBy.' '.($orderAscending ? 'ASC' : 'DESC');
         }
         return $sql;
     }

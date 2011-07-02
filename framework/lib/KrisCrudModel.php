@@ -35,24 +35,26 @@ class KrisCrudModel extends KrisModel
      * @param array $where
      * @param array $bindings
      * @param int $count
-     * @param string $orderBy
      * @param int $offset
+     * @param string $orderBy
+     * @param bool $orderAscending
      * @return bool|KrisModel
      */
-    public function retrieveMultiple($where, $bindings, $count = 0, $orderBy = '', $offset = 0)
+    public function retrieveMultiple($where, $bindings, $count = 0, $offset = 0, $orderBy = '', $orderAscending = true)
     {
-        return $this->returnMultiple($this->generateStatement($where, $bindings, $count, $orderBy, $offset));
+        return $this->returnMultiple($this->generateStatement($where, $bindings, $count, $offset, $orderBy, $orderAscending));
     }
 
     /**
      * @param string|array $where
      * @param array $bindings
      * @param int $count
-     * @param array|string $order
      * @param int $offset
+     * @param array|string $order
+     * @param $orderAscending
      * @return PDOStatement
      */
-    private function generateStatement($where, $bindings, $count = 0, $order = '', $offset = 0)
+    private function generateStatement($where, $bindings, $count = 0, $offset = 0, $order = '', $orderAscending)
     {
         $dbh = $this->getDatabaseHandle();
         if (is_scalar($bindings))
@@ -90,7 +92,7 @@ class KrisCrudModel extends KrisModel
             $sql .= ' WHERE ' . $this->generateWhere($where, $bindings);
         }
 
-        $stmt = $dbh->prepare($this->addLimit($this->addOrder($sql, $order), $count, $offset));
+        $stmt = $dbh->prepare($this->addLimit($this->addOrder($sql, $order, $orderAscending), $count, $offset));
 
         $stmt->execute($bindings);
 

@@ -66,7 +66,12 @@ class KrisController
         }
         if (isset($p[2]))
         {
-            $this->_params = array_slice($p, 2);
+            $this->_params = array();
+            foreach( array_slice($p, 2) as $array_item)
+            {
+                $this->_params[] = urldecode($array_item);
+            }
+
         }
         return $this;
     }
