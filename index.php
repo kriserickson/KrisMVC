@@ -30,14 +30,19 @@ function __autoload($className)
     }   
     else
     {
-        if (substr($className, -5) == 'Model')
+        $path = '';
+        if (strtolower(substr($className, -5)) == 'model')
         {
-            require(KrisConfig::APP_PATH . 'models/generated/' . $className . '.php');
+            $path = 'generated/';
         }
-        else
+        else if (strtolower(substr($className, -4)) == 'view')
         {
-            require(KrisConfig::APP_PATH . 'models/' . $className . '.php');
+            $path = 'crud/';
         }
+
+
+        require(KrisConfig::APP_PATH . 'models/'. $path . $className . '.php');
+
     }
     
 }

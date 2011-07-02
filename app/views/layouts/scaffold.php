@@ -3,7 +3,10 @@
 
 // Variables passed into the view...
 
+/** @var $tables array */
 /** @var $display_name string */
+/** @var $display_table bool */
+/** @var $display_base_href string */
 /** @var $display_href string */
 /** @var $change_href string */
 /** @var $delete_href string */
@@ -27,6 +30,14 @@
     <link href="<?= KrisConfig::WEB_FOLDER ?>/css/scaffold.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
+
+<table width="100%">
+    <tr>
+        <?php foreach ($tables as $link => $name): ?>
+        <td><a href="<?= $display_base_href.$link ?>"><?= $name ?></a></td>
+        <?php endforeach; ?>
+    </tr>
+</table>
 
 <h3><?= $display_name ?></h3>
 
