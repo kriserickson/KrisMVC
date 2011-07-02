@@ -3,17 +3,19 @@
 
 // Variables passed into the view...
 
-/** @var $displayName string */
-/** @var $displayHref string */
-/** @var $changeHref string */
-/** @var $deleteHref string */
-/** @var $viewHref string */
+/** @var $display_name string */
+/** @var $display_href string */
+/** @var $change_href string */
+/** @var $delete_href string */
+/** @var $view_href string */
 /** @var $columns array */
 /** @var $sorted array */
 /** @var $models array */
 /** @var $current_page int */
+/** @var $sort_ascending bool */
 /** @var $number_of_pages int */
 /** @var $total_records int */
+/** @var $search bool|array */
 
 // Types used in the view...
 /** @var $model KrisCrudModel */
@@ -21,49 +23,59 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title><?= $displayName ?></title>
+    <title><?= $display_name ?></title>
     <link href="<?= KrisConfig::WEB_FOLDER ?>/css/scaffold.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 
-<h3><?= $displayName ?></h3>
+<h3><?= $display_name ?></h3>
 
-<form method="post" action="<?= $displayHref ?>">
+<?php if ($display_table): ?>
+
+<form id="displayForm" method="post" action="<?= $display_href ?>">
     <input type="hidden" name="current_page" value="<?= $current_page; ?>"/>
-    <table class="pme-main" summary="<?= $displayName ?>">
+    <table class="pme-main" summary="<?= $display_name ?>">
         <tr class="pme-header">
-            <th class="pme-header" colspan="1"><input type="submit" class="pme-search" name="search" value="Search"/>
+            <th class="pme-header" colspan="1">
+                <?php if (!$search): ?>
+                    <input type="submit" name="search" value="Search"/>
+                <?php else: ?>
+                    <input type="submit" name="hide" value="Hide"/>
+                <?php endif; ?>
             </th>
 
-            <?php foreach ($columns as $columnName): ?>
-            <th class="pme-header"><a class="pme-header"
-                                      href="<?= $displayHref ?>/<?= $columnName ?>"><?= $columnName?></a></th>
+            <?php foreach ($columns as $columnId => $columnName): ?>
+            <th class="pme-header"><a href="<?= $display_href ?>/<?= $columnId ?>/<?= $sort_ascending ? 'dec' : 'asc' ?>"><?= $columnName?></a></th>
             <?php endforeach; ?>
         </tr>
 
-        <?php foreach ($sorted as $sortInfo): ?>
-        <tr class="pme-sortinfo">
-            <td class="pme-sortinfo" colspan="1"><a class="pme-sortinfo"
-                                                    href="<?= $displayHref ?>/clear/sort/<?= $sortInfo['id'] ?>">Clear</a>
+        <?php if ($search): ?>
+        <tr class="pme-filter">
+            <td class="pme-filter" colspan="1">
+                <input type="submit" class="pme-query" name="query" value="Query"/></td>
+            <?php foreach (array_keys($columns) as $columnId): ?>
+            <td class="pme-filter">
+                <label for="search_<?= $columnId; ?>"></label>
+                <input class="pme-filter" value="<?= isset($search[$columnId]) ? $search[$columnId] : '' ?>" type="text" id="search_<?= $columnId; ?>" name="search_<?= $columnId; ?>" size="12" maxlength="45" />
             </td>
-            <td class="pme-sortinfo" colspan="<?= count($columns) ?>">Sorted
-                By: <?= $sortInfo['name'] ?> <?= $sortInfo['ascending'] ? 'Ascending' : 'Descending' ?></td>
-        </tr>
-        <?php endforeach; ?>
+            <?php endforeach; ?>
 
+
+        </tr>
+        <?php endif; ?>
 
         <?php foreach ($models as $model): ?>
         <tr class="pme-row-0">
             <td class="pme-navigation-0">
-                <a class="pme-navigation-0" href="<?= $viewHref ?>/<?= $model->PrimaryKey() ?>"><img
+                <a class="pme-navigation-0" href="<?= $view_href ?>/<?= $model->PrimaryKey() ?>"><img
                         class="pme-navigation-0" src="<?= KrisConfig::WEB_FOLDER ?>/images/scaffold/pme-view.png"
                         height="16" width="16" border="0" alt="View"
                         title="View"/></a>&nbsp;
-                <a class="pme-navigation-0" href="<?= $changeHref ?>/<?= $model->PrimaryKey() ?>"><img
+                <a class="pme-navigation-0" href="<?= $change_href ?>/<?= $model->PrimaryKey() ?>"><img
                         class="pme-navigation-0" src="<?= KrisConfig::WEB_FOLDER ?>/images/scaffold/pme-change.png"
                         height="16" width="16" border="0" alt="Change"
                         title="Change"/></a>&nbsp;
-                <a class="pme-navigation-0" href="<?= $deleteHref ?>/<?= $model->PrimaryKey() ?>"><img
+                <a class="pme-navigation-0" href="<?= $delete_href ?>/<?= $model->PrimaryKey() ?>"><img
                         class="pme-navigation-0" src="<?= KrisConfig::WEB_FOLDER ?>/images/scaffold/pme-delete.png"
                         height="16" width="16" border="0" alt="Delete"
                         title="Delete"/></a>
@@ -78,24 +90,42 @@
     <table summary="navigation" class="pme-navigation">
         <tr class="pme-navigation">
             <td class="pme-buttons">
-                <input type="submit" name="first_page" value="<<" <?= $current_page == 0 ? 'disabled="disabled"' : '' ?>/>
+                <input type="submit" name="first_page" value="<<" <?= $current_page == 0 ? 'disabled="disabled"'
+                        : '' ?>/>
                 <input type="submit" name="prev_page" value="<" <?= $current_page == 0 ? 'disabled="disabled"' : '' ?>/>
                 <input type="submit" name="add" value="Add"/>
-                <input type="submit" name="next_page" value=">" <?= $current_page >= $number_of_pages - 1 ? 'disabled="disabled"' : '' ?>/>
-                <input type="submit" name="last_page" value=">>"<?= $current_page >= $number_of_pages - 1 ? 'disabled="disabled"' : '' ?>/>
+                <input type="submit" name="next_page" value=">" <?= $current_page >= $number_of_pages - 1
+                        ? 'disabled="disabled"' : '' ?>/>
+                <input type="submit" name="last_page" value=">>"<?= $current_page >= $number_of_pages - 1
+                        ? 'disabled="disabled"' : '' ?>/>
                 <label for="goto">Go to</label>
                 <select name="goto" id="goto" onchange="return this.form.submit();">
                     <?php for ($i = 0; $i < $number_of_pages; $i++): ?>
-                    <option value="<?= $i ?>" <?= $i == $current_page ? 'selected="selected"' : '' ?>><?= $i + 1 ?></option>
+                    <option value="<?= $i ?>" <?= $i == $current_page ? 'selected="selected"'
+                            : '' ?>><?= $i + 1 ?></option>
                     <?php endfor; ?>
                 </select>
             </td>
             <td class="pme-stats">
-                Page:&nbsp;<?= $current_page + 1 ?>&nbsp;of&nbsp;<?= $number_of_pages ?>&nbsp; Records:&nbsp;<?= $total_records ; ?>
+                Page:&nbsp;<?= $current_page + 1 ?>&nbsp;of&nbsp;<?= $number_of_pages ?>&nbsp;
+                Records:&nbsp;<?= $total_records ; ?>
             </td>
         </tr>
     </table>
-</form> 
+</form>
+<?php endif; ?>
 
+
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>-->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+<script>
+    $('.pme-filter').keydown(function()
+    {
+        if (event.keyCode == '13') {
+            $('#displayForm').submit();
+            return false;
+        }
+    });
+</script>
 </body>
 </html>

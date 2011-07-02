@@ -1,12 +1,17 @@
 <?php
 
 
-
+/**
+ * Test the DBClass
+ */
 class KrisDBTest extends PHPUnit_Framework_TestCase
 {
     private $_krisDB;
 
-	function __construct()
+    /**
+     * Constructor
+     */
+    function __construct()
     {
         $this->_krisDB = new KrisDBExposeProtected();
     }
@@ -38,7 +43,7 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
             $this->_krisDB->convertClassKeyToDBKey($this->_krisDB->convertDBKeyToClassKey('record_id')));
     }
 
-     /**
+    /**
      * @test
      */
     function convertClassKeyToDisplayTest()
@@ -71,6 +76,9 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * @test
+     */
     function testBindRecordSetNoInitialize()
     {
         $testResult2 = 'test_result2';
@@ -84,7 +92,7 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($testResult1, $this->_krisDB->TestField1);
         $this->assertEquals($testResult1, $this->_krisDB->get('TestField1'));
         $this->assertEquals($testResult1, $this->_krisDB->get($testField1));
-        
+
         $this->assertEquals($testResult2, $this->_krisDB->TestField2);
         $this->assertEquals($testResult2, $this->_krisDB->get('TestField2'));
         $this->assertEquals($testResult2, $this->_krisDB->get($testField2));
@@ -110,8 +118,8 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($testResult1, $this->_krisDB->get('TestField1'));
         $this->assertEquals($testResult1, $this->_krisDB->get($testField1));
 
-        $this->setExpectedException('DatabaseException', 'Invalid key: TestField2');
-        $res = $this->_krisDB->TestField2;
+        $this->setExpectedException('KrisDatabaseException', 'Invalid key: TestField2');
+        $this->_krisDB->TestField2;
 
     }
 
@@ -122,8 +130,8 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
     {
         $sql = 'SELECT * FROM table';
 
-        $this->assertEquals($sql.' LIMIT 2', $this->_krisDB->addLimit($sql, 2));
-        $this->assertEquals($sql.' ORDER BY table_id', $this->_krisDB->addOrder($sql, 'table_id'));
+        $this->assertEquals($sql . ' LIMIT 2', $this->_krisDB->addLimit($sql, 2));
+        $this->assertEquals($sql . ' ORDER BY table_id ASC', $this->_krisDB->addOrder($sql, 'table_id'));
     }
 
     /**
@@ -136,7 +144,7 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
         $sql = '`foo`, `bar`';
 
         $this->assertEquals($sql, $this->_krisDB->generateWhat($sql));
-        $this->assertEquals($sql, $this->_krisDB->generateWhat(array('foo','bar')));
+        $this->assertEquals($sql, $this->_krisDB->generateWhat(array('foo', 'bar')));
     }
 
     /**
@@ -149,10 +157,10 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
         $sql = '`foo` = ? AND `bar` = ?';
 
         $this->assertEquals($sql, $this->_krisDB->generateWhere($sql, array('bindFoo', 'bindBar')));
-        $this->assertEquals($sql, $this->_krisDB->generateWhere(array('foo','bar'), array('bindFoo', 'bindBar')));
+        $this->assertEquals($sql, $this->_krisDB->generateWhere(array('foo', 'bar'), array('bindFoo', 'bindBar')));
 
-        $this->setExpectedException('DatabaseException', 'Count of where (3) does not equal the count of bindings (2)');
-        $this->_krisDB->generateWhere(array('foo','bar', 'baz'), array('bindFoo', 'bindBar'));
+        $this->setExpectedException('KrisDatabaseException', 'Count of where (3) does not equal the count of bindings (2)');
+        $this->_krisDB->generateWhere(array('foo', 'bar', 'baz'), array('bindFoo', 'bindBar'));
     }
 
 }
@@ -163,107 +171,116 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
  */
 class KrisDBExposeProtected extends KrisDB
 {
-        /**
-         * @param string $name
-         * @return string
-         */
-        function quoteDbObject($name)
-        {
-            return parent::quoteDbObject($name);
-        }
+    /**
+     * @param string $name
+     * @return string
+     */
+    function quoteDbObject($name)
+    {
+        return parent::quoteDbObject($name);
+    }
 
-        function initializeRecordSet($records)
-        {
-            return parent::initializeRecordSet($records);
-        }
+    /**
+     * @param $records
+     * @return void
+     */
+    function initializeRecordSet($records)
+    {
+        parent::initializeRecordSet($records);
+    }
 
-        /**
-         *
-         * @param array $rs
-         * @param KrisDB $bindTo
-         * @return bool|KrisDB
-         */
-        function bindRecordSet($rs, $bindTo)
-        {
-            return parent::bindRecordSet($rs, $bindTo);
-        }
+    /**
+     *
+     * @param array $rs
+     * @param KrisDB $bindTo
+     * @return bool|KrisDB
+     */
+    function bindRecordSet($rs, $bindTo)
+    {
+        return parent::bindRecordSet($rs, $bindTo);
+    }
 
-        /**
-         * Returns multiple instances of a model based on a statement...
-         *
-         * @param PDOStatement $stmt
-         * @return array
-         */
-        function returnMultiple($stmt)
-        {
-            return parent::returnMultiple($stmt);
-        }
+    /**
+     * Returns multiple instances of a model based on a statement...
+     *
+     * @param PDOStatement $stmt
+     * @return array
+     */
+    function returnMultiple($stmt)
+    {
+        return parent::returnMultiple($stmt);
+    }
 
-        /**
-         * @param string $sql
-         * @param int $count
-         * @return string
-         */
-        function addLimit($sql, $count)
-        {
-            return parent::addLimit($sql, $count);
-        }
+    /**
+     * @param string $sql
+     * @param int $count
+     * @return string
+     */
+    function addLimit($sql, $count)
+    {
+        return parent::addLimit($sql, $count);
+    }
 
 
-        /**
-         * @param string $sql
-         * @param string|array $order
-         * @return string
-         */
-        function addOrder($sql, $order)
-        {
-            return parent::addOrder($sql, $order);
-        }
+    /**
+     * @param string $sql
+     * @param string|array $order
+     * @return string
+     */
+    function addOrder($sql, $order)
+    {
+        return parent::addOrder($sql, $order);
+    }
 
-        /**
-         * @param array|string $what
-         * @return string
-         */
-        function generateWhat($what)
-        {
-            return parent::generateWhat($what);
-        }
+    /**
+     * @param array|string $what
+     * @return string
+     */
+    function generateWhat($what)
+    {
+        return parent::generateWhat($what);
+    }
 
-        /**
-         * @throws Exception
-         * @param array|string $where
-         * @param array $bindings
-         * @return string
-         */
-        function generateWhere($where, $bindings)
-        {
-            return parent::generateWhere($where, $bindings);
-        }
+    /**
+     * @throws Exception
+     * @param array|string $where
+     * @param array $bindings
+     * @param bool $likeQuery
+     * @return string
+     */
+    function generateWhere($where, $bindings, $likeQuery = false)
+    {
+        return parent::generateWhere($where, $bindings, $likeQuery);
+    }
 
-        /**
-         * Converts a key like record_id to RecordId
-         * @param string $key
-         * @return string
-         */
-        function convertDBKeyToClassKey($key)
-        {
-            return parent::convertDBKeyToClassKey($key);
-        }
+    /**
+     * Converts a key like record_id to RecordId
+     * @param string $key
+     * @return string
+     */
+    function convertDBKeyToClassKey($key)
+    {
+        return parent::convertDBKeyToClassKey($key);
+    }
 
-        /**
-         * Converts a key like RecordId to record_id
-         * @param string $key
-         * @return string
-         */
-        function convertClassKeyToDBKey($key)
-        {
-            return parent::convertClassKeyToDBKey($key);
-        }
+    /**
+     * Converts a key like RecordId to record_id
+     * @param string $key
+     * @return string
+     */
+    function convertClassKeyToDBKey($key)
+    {
+        return parent::convertClassKeyToDBKey($key);
+    }
 
-        function convertClassKeyToDisplayField($key)
-        {
-            return parent::convertClassKeyToDisplayField($key);
-        }
+    /**
+     * @param $key
+     * @return string
+     */
+    function convertClassKeyToDisplayField($key)
+    {
+        return parent::convertClassKeyToDisplayField($key);
+    }
 
 
 }

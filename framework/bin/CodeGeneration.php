@@ -7,34 +7,67 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
- 
+
+/**
+ * Used for code generation...
+ */
 class KrisCG extends KrisDB
 {
 
     const UNDERSCORE_PLACEHOLDER = '+=+';
 
+    private $applicationDirectory;
+    private $baseModelDirectory;
+    private $generatedDirectory;
+    private $crudDirectory;
+
+    /**
+     * Constructor
+     * @param string $appPath
+     * @return KrisCG
+     */
+    public function __construct($appPath = '')
+    {
+        if (strlen($appPath) == 0)
+        {
+            $appPath = __DIR__ . '/..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
+        }
+
+        $this->applicationDirectory = str_replace('/', DIRECTORY_SEPARATOR, KrisConfig::APP_PATH);
+        $this->baseModelDirectory = $this->applicationDirectory . 'models';
+        $this->generatedDirectory = $appPath . $this->baseModelDirectory . DIRECTORY_SEPARATOR . 'generated';
+        $this->crudDirectory = $appPath . $this->baseModelDirectory . DIRECTORY_SEPARATOR . 'crud';
+        
+
+        if (!file_exists($this->generatedDirectory))
+        {
+            mkdir($this->generatedDirectory);
+        }
+        if (!file_exists($this->crudDirectory))
+        {
+            mkdir($this->crudDirectory);
+            
+        }        
+    }
+
+    /**
+     * Generates a model based on a table name
+     * @param $tableName
+     * @return void
+     */
     public function GenerateModel($tableName)
     {
         $tableName = strtolower($tableName);
+
         $columnNames = $this->GetColumnMetadata($tableName);
 
         $foreignKeys = $this->GetForeignKeys($tableName, array_keys($columnNames));
-
-        $appPath = str_replace('/', DIRECTORY_SEPARATOR, KrisConfig::APP_PATH);
-        $baseModelDir = $appPath . 'models';
-        $generatedDir = __DIR__ . '/..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $baseModelDir . DIRECTORY_SEPARATOR . 'generated';
-        $modelDir = __DIR__ . '/..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $baseModelDir;
-
-        if (!file_exists($generatedDir))
-        {
-            mkdir($generatedDir);
-        }
 
         $className = $this->convertDBKeyToClassKey($tableName);
 
         echo 'Generating class '.$className.PHP_EOL;
 
-        $safeClassName = $this->GenerateClassNameFromTableName($className);
+        $safeClassName = $className.'View';
 
 
         list($properties, $primaryKey, $initializeFields, $fakeFields) = $this->GetPropertiesPrimaryKey($columnNames, $foreignKeys);
@@ -42,33 +75,23 @@ class KrisCG extends KrisDB
         $foreignKeyString = $this->GetForeignKeyString($foreignKeys);
 
         $filename = $safeClassName . '.php';
-
-        $this->GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields, $fakeFields, $primaryKey,
-            $generatedDir, $baseModelDir);
+        
+        $this->GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields, $fakeFields, $primaryKey);
 
         // Don't overwrite a class that has changes....
-        if (!file_exists($modelDir . DIRECTORY_SEPARATOR . $filename))
+        if (!file_exists($this->crudDirectory . DIRECTORY_SEPARATOR . $filename))
         {
-            $this->GenerateDerivedClass($filename, $safeClassName, $className, $modelDir);
+            $this->GenerateDerivedClass($filename, $safeClassName, $className);
         }
     }
 
-    private function GenerateClassNameFromTableName($className)
-    {
-        if (in_array(strtolower($className), array('abstract', 'and', 'array', 'as', 'break', 'case', 'catch', 'class', 'clone',
-                'const', 'continue', 'declare', 'default', 'do', 'else', 'elseif', 'enddeclare', 'endfor', 'endforeach',
-                'endif', 'endswitch', 'endwhile', 'extends', 'final', 'for', 'foreach', 'function', 'global', 'goto',
-                'if', 'implements', 'interface', 'instanceof', 'namespace', 'new', 'or', 'private', 'protected',
-                'public', 'static', 'switch', 'throw', 'try', 'use', 'var', 'while', 'xor', '__class__', '__dir__',
-                '__file__', '__line__', '__function__', '__method__', '__namespace__', 'die', 'echo', 'empty', 'exit',
-                'eval', 'include', 'include_once', 'isset', 'list', 'require', 'require_once', 'return', 'print', 'unset')))
-        {
-            $className .= 'Class';
-        }
+    
 
-        return $className;
-    }
-
+    /**
+     * @param $columnNames
+     * @param $foreignKeys
+     * @return array ($properties, $primaryKey, $initializeFields, $fakeFields)
+     */
     private function GetPropertiesPrimaryKey($columnNames, $foreignKeys)
     {
         $properties = '';
@@ -103,6 +126,12 @@ class KrisCG extends KrisDB
         return array($properties, $primaryKey, $initializeFields, $fakeFields);
     }
 
+    /**
+     * Returns all the foreign keys...
+     *
+     * @param $foreignKeys
+     * @return string
+     */
     private function GetForeignKeyString($foreignKeys)
     {
         if (count($foreignKeys) > 0)
@@ -127,13 +156,26 @@ class KrisCG extends KrisDB
     }
 
 
+    /**
+     * Outputs the base class to a file..
+     *
+     * @param $tableName
+     * @param $className
+     * @param $filename
+     * @param $properties
+     * @param $foreignKeyString
+     * @param $initializeFields
+     * @param $fakeFields
+     * @param $primaryKey
+     * @return void
+     */
     private function GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields,
-        $fakeFields, $primaryKey, $generatedDir, $baseModelDir)
+        $fakeFields, $primaryKey)
     {
         $output = <<<EOT
 <?php
 /**
- * Generated Code, do not edit, edit the file ${filename} in ${baseModelDir}
+ * Generated Code, do not edit, edit the file ${filename} in {$this->baseModelDirectory}
  */
 
 /**
@@ -154,7 +196,7 @@ class ${className}Model extends KrisCrudModel
 }
 ?>
 EOT;
-        $filePath = $generatedDir . DIRECTORY_SEPARATOR . $className . 'Model' . '.php';
+        $filePath = $this->generatedDirectory . DIRECTORY_SEPARATOR . $className . 'Model' . '.php';
         if (file_exists($filePath))
         {
             unlink($filePath);
@@ -164,8 +206,13 @@ EOT;
         fclose($fp);
     }
 
-
-    private function GenerateDerivedClass($filename, $safeClassName, $className, $modelDir)
+    /**
+     * @param $filename
+     * @param $safeClassName
+     * @param $className
+     * @return void
+     */
+    private function GenerateDerivedClass($filename, $safeClassName, $className)
     {
         $output = <<<EOT
 <?php
@@ -182,11 +229,15 @@ class ${safeClassName} extends ${className}Model
 ?>
 EOT;
 
-        $fp = fopen($modelDir . DIRECTORY_SEPARATOR . $filename, 'w');
+        $fp = fopen($this->crudDirectory . DIRECTORY_SEPARATOR . $filename, 'w');
         fwrite($fp, $output);
         fclose($fp);
     }
 
+    /**
+     * @param $table
+     * @return array
+     */
     private function GetColumnMetadata($table)
     {
         $dbh = $this->getDatabaseHandle();
@@ -202,7 +253,7 @@ EOT;
             foreach ($raw_column_data as $column_data)
             {
                 $columnNames[$column_data['COLUMN_NAME']] = array('type' => $this->GetTypeFromDataType($column_data['DATA_TYPE']),
-                    'primary' => $column_data['COLUMN_KEY'] == 'PRI');
+                    'displayType' => $column_data['DATA_TYPE'], 'primary' => $column_data['COLUMN_KEY'] == 'PRI');
             }
         }
 
@@ -210,6 +261,11 @@ EOT;
 
     }
 
+    /**
+     * @param $table
+     * @param $usedColumnNames
+     * @return array
+     */
     private function GetForeignKeys($table, $usedColumnNames)
     {
         $dbh = $this->getDatabaseHandle();
@@ -264,6 +320,10 @@ EOT;
         return $foreignKeys;
     }
 
+    /**
+     * @param $type
+     * @return string
+     */
     private function GetTypeFromDataType($type)
     {
         switch ($type)

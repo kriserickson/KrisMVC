@@ -8,10 +8,10 @@
  * with this source code in the file LICENSE.
  */
 
-//===============================================================
-// Controller
-// Parses the HTTP request and routes to the appropriate function
-//===============================================================
+/**
+ * Controller
+ * Parses the HTTP request and routes to the appropriate function
+ */
 class KrisController
 {
     protected $_controllerPath = '../app/controllers/'; //with trailing slash
@@ -21,6 +21,12 @@ class KrisController
     protected $_action;
     protected $_params = array();
 
+    /**
+     * @param string $controller_path
+     * @param string $web_folder
+     * @param string $default_controller
+     * @param string $default_action
+     */
     function __construct($controller_path, $web_folder, $default_controller, $default_action)
     {
         $this->_controllerPath = $controller_path;
@@ -106,6 +112,7 @@ class KrisController
             $this->request_not_found('Invalid function name: ' . $function);
         }
 
+        /** @noinspection PhpIncludeInspection */
         require($controllerFile);
 
         if (!class_exists($controllerClass))
@@ -125,7 +132,12 @@ class KrisController
         return $this;
     }
 
-    //Override this function for your own custom 404 page
+    /**
+     * Override this function for your own custom 404 page
+     *
+     * @param string $msg
+     * @return void
+     */
     protected function request_not_found($msg = '')
     {
         $displayedError = false;

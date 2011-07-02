@@ -7,13 +7,20 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
- 
+
+/**
+ * CrudModel, used for scaffolding and simple crud generation
+ */
 class KrisCrudModel extends KrisModel
 {
     protected $_foreignKeys = array();
     protected $_fakeFields = array();
     public $DisplayName;
 
+    /**
+     * @param string $primaryKeyName
+     * @param string $tableName
+     */
     function __construct($primaryKeyName, $tableName)
     {
         parent::__construct($primaryKeyName, $tableName);
@@ -27,34 +34,36 @@ class KrisCrudModel extends KrisModel
      */
     public function retrieve($primaryKeyValue)
     {
-        return $this->bindRecordSet($this->generateStatement(array($this->_primaryKeyName), array($primaryKeyValue))->fetch(PDO::FETCH_ASSOC), $this);
+        return $this->bindRecordSet($this->generateStatement(array($this->_primaryKeyName), array($primaryKeyValue), false)->fetch(PDO::FETCH_ASSOC), $this);
     }
 
 
     /**
      * @param array $where
      * @param array $bindings
+     * @param bool $likeQuery
      * @param int $count
      * @param int $offset
      * @param string $orderBy
      * @param bool $orderAscending
-     * @return bool|KrisModel
+     * @return bool|KrisCrudModel
      */
-    public function retrieveMultiple($where, $bindings, $count = 0, $offset = 0, $orderBy = '', $orderAscending = true)
+    public function retrieveMultiple($where, $bindings, $likeQuery = false, $count = 0, $offset = 0, $orderBy = '', $orderAscending = true)
     {
-        return $this->returnMultiple($this->generateStatement($where, $bindings, $count, $offset, $orderBy, $orderAscending));
+        return $this->returnMultiple($this->generateStatement($where, $bindings, $likeQuery, $count, $offset, $orderBy, $orderAscending));
     }
 
     /**
      * @param string|array $where
      * @param array $bindings
+     * @param $likeQuery
      * @param int $count
      * @param int $offset
      * @param array|string $order
-     * @param $orderAscending
+     * @param bool $orderAscending
      * @return PDOStatement
      */
-    private function generateStatement($where, $bindings, $count = 0, $offset = 0, $order = '', $orderAscending)
+    private function generateStatement($where, $bindings, $likeQuery, $count = 0, $offset = 0, $order = '', $orderAscending = true)
     {
         $dbh = $this->getDatabaseHandle();
         if (is_scalar($bindings))
@@ -89,8 +98,11 @@ class KrisCrudModel extends KrisModel
 
         if ((is_array($where) && count($where) > 0) || (!is_array($where) && strlen($where) > 0))
         {
-            $sql .= ' WHERE ' . $this->generateWhere($where, $bindings);
+            $sql .= ' WHERE ' . $this->generateWhere($where, $bindings, $likeQuery);
         }
+
+        $bindings = $this->GetBindings($bindings, $likeQuery);
+
 
         $stmt = $dbh->prepare($this->addLimit($this->addOrder($sql, $order, $orderAscending), $count, $offset));
 
@@ -180,6 +192,10 @@ class KrisCrudModel extends KrisModel
         return is_array($this->_fakeFields) && isset($this->_fakeFields[$fieldName]);
     }
 
+    /**
+     * @param string $fieldName
+     * @return bool
+     */
     private function isForeignKeyField($fieldName)
     {
         return is_array($this->_foreignKeys) && isset($this->_foreignKeys[$this->convertClassKeyToDBKey($fieldName)]);

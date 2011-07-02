@@ -8,16 +8,20 @@
  * with this source code in the file LICENSE.
  */
 
-//===============================================================
-// View
-// For plain .php templates
-//===============================================================
+/**
+ * View
+ * For plain .php templates
+ */
 class KrisView
 {
     protected $_file = '';
     protected $_vars = array();
 
-    function __construct($file = '', $vars = '')
+    /**
+     * @param string $file
+     * @param null|array $vars
+     */
+    function __construct($file = '', $vars = null)
     {
         if ($file)
         {
@@ -30,54 +34,76 @@ class KrisView
         return $this;
     }
 
+    /**
+     * @param string $key
+     * @param string|int $var
+     * @return KrisView
+     */
     function __set($key, $var)
     {
         return $this->set($key, $var);
     }
 
+    /**
+     * @param string $key
+     * @param string|int $var
+     * @return KrisView
+     */
     function set($key, $var)
     {
         $this->_vars[$key] = $var;
         return $this;
     }
 
-    //for adding to an array
+
+    /**
+     *  for adding to an array
+     * @param string $key
+     * @param string|int $var
+     * @return void
+     */
     function add($key, $var)
     {
         $this->_vars[$key][] = $var;
     }
 
-    function fetch($file = '', $vars = '', $merge = true)
+    /**
+     * @param string $file
+     * @param string|array $vars
+     * @param bool $merge
+     * @return string
+     */
+    function fetch($file = '', $vars = array(), $merge = true)
     {
         if ($merge)
         {
-            if (is_array($vars))
-            {
-                $this->_vars = array_merge($this->_vars, $vars);
-            }
-            extract($this->_vars);
+            $vars = array_merge($this->_vars, $vars);
         }
-        else
-        {
-            extract($vars);
-        }
+
+        extract($vars);
 
         if (strlen($file) == 0)
         {
             $file = $this->_file;
         }
         ob_start();
+        /** @noinspection PhpIncludeInspection */
         require($file);
         return ob_get_clean();
     }
 
-    function dump($vars = '')
+    /**
+     * @param array|null $vars
+     * @return void
+     */
+    function dump($vars = null)
     {
         if (is_array($vars))
         {
             $this->_vars = array_merge($this->_vars, $vars);
         }
         extract($this->_vars);
+        /** @noinspection PhpIncludeInspection */
         require($this->_file);
     }
 

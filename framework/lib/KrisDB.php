@@ -9,11 +9,12 @@
  * with this source code in the file LICENSE.
  */
 
-//===============================================================
-// DB
-// Base class that is shared by Model and DBView
-//===============================================================
-
+/**
+ * @throws DatabaseException
+ *
+ * DB
+ * Base class that is shared by Model and DBView
+ */
 abstract class KrisDB
 {
     protected $_dbh = null;
@@ -33,7 +34,7 @@ abstract class KrisDB
         $fixedKey = $this->convertDBKeyToClassKey($key);
         if (!isset($this->_recordSet[$fixedKey]))
         {
-            throw new DatabaseException('Invalid key: '.$key);
+            throw new KrisDatabaseException('Invalid key: '.$key);
         }
 
         return $this->_recordSet[$fixedKey];
@@ -52,7 +53,7 @@ abstract class KrisDB
         $key = $this->convertDBKeyToClassKey($key);
         if (!$this->_initializedRecordSet || isset($this->_recordSet[$key]))
         {
-            // If $val is null then isset will return false.  We don't want that cause get uses isset to determin
+            // If $val is null then isset will return false.  We don't want that cause get uses isset to determine
             // whether the field is valid or not..
             $this->_recordSet[$key] = is_null($val) ? '' : $val;
         }
@@ -150,7 +151,7 @@ abstract class KrisDB
             $key = $this->convertDBKeyToClassKey($key);
             if (!$this->_initializedRecordSet || isset($bindTo->_recordSet[$key]))
             {
-                // If $val is null then isset will return false.  We don't want that cause get uses isset to determin
+                // If $val is null then isset will return false.  We don't want that cause get uses isset to determine
                 // whether the field is valid or not..
                 $bindTo->_recordSet[$key] = is_null($val) ? '' : $val;
             }
@@ -198,7 +199,7 @@ abstract class KrisDB
 
 
     /**
-     * Adds ordering to the recordset...
+     * Adds ordering to the RecordSet...
      *
      * @param string $sql
      * @param string|array $order
@@ -252,20 +253,21 @@ abstract class KrisDB
      * @throws DatabaseException
      * @param array|string $where
      * @param array $bindings
+     * @param $likeQuery
      * @return string
      */
-    protected function generateWhere($where, $bindings)
+    protected function generateWhere($where, $bindings, $likeQuery)
     {
         if (is_array($where))
         {
             if (count($where) != count($bindings))
             {
-                throw new DatabaseException('Count of where (' . count($where) . ') does not equal the count of bindings (' . count($bindings) . ')');
+                throw new KrisDatabaseException('Count of where (' . count($where) . ') does not equal the count of bindings (' . count($bindings) . ')');
             }
             $whereString = '';
             foreach ($where as $whereName)
             {
-                $whereString .= (strlen($whereString) > 0 ? ' AND ' : '') . $this->quoteDbObject($whereName) . ' = ?';
+                $whereString .= (strlen($whereString) > 0 ? ' AND ' : '') . $this->quoteDbObject($whereName). ($likeQuery ? ' LIKE ?' : ' = ?');
             }
             return $whereString;
         }
@@ -301,6 +303,10 @@ abstract class KrisDB
         return $key;
     }
 
+    /**
+     * @param string $key
+     * @return string
+     */
     protected function convertClassKeyToDisplayField($key)
     {
         if (strpos($key, '_') > 0 && $key[0] == strtolower($key[0]))
@@ -322,7 +328,7 @@ abstract class KrisDB
         if ($stmt->errorCode() > 0)
         {
             $info = $stmt->errorInfo();
-            throw new DatabaseException('Invalid SQL ['.$stmt->queryString.']'.PHP_EOL.
+            throw new KrisDatabaseException('Invalid SQL ['.$stmt->queryString.']'.PHP_EOL.
                         'Error: ' . $info[0] . ' - ' . $info[1] . ' -- ' . $info[2]);
         }
     }
@@ -335,6 +341,27 @@ abstract class KrisDB
         return array_keys($this->_recordSet);
     }
 
+    /**
+     * @param array $bindings
+     * @param bool $likeQuery
+     * @return array
+     */
+    protected function GetBindings($bindings, $likeQuery)
+    {
+        if ($likeQuery)
+        {
+            for ($index = 0; $index < count($bindings); $index++)
+            {
+                $bindings[$index] = '%' . $bindings[$index] . '%';
+            }
+            return $bindings;
+        }
+        return $bindings;
+    }
+
 }
 
-class DatabaseException extends Exception { }
+/**
+ * Database exception...
+ */
+class KrisDatabaseException extends Exception { }

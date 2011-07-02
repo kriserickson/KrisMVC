@@ -28,8 +28,7 @@ class ClassCategoryTest extends KrisDBView
      */
     public function getActiveCategories()
     {
-         return $this->retrieveMultiple('ca.category_id <> ? AND offered = ? and image <> ?', array(0,1,''),0,
-             'category_position', true);
+         return $this->retrieveMultiple('ca.category_id <> ? AND offered = ? and image <> ?', array(0,1,''), false, 0, 'category_position', true);
     }
 
 

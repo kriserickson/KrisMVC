@@ -19,7 +19,7 @@ class KrisControllerTest extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new KrisController();
+        $this->object = new KrisController(KrisConfig::APP_PATH . 'controllers/', KrisConfig::WEB_FOLDER, 'main', 'index');
     }
 
     /**

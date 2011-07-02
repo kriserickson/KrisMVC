@@ -8,11 +8,13 @@
  * with this source code in the file LICENSE.
  */
 
-//===============================================================
-// KrisDBView
-// Represents a view of the multiple tables in the database...
-//===============================================================
- 
+
+/**
+ * @throws Exception
+ *
+ * KrisDBView
+ * Represents a view of the multiple tables in the database...
+ */
 abstract class KrisDBView  extends KrisDB
 {
 
@@ -63,14 +65,16 @@ abstract class KrisDBView  extends KrisDB
     /**
      * @param array|string $where
      * @param array $bindings
+     * @param $likeQuery
      * @param int $count
+     * @param int $offset
      * @param array|string $order
      * @param bool $distinct
      * @return array
      */
-    public function retrieveMultiple($where, $bindings, $count = 0, $order = '', $distinct = false)
+    public function retrieveMultiple($where, $bindings, $likeQuery, $count = 0, $offset = 0, $order = '', $distinct = false)
     {
-        return $this->returnMultiple($this->returnStatement($bindings, $where, $count, $order, $distinct));
+        return $this->returnMultiple($this->returnStatement($where, $bindings, $likeQuery, $count, $offset, $order, $distinct));
     }
 
     /**
@@ -80,10 +84,20 @@ abstract class KrisDBView  extends KrisDB
      */
     public function retrieveOne($where, $bindings)
     {
-        return $this->bindRecordSet($this->returnStatement($bindings, $where, 1, '', false)->fetch(PDO::FETCH_ASSOC), $this);
+        return $this->bindRecordSet($this->returnStatement($where, $bindings, false, 1, 0, '', false)->fetch(PDO::FETCH_ASSOC), $this);
     }
 
-    protected function returnStatement($bindings, $where, $count, $order, $distinct)
+    /**
+     * @param array $where
+     * @param array $bindings
+     * @param bool $likeQuery
+     * @param int $count
+     * @param int $offset
+     * @param string $order
+     * @param bool $distinct
+     * @return PDOStatement
+     */
+    protected function returnStatement($where, $bindings, $likeQuery, $count, $offset, $order, $distinct)
     {
         $dbh = $this->getDatabaseHandle();
 
@@ -92,7 +106,9 @@ abstract class KrisDBView  extends KrisDB
             $bindings = $bindings ? array($bindings) : array();
         }
 
-        $sql = $this->generateQuery($where, $bindings, $count, $order, $distinct);
+        $sql = $this->generateQuery($where, $bindings, $likeQuery, $count, $offset, $order, $distinct);
+
+        $bindings = $this->GetBindings($bindings, $likeQuery);
 
         $stmt = $dbh->prepare($sql);
 
@@ -106,21 +122,23 @@ abstract class KrisDBView  extends KrisDB
     /**
      * @param string|array $where
      * @param array $bindings
+     * @param $likeQuery
      * @param int $count
+     * @param int $offset
      * @param array|string $order
      * @param bool $distinct
      * @return string
      */
-    private function generateQuery($where, $bindings, $count = 0, $order = '', $distinct = false)
+    private function generateQuery($where, $bindings, $likeQuery, $count, $offset, $order, $distinct)
     {
         $sql = $this->generateSelect($distinct);
 
         if ((is_array($where) && count($where) > 0) || strlen($where) > 0)
         {
-            $sql .= ' WHERE ' . $this->generateWhere($where, $bindings);
+            $sql .= ' WHERE ' . $this->generateWhere($where, $bindings, $likeQuery);
         }
 
-        return $this->addLimit($this->addOrder($sql, $order), $count);
+        return $this->addLimit($this->addOrder($sql, $order), $count, $offset);
 
     }
 

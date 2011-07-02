@@ -8,23 +8,32 @@
  * with this source code in the file LICENSE.
  */
 
-//===============================================================
-// Model
-// Simplistic ORM that represents a table in the database...
-// TODO: Replace with something a little better
-//===============================================================
+
+/**
+ * Model
+ * Simplistic ActiveRecord style ORM that represents a table in the database...
+ */
 abstract class KrisModel extends KrisDB
 {
 
     protected $_primaryKeyName;
     protected $_tableName;
 
+    /**
+     * @param string $primaryKeyName
+     * @param string $tableName
+     */
     function __construct($primaryKeyName = '', $tableName = '')
     {
         $this->_primaryKeyName = $primaryKeyName; //Name of auto-incremented Primary Key
         $this->_tableName = $tableName; //Corresponding table in database
     }
 
+    /**
+     * Returns the primary key
+     *
+     * @return string
+     */
     function PrimaryKey()
     {
         return $this->get($this->_primaryKeyName);
@@ -77,20 +86,22 @@ abstract class KrisModel extends KrisDB
      */
     public function retrieve($primaryKeyValue)
     {
-        return $this->bindRecordSet($this->generateStatement('*',array($this->_primaryKeyName), array($primaryKeyValue))->fetch(PDO::FETCH_ASSOC), $this);
+        return $this->bindRecordSet($this->generateStatement('*',array($this->_primaryKeyName), array($primaryKeyValue), false)->fetch(PDO::FETCH_ASSOC), $this);
     }
 
 
     /**
      * @param array|string $where
      * @param array $bindings
+     * @param bool $likeQuery
      * @param int $count
+     * @param int $offset
      * @param string $orderBy
      * @return bool|KrisModel
      */
-    public function retrieveMultiple($where, $bindings, $count = 0, $orderBy = '')
+    public function retrieveMultiple($where, $bindings, $likeQuery = false, $count = 0, $offset, $orderBy = '')
     {
-        return $this->returnMultiple($this->generateStatement('*', $where, $bindings, $count, $orderBy));
+        return $this->returnMultiple($this->generateStatement('*', $where, $bindings, $likeQuery, $count, $offset, $orderBy));
     }
 
 
@@ -157,13 +168,19 @@ abstract class KrisModel extends KrisDB
             return true;
         }
 
-        return count($this->generateStatement('1', array($this->_primaryKeyName), array($this->_recordSet[$this->_primaryKeyName]))->fetchAll());
+        return count($this->generateStatement('1', array($this->_primaryKeyName), array($this->_recordSet[$this->_primaryKeyName]), false)->fetchAll());
 
     }
 
-    public function totalRecords($where = '', $bindings = '')
+    /**
+     * @param string $where
+     * @param string $bindings
+     * @param bool $likeQuery
+     * @return
+     */
+    public function totalRecords($where = '', $bindings = '', $likeQuery)
     {
-        $res = $this->select('count('.$this->_primaryKeyName.') AS num_records', $where, $bindings);
+        $res = $this->select('count('.$this->_primaryKeyName.') AS num_records', $where, $bindings, $likeQuery);
         $row = current($res);
         return $row['num_records'];
     }
@@ -173,24 +190,28 @@ abstract class KrisModel extends KrisDB
      *
      * @param string|array $what
      * @param string|array $where
-     * @param string $bindings
-     * @param int $pdo_fetch_mode
+     * @param string|array $bindings
+     * @param bool $likeQuery     *
+     * @param int $pdoFetchMode
      * @return array
      */
-    public function select($what = '*', $where = '', $bindings = '', $pdo_fetch_mode = PDO::FETCH_ASSOC)
+    public function select($what = '*', $where = '', $bindings = '', $likeQuery = false, $pdoFetchMode = PDO::FETCH_ASSOC)
     {
-        return $this->generateStatement($what, $where, $bindings)->fetchAll($pdo_fetch_mode);
+        return $this->generateStatement($what, $where, $bindings, $likeQuery)->fetchAll($pdoFetchMode);
     }
 
     /**
      * @param string|array $what
      * @param string|array $where
      * @param array $bindings
+     * @param bool $likeQuery
      * @param int $count
+     * @param int $offset
      * @param array|string $order
+     * @param bool $orderAscending
      * @return PDOStatement
      */
-    private function generateStatement($what, $where, $bindings, $count = 0, $offset = 0, $order = '', $orderAscending = true)
+    private function generateStatement($what, $where, $bindings, $likeQuery, $count = 0, $offset = 0, $order = '', $orderAscending = true)
     {
         $dbh = $this->getDatabaseHandle();
         if (is_scalar($bindings))
@@ -199,10 +220,12 @@ abstract class KrisModel extends KrisDB
         }
         $sql = 'SELECT ' . $this->generateWhat($what) . ' FROM ' . $this->_tableName;
 
-        if ((is_array($where) && count($where) > 0) || strlen($where) > 0)
+        if ((is_array($where) && count($where) > 0) || (!is_array($where) && strlen($where) > 0))
         {
-            $sql .= ' WHERE ' . $this->generateWhere($where, $bindings);
+            $sql .= ' WHERE ' . $this->generateWhere($where, $bindings, $likeQuery);
         }
+
+        $bindings = $this->GetBindings($bindings, $likeQuery);
 
         $stmt = $dbh->prepare($this->addLimit($this->addOrder($sql, $order, $orderAscending), $count, $offset));
 
@@ -212,6 +235,7 @@ abstract class KrisModel extends KrisDB
 
         return $stmt;
     }
+
 
 
 }
