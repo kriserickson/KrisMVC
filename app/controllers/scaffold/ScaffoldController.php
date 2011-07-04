@@ -48,57 +48,33 @@ class ScaffoldController
         {
             $pathInfo = pathinfo($entry);
             $filename = $pathInfo['filename'];
-            if ($pathInfo['extension'] == 'php' && substr($filename, -4) == 'View');
+            if ($pathInfo['extension'] == 'php' && substr($filename, -4) == 'View')
             {
                 $tables[$filename] = substr($filename, 0,  -4);
             }
         }
 
         $this->view->set('tables', $tables);
+        $this->view->set('table_width', (int)(100 / count($tables)));
 
+        $this->base_href = KrisConfig::WEB_FOLDER.'/scaffold/';
+        $this->view->set('display_base_href', $this->base_href.'index/');
 
-
-        if (count($params) > 0)
-        {
-            $base_href = KrisConfig::WEB_FOLDER.'/scaffold/';
-            $this->view->set('display_base_href', $base_href.'index/');
-            $this->view->set('display_href', $base_href.'index/'.$params[0]);
-            $this->view->set('view_href', $base_href.'view/'.$params[0]);
-            $this->view->set('change_href', $base_href.'change/'.$params[0]);
-            $this->view->set('delete_href', $base_href.'delete/'.$params[0]);
-            $this->displayTables = true;
-        }
 
     }
 
     /**
-     * @param string $class
+     * @param string $className
      * @internal string $sort = func_get_arg(1);
      * @internal string $ascending = func_get_arg(2)
      * @return void
      */
-    public function Index($class)
+    public function Index($className)
     {
 
-        if ($this->displayTables)
+        if (!is_null($className ))
         {
-
-             // Dynamically create the class...
-            if (class_exists($class))
-            {
-                // Make sure it is valid and has a proper model...
-                $class = new $class();
-                if (!is_subclass_of($class, 'KrisCrudModel'))
-                {
-                    throw new Exception('Invalid crud class: ' . get_class($class));
-                }
-            }
-            else
-            {
-                throw new Exception('Invalid class: ' . $class);
-            }
-
-            /** @var $class KrisCrudModel */
+            $class = $this->GenerateClass($className);
 
             $fields = $class->GetDisplayAndDatabaseFields();
 
@@ -117,12 +93,62 @@ class ScaffoldController
                 $sort = key($fields);
             }
 
-            $this->SetupIndexView($class, $ascending, $sort, $fields);
-
-
+            $this->view->set('display_name', $class->DisplayName);
+            $this->view->set('body', $this->GetIndexView($class, $ascending, $sort, $fields));
+        }
+        else
+        {
+            $this->view->set('display_name', 'Choose Table To Edit');
+            $this->view->set('body', '');
         }
 
         $this->view->dump();
+    }
+
+
+    /**
+     * @param string $className
+     * @param int $id
+     * @return void
+     */
+    public function View($className, $id)
+    {
+        $class = $this->GenerateClass($className);
+        $fields = $class->GetDisplayAndDatabaseFields();
+        $class->retrieve($id);
+
+        $data = array('display_name' => $class->DisplayName, 'fields' => $fields, 'class' => $class,
+            'display_href' => $this->base_href.'index/'.$className);
+
+        $this->view->set('display_name', 'Choose Table To Edit');
+        $this->view->set('body', $this->view->fetch(KrisConfig::APP_PATH . 'views/scaffold/view.php', $data, false));
+
+        $this->view->dump();
+    }
+
+    /**
+     * @throws Exception
+     * @param string $className
+     * @return null|KrisCrudModel
+     */
+    public function GenerateClass($className)
+    { // Dynamically create the class...
+        if (class_exists($className))
+        {
+            // Make sure it is valid and has a proper model...
+            $class = new $className();
+            if (!is_subclass_of($class, 'KrisCrudModel'))
+            {
+                throw new Exception('Invalid crud class: ' . get_class($class));
+            }
+            return $class;
+        }
+        else
+        {
+            throw new Exception('Invalid class: ' . $className);
+        }
+
+
     }
 
     /**
@@ -133,12 +159,10 @@ class ScaffoldController
      * @param bool $ascending
      * @param string $sort
      * @param array $fields
-     * @return void
+     * @return string
      */
-    public function SetupIndexView($class, $ascending, $sort, $fields)
+    public function GetIndexView($class, $ascending, $sort, $fields)
     {
-
-
         // Get search, where and bindings from the post variables...
         list($bindings, $where, $search) = $this->GetSearchFromPostVars($fields);
 
@@ -150,28 +174,18 @@ class ScaffoldController
         //  Get the current paging location from the post vars.
         $page = $this->GetPageFromPostVars($numPages);
 
+        $className = get_class($class);
 
         // Set variables in the view...
-        $this->view->set('display_table', true);
-        $this->view->set('display_name', $class->DisplayName);
-        $this->view->set('columns', $fields);
-        $this->view->set('sorted', array());
-        $this->view->set('number_of_pages', $numPages);
-        $this->view->set('total_records', $totalRecords);
-        $this->view->set('current_page', $page);
-        $this->view->set('sort_ascending', $ascending);
-        $this->view->set('search', $search);
+        $data = array('display_table' => true ,'display_name' => $class->DisplayName ,'columns' => $fields ,
+            'sorted' => array(),'number_of_pages' => $numPages ,'total_records' => $totalRecords,'current_page' => $page,
+            'sort_ascending' => $ascending ,'search' => $search, 'display_href' => $this->base_href.'index/'.$className,
+            'view_href' => $this->base_href.'view/'.$className, 'change_href' => $this->base_href.'change/'.$className,
+            'delete_href' => $this->base_href.'delete/'.$className,
+            'models'=> $class->retrieveMultiple($where, $bindings, true, $this->pageSize, $page * $this->pageSize, $sort, $ascending));
 
-
-        $this->view->set('models', $class->retrieveMultiple($where, $bindings, true, $this->pageSize, $page * $this->pageSize, $sort, $ascending));
-    }
-
-    /**
-     * @return void
-     */
-    public function View()
-    {
-
+        return $this->view->fetch(KrisConfig::APP_PATH . 'views/scaffold/index.php', $data, false);
+            
     }
 
     /**
