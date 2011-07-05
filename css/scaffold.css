@@ -4,7 +4,7 @@ body {
     font-size: 14px;
 }
 
-hr.pme-hr {
+hr.horizontalRule {
     border: 0 solid;
     padding: 0;
     margin: 0;
@@ -12,44 +12,39 @@ hr.pme-hr {
     height: 1px;
 }
 
-table.pme-main {
+table.displayTable {
     border: #004d9c 1px solid;
     border-collapse: collapse;
     border-spacing: 0;
     width: 100%;
 }
 
-table.pme-navigation {
+table.navigationTable {
     border: #004d9c 0 solid;
     border-collapse: collapse;
     border-spacing: 0;
     width: 100%;
 }
 
-td.pme-navigation-even, td.pme-navigation-odd {
+td.crudButtonsEven, td.crudButtonsOdd {
     white-space: nowrap;
 }
 
-th.pme-header {
+th.rowHeader {
     border: #004d9c 1px solid;
     padding: 4px;
     background: #add8e6;
 }
 
-td.pme-key-odd, td.pme-value-odd, td.pme-key-even, td.pme-value-even, td.pme-sortinfo, td.pme-filter,
-    td.pme-cell-even, td.pme-navigation-even, td.pme-cell-odd, td.pme-navigation-odd {
+td.displayField, td.valueField, td.filterColumn, td.displayCellEven, td.crudButtonsEven, td.crudButtonsOdd {
     border: #004d9c 1px solid;
     padding: 3px;
 }
 
-td.pme-buttons {
+td.navigationButtons {
     text-align: left;
 }
 
-td.pme-message {
-    text-align: center;
-}
-
-td.pme-stats {
+td.pageStatus {
     text-align: right;
 }

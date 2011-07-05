@@ -27,11 +27,7 @@ class ScaffoldController
      */
     protected $pageSize = 20;
 
-    /**
-     * @var bool
-     */
-    private $displayTables = false;
-
+    
     /**
      * @param string $action 
      * @param array $params
@@ -92,7 +88,15 @@ class ScaffoldController
             }
             else
             {
-                $sort = key($fields);
+                if (isset($_POST['sort_field']))
+                {
+                    $sort =    $_POST['sort_field'];
+                    $ascending = $_POST['sort_order'] == 'asc';
+                }
+                else
+                {
+                    $sort = $class->SortField ? $class->SortField : key($fields);
+                }
             }
 
             $this->view->set('display_name', $class->DisplayName);
@@ -189,7 +193,7 @@ class ScaffoldController
     public function GetIndexView($class, $ascending, $sort, $fields)
     {
         // Get search, where and bindings from the post variables...
-        list($bindings, $where, $search) = $this->GetSearchFromPostVars($fields);
+        list($bindings, $where, $search, $searchValues) = $this->GetSearchFromPostVars($fields);
 
         // Get total records from the table...
         $totalRecords = $class->totalRecords($where, $bindings, true);
@@ -206,7 +210,8 @@ class ScaffoldController
             'sorted' => array(),'number_of_pages' => $numPages ,'total_records' => $totalRecords,'current_page' => $page,
             'sort_ascending' => $ascending ,'search' => $search, 'display_href' => $this->base_href.'index/'.$className,
             'view_href' => $this->base_href.'view/'.$className, 'change_href' => $this->base_href.'change/'.$className,
-            'delete_href' => $this->base_href.'delete/'.$className,
+            'delete_href' => $this->base_href.'delete/'.$className, 'search_values' => $searchValues,
+            'sort_field' => $sort, 'sort_order' => $ascending ? 'asc' : 'dec',
             'models'=> $class->retrieveMultiple($where, $bindings, true, $this->pageSize, $page * $this->pageSize, $sort, $ascending));
 
         return $this->view->fetch(KrisConfig::APP_PATH . 'views/scaffold/index.php', $data, false);
@@ -223,30 +228,29 @@ class ScaffoldController
     {
         $bindings = array();
         $where = array();
+        $searchValues = array();
+
         if (isset($_POST['search']))
         {
             $search = true;
-            return array($bindings, $where, $search);
-        }
-        else if (isset($_POST['query']))
-        {
-            $search = array();
-            foreach (array_keys($fields) as $field_id)
-            {
-                $search_field = 'search_' . $field_id;
-                if (strlen($_POST[$search_field]) > 0)
-                {
-                    $bindings[] = $search[$field_id] = $_POST[$search_field];
-                    $where[] = $field_id;
-                }
-            }
-            return array($bindings, $where, $search);
         }
         else
         {
-            $search = false;
-            return array($bindings, $where, $search);
+
+            foreach (array_keys($fields) as $field_id)
+            {
+                $search_field = 'search_' . $field_id;
+                if (isset($_POST[$search_field]) && strlen($_POST[$search_field]) > 0)
+                {
+                    $bindings[] = $searchValues[$field_id] = $_POST[$search_field];
+                    $where[] = $field_id;
+                }
+            }
+            $search = count($searchValues) > 0;
         }
+
+        return array($bindings, $where, $search, $searchValues);
+
     }
 
     /**

@@ -14,19 +14,54 @@
  */
 class KrisCrudModel extends KrisModel
 {
+    /**
+     * @var array - Collection of foreign key data... ForeignKeyId => array('table' => '', 'field' => '', 'display' => '', 'alias' => '')
+     */
     protected $_foreignKeys = array();
+
+    /**
+     * @var array - List of fields that aren't in the table, but displayed based on joins of foreign keys...  $FakeFieldName => $FieldId
+     */
     protected $_fakeFields = array();
+
+    /**
+     * @var array - FieldName -> Type (string, text, int, date, bool, etc)
+     */
     protected $_fieldTypes = array();
 
-    // Override these to change the sort order.
+    /**
+     * @var array - Override these to change the sort order.  FieldName => Order...
+     */
     protected $_fieldSortOrder = array();
 
-    // Override these to change any field aliases.
+    /**
+     * @var array - Override these to change any field aliases.
+     */
     protected $_fieldAliases = array();
 
+    /**
+     * @var string - The name of the table, can be overridden in View.
+     */
     public $DisplayName;
+
+    /**
+     * @var bool|string - Name of the sort field, can be override in the view.
+     */
+    public $SortField = false;
+
+    /**
+     * @var string - Class Name of the selects
+     */
     public $SelectClass = 'crudSelect';
+
+    /**
+     * @var string - Class name of the textareas
+     */
     public $TextAreaClass = 'crudTextArea';
+
+    /**
+     * @var string - Class name of the inputs
+     */
     public $InputClass = 'crudInput';
 
     /**
@@ -121,7 +156,7 @@ class KrisCrudModel extends KrisModel
             $displayField = $foreignFieldData['display'];
             $aliasField = $foreignFieldData['alias'];
 
-            $displayFieldSelect = $this->GetForeignFeildSelectDisplay($tableAlias, $displayField, $aliasField);
+            $displayFieldSelect = $this->GetForeignFieldSelectDisplay($tableAlias, $displayField, $aliasField);
 
             $select .= $displayFieldSelect;
         }
@@ -147,11 +182,17 @@ class KrisCrudModel extends KrisModel
         return $stmt;
     }
 
-    private function GetForeignFeildSelectDisplay($tableAlias, $displayField, $aliasField)
+    /**
+     * @param $tableAlias
+     * @param $displayField
+     * @param $aliasField
+     * @return string
+     */
+    private function GetForeignFieldSelectDisplay($tableAlias, $displayField, $aliasField)
     {
         if (is_array($displayField))
         {
-            // TODO: Make work with other databases
+            // TODO: Make work with databases other than MySql
             $displayFieldSelect = ', CONCAT(';
             for ($i = 0; $i < count($displayField); $i++)
             {
@@ -349,7 +390,7 @@ class KrisCrudModel extends KrisModel
     {
         $dbh = $this->getDatabaseHandle();
 
-        $displayFieldSelect = $this->GetForeignFeildSelectDisplay('t1', $this->_foreignKeys[$foreignField]['display'], 'display');
+        $displayFieldSelect = $this->GetForeignFieldSelectDisplay('t1', $this->_foreignKeys[$foreignField]['display'], 'display');
 
         $stmt = $dbh->prepare('SELECT t1.' . $this->_foreignKeys[$foreignField]['field'] . ' AS value ' . $displayFieldSelect .
                     ' FROM ' . $this->_foreignKeys[$foreignField]['table'].' AS t1');

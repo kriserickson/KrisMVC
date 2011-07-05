@@ -9,16 +9,16 @@
 
 ?>
 
-<table class="pme-main" summary="<?= $display_name ?>">
+<table class="displayTable" summary="<?= $display_name ?>">
     <?php foreach ($class->GetDisplayAndDatabaseFields() as $fieldName => $fieldDisplay): ?>
     <tr>
-        <td class="pme-key-odd"><?= $fieldDisplay ?></td>
-        <td class="pme-key-even"><?= $class->GetEditValue($fieldName) ?></td>
+        <td class="displayField"><?= $fieldDisplay ?></td>
+        <td class="valueField"><?= $class->GetEditValue($fieldName) ?></td>
     </tr>
     <?php endforeach; ?>
 </table>
 
-<hr size="1" class="pme-hr"/>
+<hr size="1" class="horizontalRule"/>
 
 <button id="saveButton">Save</button><button id="applyButton">Apply</button><button id="cancelButton">Cancel</button>
 
