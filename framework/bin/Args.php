@@ -1,10 +1,19 @@
 <?php
 
-
+/**
+ * Used to pull arguments out of the command prompt
+ * @package CodeGeneration
+ */
 class Args
 {
+    /**
+     * @var array
+     */
     private $flags;
 
+    /**
+     *
+     */
     public function __construct()
     {
         $this->flags = array();
@@ -52,6 +61,12 @@ class Args
 
     }
 
+    /**
+     * Gets a flag or fale if the flag doesn't exist...
+     *
+     * @param $name
+     * @return bool|string
+     */
     public function flag($name)
     {
         return isset($this->flags[$name]) ? $this->flags[$name] : false;

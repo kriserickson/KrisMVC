@@ -9,6 +9,8 @@
  */
 
 /**
+ * @package View
+ * 
  * View
  * For plain .php templates
  */

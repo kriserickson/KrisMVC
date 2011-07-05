@@ -10,6 +10,7 @@
 
 /**
  * Used for code generation...
+ * @package CodeGeneration
  */
 class KrisCG extends KrisDB
 {

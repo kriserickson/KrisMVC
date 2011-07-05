@@ -23,16 +23,15 @@
 					</div>
 	<div class="info-box-body">
         		<!-- ========== Info from phpDoc block ========= -->
-<p class="short-description">Model  Simplistic ActiveRecord style ORM that represents a table in the database...</p>
 	<ul class="tags">
 				<li><span class="field">abstract:</span> </li>
 			</ul>
 		<p class="notes">
-			Located in <a class="field" href="_KrisModel.php.html">/KrisModel.php</a> (line <span class="field">16</span>)
+			Located in <a class="field" href="_KrisModel.php.html">/KrisModel.php</a> (line <span class="field">18</span>)
 		</p>
 		
 				
-		<pre><a href="../default/KrisDB.html">KrisDB</a>
+		<pre><a href="../Model/KrisDB.html">KrisDB</a>
    |
    --KrisModel</pre>
 	
@@ -56,7 +55,7 @@
 					<th class="class-table-header">Description</th>
 				</tr>
 								<tr>
-					<td style="padding-right: 2em"><a href="../default/KrisCrudModel.html">KrisCrudModel</a></td>
+					<td style="padding-right: 2em"><a href="../Model/KrisCrudModel.html">KrisCrudModel</a></td>
 					<td>
 											CrudModel, used for scaffolding and simple crud generation
 										</td>
@@ -111,7 +110,7 @@
 											([<span class="var-type">string</span>&nbsp;<span class="var-name">$primaryKeyName</span> = <span class="var-default">''</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$tableName</span> = <span class="var-default">''</span>])
 									</div>
 																<div class="method-definition">
-											<span class="method-result">bool|<a href="../default/KrisModel.html">KrisModel</a></span>
+											<span class="method-result">bool|<a href="../Model/KrisModel.html">KrisModel</a></span>
 										<a href="#create" title="details" class="method-name">create</a>
 										()
 									</div>
@@ -131,12 +130,12 @@
 										()
 									</div>
 																<div class="method-definition">
-											<span class="method-result">bool|<a href="../default/KrisDB.html">KrisDB</a></span>
+											<span class="method-result">bool|<a href="../Model/KrisDB.html">KrisDB</a></span>
 										<a href="#retrieve" title="details" class="method-name">retrieve</a>
 											(<span class="var-type">$primaryKeyValue</span>&nbsp;<span class="var-name">$primaryKeyValue</span>)
 									</div>
 																<div class="method-definition">
-											<span class="method-result">bool|<a href="../default/KrisModel.html">KrisModel</a></span>
+											<span class="method-result">bool|<a href="../Model/KrisModel.html">KrisModel</a></span>
 										<a href="#retrieveMultiple" title="details" class="method-name">retrieveMultiple</a>
 											(<span class="var-type">array|string</span>&nbsp;<span class="var-name">$where</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$bindings</span>, [<span class="var-type">bool</span>&nbsp;<span class="var-name">$likeQuery</span> = <span class="var-default">false</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$count</span> = <span class="var-default">0</span>], <span class="var-type">int</span>&nbsp;<span class="var-name">$offset</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$orderBy</span> = <span class="var-default">''</span>])
 									</div>
@@ -180,7 +179,7 @@
 		<span class="var-title">
 			<span class="var-type">mixed</span>
 			<span class="var-name">$_primaryKeyName</span>
-						(line <span class="line-number">19</span>)
+						(line <span class="line-number">21</span>)
 		</span>
 	</div>
 
@@ -201,7 +200,7 @@
 		<span class="var-title">
 			<span class="var-type">mixed</span>
 			<span class="var-name">$_tableName</span>
-						(line <span class="line-number">20</span>)
+						(line <span class="line-number">22</span>)
 		</span>
 	</div>
 
@@ -217,16 +216,16 @@
 </div>
 							<h4>Inherited Variables</h4>
 				<A NAME='inherited_vars'><!-- --></A>
-									<p>Inherited from <span class="classname"><a href="../default/KrisDB.html">KrisDB</a></span></p>
+									<p>Inherited from <span class="classname"><a href="../Model/KrisDB.html">KrisDB</a></span></p>
 					<blockquote>
 													<span class="var-title">
-								<span class="var-name"><a href="../default/KrisDB.html#var$_dbh">KrisDB::$_dbh</a></span><br>
+								<span class="var-name"><a href="../Model/KrisDB.html#var$_dbh">KrisDB::$_dbh</a></span><br>
 							</span>
 													<span class="var-title">
-								<span class="var-name"><a href="../default/KrisDB.html#var$_initializedRecordSet">KrisDB::$_initializedRecordSet</a></span><br>
+								<span class="var-name"><a href="../Model/KrisDB.html#var$_initializedRecordSet">KrisDB::$_initializedRecordSet</a></span><br>
 							</span>
 													<span class="var-title">
-								<span class="var-name"><a href="../default/KrisDB.html#var$_recordSet">KrisDB::$_recordSet</a></span><br>
+								<span class="var-name"><a href="../Model/KrisDB.html#var$_recordSet">KrisDB::$_recordSet</a></span><br>
 							</span>
 											</blockquote> 
 										
@@ -250,7 +249,7 @@
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">Constructor __construct</span> (line <span class="line-number">26</span>)
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">28</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -277,7 +276,7 @@
 		<div class="notes">Redefined in descendants as:</div>
 		<ul class="redefinitions">
 					<li>
-				<a href="../default/KrisCrudModel.html#method__construct">KrisCrudModel::__construct()</a>
+				<a href="../Model/KrisCrudModel.html#method__construct">KrisCrudModel::__construct()</a>
 							</li>
 				</ul>
 	</div>
@@ -285,7 +284,7 @@
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">create</span> (line <span class="line-number">48</span>)
+		<span class="method-title">create</span> (line <span class="line-number">50</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -295,7 +294,7 @@
 			</ul>
 	
 	<div class="method-signature">
-		<span class="method-result">bool|<a href="../default/KrisModel.html">KrisModel</a></span>
+		<span class="method-result">bool|<a href="../Model/KrisModel.html">KrisModel</a></span>
 		<span class="method-name">
 			create
 		</span>
@@ -309,7 +308,7 @@
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">delete</span> (line <span class="line-number">142</span>)
+		<span class="method-title">delete</span> (line <span class="line-number">144</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -333,7 +332,7 @@
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">exists</span> (line <span class="line-number">160</span>)
+		<span class="method-title">exists</span> (line <span class="line-number">162</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -362,7 +361,7 @@
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">PrimaryKey</span> (line <span class="line-number">37</span>)
+		<span class="method-title">PrimaryKey</span> (line <span class="line-number">39</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -383,7 +382,7 @@
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">retrieve</span> (line <span class="line-number">87</span>)
+		<span class="method-title">retrieve</span> (line <span class="line-number">89</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -393,7 +392,7 @@
 			</ul>
 	
 	<div class="method-signature">
-		<span class="method-result">bool|<a href="../default/KrisDB.html">KrisDB</a></span>
+		<span class="method-result">bool|<a href="../Model/KrisDB.html">KrisDB</a></span>
 		<span class="method-name">
 			retrieve
 		</span>
@@ -411,7 +410,7 @@
 		<div class="notes">Redefined in descendants as:</div>
 		<ul class="redefinitions">
 					<li>
-				<a href="../default/KrisCrudModel.html#methodretrieve">KrisCrudModel::retrieve()</a>
+				<a href="../Model/KrisCrudModel.html#methodretrieve">KrisCrudModel::retrieve()</a>
 								: Retrieves (hopefully) one record from the table based on the primary key...
 							</li>
 				</ul>
@@ -420,7 +419,7 @@
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">retrieveMultiple</span> (line <span class="line-number">102</span>)
+		<span class="method-title">retrieveMultiple</span> (line <span class="line-number">104</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -429,7 +428,7 @@
 			</ul>
 	
 	<div class="method-signature">
-		<span class="method-result">bool|<a href="../default/KrisModel.html">KrisModel</a></span>
+		<span class="method-result">bool|<a href="../Model/KrisModel.html">KrisModel</a></span>
 		<span class="method-name">
 			retrieveMultiple
 		</span>
@@ -462,7 +461,7 @@
 		<div class="notes">Redefined in descendants as:</div>
 		<ul class="redefinitions">
 					<li>
-				<a href="../default/KrisCrudModel.html#methodretrieveMultiple">KrisCrudModel::retrieveMultiple()</a>
+				<a href="../Model/KrisCrudModel.html#methodretrieveMultiple">KrisCrudModel::retrieveMultiple()</a>
 							</li>
 				</ul>
 	</div>
@@ -470,7 +469,7 @@
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">select</span> (line <span class="line-number">198</span>)
+		<span class="method-title">select</span> (line <span class="line-number">200</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -511,7 +510,7 @@
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">totalRecords</span> (line <span class="line-number">181</span>)
+		<span class="method-title">totalRecords</span> (line <span class="line-number">183</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -545,7 +544,7 @@
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">update</span> (line <span class="line-number">114</span>)
+		<span class="method-title">update</span> (line <span class="line-number">116</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -568,27 +567,27 @@
 							<h4>Inherited Methods</h4>
 				<a name='inherited_methods'><!-- --></a>	
 									<!-- =========== Summary =========== -->
-					<p>Inherited From <span class="classname"><a href="../default/KrisDB.html">KrisDB</a></span></p>
+					<p>Inherited From <span class="classname"><a href="../Model/KrisDB.html">KrisDB</a></span></p>
 					<blockquote>
-													<span class="method-name"><a href="../default/KrisDB.html#methodaddLimit">KrisDB::addLimit()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodaddOrder">KrisDB::addOrder()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodbindRecordSet">KrisDB::bindRecordSet()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodconvertClassKeyToDBKey">KrisDB::convertClassKeyToDBKey()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodconvertClassKeyToDisplayField">KrisDB::convertClassKeyToDisplayField()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodconvertDBKeyToClassKey">KrisDB::convertDBKeyToClassKey()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodgenerateWhat">KrisDB::generateWhat()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodgenerateWhere">KrisDB::generateWhere()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodget">KrisDB::get()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodGetAllFields">KrisDB::GetAllFields()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodGetBindings">KrisDB::GetBindings()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodgetDatabaseHandle">KrisDB::getDatabaseHandle()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodinitializeRecordSet">KrisDB::initializeRecordSet()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodquoteDbObject">KrisDB::quoteDbObject()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodreturnMultiple">KrisDB::returnMultiple()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodset">KrisDB::set()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#methodValidateStatement">KrisDB::ValidateStatement()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#method__get">KrisDB::__get()</a></span><br>
-													<span class="method-name"><a href="../default/KrisDB.html#method__set">KrisDB::__set()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodaddLimit">KrisDB::addLimit()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodaddOrder">KrisDB::addOrder()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodbindRecordSet">KrisDB::bindRecordSet()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodconvertClassKeyToDBKey">KrisDB::convertClassKeyToDBKey()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodconvertClassKeyToDisplayField">KrisDB::convertClassKeyToDisplayField()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodconvertDBKeyToClassKey">KrisDB::convertDBKeyToClassKey()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodgenerateWhat">KrisDB::generateWhat()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodgenerateWhere">KrisDB::generateWhere()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodget">KrisDB::get()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodGetAllFields">KrisDB::GetAllFields()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodGetBindings">KrisDB::GetBindings()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodgetDatabaseHandle">KrisDB::getDatabaseHandle()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodinitializeRecordSet">KrisDB::initializeRecordSet()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodquoteDbObject">KrisDB::quoteDbObject()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodreturnMultiple">KrisDB::returnMultiple()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodset">KrisDB::set()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodValidateStatement">KrisDB::ValidateStatement()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#method__get">KrisDB::__get()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#method__set">KrisDB::__set()</a></span><br>
 											</blockquote>
 										
 		</div>
@@ -596,7 +595,7 @@
 
 
 	<p class="notes" id="credit">
-		Documentation generated on Tue, 05 Jul 2011 14:06:34 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+		Documentation generated on Tue, 05 Jul 2011 14:09:49 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
 	</p>
 	</div></body>
 </html>

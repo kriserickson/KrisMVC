@@ -11,6 +11,7 @@
 /**
  * Controller
  * Parses the HTTP request and routes to the appropriate function
+ * @package Controller
  */
 class KrisController
 {

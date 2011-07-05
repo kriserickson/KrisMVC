@@ -10,6 +10,7 @@
 
 /**
  * CrudModel, used for scaffolding and simple crud generation
+ * @package Model
  */
 class KrisCrudModel extends KrisModel
 {
@@ -104,7 +105,7 @@ class KrisCrudModel extends KrisModel
         $tableFields = $this->GetTableFields();
         for ($i = 0; $i < count($tableFields); $i++)
         {
-            $tableFields[$i] = 't1.' . KrisDB::convertClassKeyToDBKey($tableFields[$i]);
+            $tableFields[$i] = 't1.' . $this->convertClassKeyToDBKey($tableFields[$i]);
         }
 
         $select = 'SELECT ' . (implode(',', $tableFields));
@@ -117,7 +118,12 @@ class KrisCrudModel extends KrisModel
 
             $tableAlias = 't' . $tableIndex++;
             $from .= ' INNER JOIN ' . $foreignFieldData['table'] . ' ' . $tableAlias . ' ON (t1.' . $columnName . ' = ' . $tableAlias . '.' . $foreignFieldData['field'] . ') ';
-            $select .= ', ' . $tableAlias . '.' . $foreignFieldData['display'] . ' AS ' . $foreignFieldData['alias'];
+            $displayField = $foreignFieldData['display'];
+            $aliasField = $foreignFieldData['alias'];
+
+            $displayFieldSelect = $this->GetForeignFeildSelectDisplay($tableAlias, $displayField, $aliasField);
+
+            $select .= $displayFieldSelect;
         }
 
         $sql = $select . $from;
@@ -139,6 +145,27 @@ class KrisCrudModel extends KrisModel
         $this->ValidateStatement($stmt);
 
         return $stmt;
+    }
+
+    private function GetForeignFeildSelectDisplay($tableAlias, $displayField, $aliasField)
+    {
+        if (is_array($displayField))
+        {
+            // TODO: Make work with other databases
+            $displayFieldSelect = ', CONCAT(';
+            for ($i = 0; $i < count($displayField); $i++)
+            {
+                $displayFieldSelect .= ($i > 0 ? ", ' '," : '') . $tableAlias . '.' . $displayField[$i];
+            }
+            $displayFieldSelect .= ')';
+        }
+        else
+        {
+            $displayFieldSelect = ', ' . $tableAlias . '.' . $displayField;
+        }
+
+        $displayFieldSelect .= ' AS ' . $aliasField;
+        return $displayFieldSelect;
     }
 
 
@@ -171,7 +198,7 @@ class KrisCrudModel extends KrisModel
         $index = 0;
         foreach (array_keys($this->_recordSet) as $field)
         {
-            if (!$this->isForeignKeyField($field) && KrisDB::convertClassKeyToDBKey($field) != $this->_primaryKeyName)
+            if (!$this->isForeignKeyField($field) && $this->convertClassKeyToDBKey($field) != $this->_primaryKeyName)
             {
                 if (isset($this->_fieldSortOrder[$field]))
                 {
@@ -213,13 +240,14 @@ class KrisCrudModel extends KrisModel
      */
     public function GetEditValue($key)
     {
-        $value = $this->get($key);
         $fixedKey = $this->convertDBKeyToClassKey($key);
         if (isset($this->_fakeFields[$fixedKey]))
         {
-            return $this->getSelect($key, $this->getForeignKeyValues($this->_fakeFields[$fixedKey]), $value, $this->SelectClass);
+            $value = $this->get($this->_fakeFields[$fixedKey]);
+            return $this->getSelect($this->_fakeFields[$fixedKey], $this->getForeignKeyValues($this->_fakeFields[$fixedKey]), $value, $this->SelectClass);
         }
         else {
+            $value = $this->get($key);
             if ($this->_fieldTypes[$fixedKey] == 'bool')
             {
                 return $this->getSelect($key, array(0 => 'No', 1 => 'Yes'), $value, $this->SelectClass);
@@ -321,8 +349,10 @@ class KrisCrudModel extends KrisModel
     {
         $dbh = $this->getDatabaseHandle();
 
-        $stmt = $dbh->prepare('SELECT ' . $this->_foreignKeys[$foreignField]['field'] . ' AS value, ' . $this->_foreignKeys[$foreignField]['display'] . ' AS display' .
-                    ' FROM ' . $this->_foreignKeys[$foreignField]['table']);
+        $displayFieldSelect = $this->GetForeignFeildSelectDisplay('t1', $this->_foreignKeys[$foreignField]['display'], 'display');
+
+        $stmt = $dbh->prepare('SELECT t1.' . $this->_foreignKeys[$foreignField]['field'] . ' AS value ' . $displayFieldSelect .
+                    ' FROM ' . $this->_foreignKeys[$foreignField]['table'].' AS t1');
 
         $this->ValidateStatement($stmt);
 

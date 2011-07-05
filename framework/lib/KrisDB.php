@@ -11,7 +11,7 @@
 
 /**
  * @throws DatabaseException
- *
+ * @package Model
  * DB
  * Base class that is shared by Model and DBView
  */

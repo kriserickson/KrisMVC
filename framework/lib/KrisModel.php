@@ -10,6 +10,8 @@
 
 
 /**
+ * @package Model
+ *
  * Model
  * Simplistic ActiveRecord style ORM that represents a table in the database...
  */

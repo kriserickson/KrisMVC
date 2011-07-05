@@ -11,6 +11,7 @@
 
 /**
  * @throws Exception
+ * @package Model
  *
  * KrisDBView
  * Represents a view of the multiple tables in the database...
