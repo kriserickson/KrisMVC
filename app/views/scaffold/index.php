@@ -69,7 +69,7 @@
                         title="Delete"/></a>
             </td>
             <?php foreach (array_keys($columns) as $columnName): ?>
-            <td class="pme-cell-even"><?= $model->get($columnName); ?></td>
+            <td class="pme-cell-even"><?= $model->GetDisplayValue($columnName); ?></td>
             <?php endforeach; ?>
         </tr>
         <?php endforeach; ?>

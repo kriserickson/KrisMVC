@@ -39,12 +39,7 @@ class KrisCrudModelTest extends PHPUnit_Framework_TestCase
         $firstName = 'Bernard';
         $name1 = 'Drumming';
 
-        $sql = 'SELECT t1.class_id,t1.category_id,t1.sub_category_id,t1.day,t1.start_time,t1.length,t1.cost,t1.instructor_id,t1.max_students,'.
-                't1.start_date,t1.end_date,t1.description_id,t1.offered,t1.multiple,t1.drop_in_cost, t2.description AS description, '.
-                't3.name AS name, t4.first_name AS first_name, t3.name AS name_c1 FROM class t1 '.
-                'INNER JOIN class_description t2 ON (t1.description_id = t2.class_description_id)  '.
-                'INNER JOIN category t3 ON (t1.category_id = t3.category_id)  '.
-                'INNER JOIN instructor t4 ON (t1.instructor_id = t4.instructor_id)  WHERE `class_id` = ?';
+        $sql = 'SELECT t1.class_id,t1.category_id,t1.sub_category_id,t1.day,t1.start_time,t1.length,t1.cost,t1.instructor_id,t1.max_students,t1.start_date,t1.end_date,t1.description_id,t1.offered,t1.multiple,t1.drop_in_cost, t2.description AS description, t3.name AS name, t4.first_name AS first_name, t5.name AS name_c1 FROM class t1 INNER JOIN class_description t2 ON (t1.description_id = t2.class_description_id)  INNER JOIN category t3 ON (t1.category_id = t3.category_id)  INNER JOIN instructor t4 ON (t1.instructor_id = t4.instructor_id)  INNER JOIN category t5 ON (t1.sub_category_id = t5.category_id)  WHERE `class_id` = ?';
 
         $PDOMock = $this->getMock('MockPDO', array('prepare'), array(), '', false);
         $stmtMock = $this->getMock('PDOStatement', array('execute', 'errorCode', 'fetch'));
@@ -52,7 +47,7 @@ class KrisCrudModelTest extends PHPUnit_Framework_TestCase
         $PDOMock->expects($this->once())->method('prepare')->with($sql)->will($this->returnValue($stmtMock));
         
         $stmtMock->expects($this->once())->method('execute')->with(array($classId));
-        $stmtMock->expects($this->once())->method('errorCode')->will($this->returnValue(0));
+        $stmtMock->expects($this->exactly(2))->method('errorCode')->will($this->returnValue(0));
         $stmtMock->expects($this->once())->method('fetch')->with(PDO::FETCH_ASSOC)->will($this->returnValue(array('class_id' => $classId,
             'category_id' => $categoryId, 'sub_category_id' => $subcategoryId, 'day' => $day, 'start_time' => $startTime,'length' => $length,
             'cost' => $cost, 'instructor_id' => $instructorId, 'max_students' => $maxStudents, 'start_date' => $startDate, 'end_date' => $endDate,
@@ -60,8 +55,6 @@ class KrisCrudModelTest extends PHPUnit_Framework_TestCase
             'name' => $name, 'first_name' => $firstName, 'name_c1' => $name1)));
 
         $crudMock = $this->getMock('ClassModelTest', array('getDatabaseHandle'));
-
-
 
         $crudMock->expects($this->once())->method('getDatabaseHandle')->will($this->returnValue($PDOMock));
 

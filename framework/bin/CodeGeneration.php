@@ -59,6 +59,11 @@ class KrisCG extends KrisDB
     {
         $tableName = strtolower($tableName);
 
+        if (!$this->TableExists($tableName))
+        {
+            die('ERROR: Table '.$tableName.' does not exist');
+        }
+
         $columnNames = $this->GetColumnMetadata($tableName);
 
         $foreignKeys = $this->GetForeignKeys($tableName, array_keys($columnNames));
@@ -70,13 +75,13 @@ class KrisCG extends KrisDB
         $safeClassName = $className.'View';
 
 
-        list($properties, $primaryKey, $initializeFields, $fakeFields) = $this->GetPropertiesPrimaryKey($columnNames, $foreignKeys);
+        list($properties, $primaryKey, $initializeFields, $fakeFields, $fieldTypes) = $this->GetPropertiesPrimaryKey($columnNames, $foreignKeys);
 
         $foreignKeyString = $this->GetForeignKeyString($foreignKeys);
 
         $filename = $safeClassName . '.php';
         
-        $this->GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields, $fakeFields, $primaryKey);
+        $this->GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields, $fakeFields, $primaryKey, $fieldTypes);
 
         // Don't overwrite a class that has changes....
         if (!file_exists($this->crudDirectory . DIRECTORY_SEPARATOR . $filename))
@@ -90,7 +95,7 @@ class KrisCG extends KrisDB
     /**
      * @param $columnNames
      * @param $foreignKeys
-     * @return array ($properties, $primaryKey, $initializeFields, $fakeFields)
+     * @return array ($properties, $primaryKey, $initializeFields, $fakeFields, $fieldTypes)
      */
     private function GetPropertiesPrimaryKey($columnNames, $foreignKeys)
     {
@@ -98,24 +103,27 @@ class KrisCG extends KrisDB
         $primaryKey = '';
         $initializeFields = '';
         $fakeFields = '';
+        $fieldTypes = '';
 
         foreach ($columnNames as $columnName => $columnData)
         {
             $dbKey = $this->convertDBKeyToClassKey($columnName);
             $properties .= '* @property ' . $columnData['type'] . ' $' . $dbKey . PHP_EOL;
             $initializeFields .= (strlen($initializeFields) > 0 ? ', ' : '')."'$dbKey'";
+            $fieldTypes .= (strlen($fieldTypes) > 0 ? ', ' : '')."'$dbKey' => '".$columnData['type']."'";
+
             if ($columnData['primary'])
             {
                 $primaryKey = $columnName;
             }
         }
 
-        foreach ($foreignKeys as $foreignKeyData)
+        foreach ($foreignKeys as $foreignKeyId => $foreignKeyData)
         {
             $dbKey = $this->convertDBKeyToClassKey($foreignKeyData['alias']);
             $properties .= '* @property string $' . $dbKey . PHP_EOL;
             $initializeFields .= (strlen($initializeFields) > 0 ? ', ' : '')."'$dbKey'";
-            $fakeFields .= (strlen($fakeFields) > 0 ? ', ' : '')."'$dbKey' => true";
+            $fakeFields .= (strlen($fakeFields) > 0 ? ', ' : '')."'$dbKey' => '$foreignKeyId'";
         }
 
         $initializeFields = '$this->initializeRecordSet(array('.$initializeFields.'));'.PHP_EOL;
@@ -123,7 +131,7 @@ class KrisCG extends KrisDB
         {
             $fakeFields = 'protected $_fakeFields = array('.$fakeFields.');';
         }
-        return array($properties, $primaryKey, $initializeFields, $fakeFields);
+        return array($properties, $primaryKey, $initializeFields, $fakeFields, $fieldTypes);
     }
 
     /**
@@ -167,10 +175,11 @@ class KrisCG extends KrisDB
      * @param $initializeFields
      * @param $fakeFields
      * @param $primaryKey
+     * @param $fieldTypes
      * @return void
      */
     private function GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields,
-        $fakeFields, $primaryKey)
+        $fakeFields, $primaryKey, $fieldTypes)
     {
         $output = <<<EOT
 <?php
@@ -186,8 +195,13 @@ class ${className}Model extends KrisCrudModel
     ${foreignKeyString}
     ${fakeFields}
 
+    protected \$_fieldTypes = array(${fieldTypes});
+
     public \$DisplayName = '${className}';
 
+    /**
+     * Constructor.
+     */
     function __construct()
     {
         parent::__construct('${primaryKey}', '${tableName}');
@@ -222,10 +236,14 @@ EOT;
  * Extend the class here, this file will not be overwritten.
  */
 
+/**
+ * Constructor.
+ */
 class ${safeClassName} extends ${className}Model
 {
 
 }
+
 ?>
 EOT;
 
@@ -326,11 +344,15 @@ EOT;
      */
     private function GetTypeFromDataType($type)
     {
+        // TODO: Make this work with non-mysql types...
         switch ($type)
         {
-            case 'varchar' : case 'text': case 'char': case 'mediumblob': case 'enum': case 'mediumtext': case 'set': case 'blob':
-            case 'tinytext': case 'longblob': case 'time': case 'datetime': case 'date': case 'timestamp':
+            case 'varchar' : case 'text': case 'char': case 'mediumblob': case 'mediumtext': case 'set': case 'blob':
+            case 'tinytext': case 'longblob':
                 return 'string';
+
+            case 'time': case 'timestamp': case 'datetime': case 'date': case 'enum':
+                return $type;
 
             case 'bigint': case 'longtext': case 'int': case 'mediumint': case 'smallint':
                 return 'int';
@@ -345,6 +367,30 @@ EOT;
                 return 'mixed'; // Really unknown...
 
         }
+    }
+
+    /**
+     * Returns whether or not a table exists..
+     *
+     * @param $tableName
+     * @return bool
+     */
+    private function TableExists($tableName)
+    {
+        $dbh = $this->getDatabaseHandle();
+
+        $stmt = $dbh->prepare("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?");
+
+        $this->ValidateStatement($stmt);
+
+        if ($stmt->execute(array(KrisConfig::DB_DATABASE, $tableName)))
+        {
+            $this->ValidateStatement($stmt);
+
+            return $stmt->rowCount() > 0;
+        }
+
+        return false;
     }
 
 

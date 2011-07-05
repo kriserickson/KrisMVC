@@ -254,33 +254,35 @@ class KrisDBExposeProtected extends KrisDB
     }
 
     /**
-     * Converts a key like record_id to RecordId
-     * @param string $key
-     * @return string
-     */
-    function convertDBKeyToClassKey($key)
-    {
-        return parent::convertDBKeyToClassKey($key);
-    }
+         * Converts a key like record_id to RecordId
+         * @param string $key
+         * @return string
+         */
+        function convertDBKeyToClassKey($key)
+        {
+            return parent::convertDBKeyToClassKey($key);
+        }
 
-    /**
-     * Converts a key like RecordId to record_id
-     * @param string $key
-     * @return string
-     */
-    function convertClassKeyToDBKey($key)
-    {
-        return parent::convertClassKeyToDBKey($key);
-    }
+        /**
+         * Converts a key like RecordId to record_id
+         * @param string $key
+         * @return string
+         */
+        function convertClassKeyToDBKey($key)
+        {
+            return parent::convertClassKeyToDBKey($key);
+        }
 
-    /**
-     * @param $key
-     * @return string
-     */
-    function convertClassKeyToDisplayField($key)
-    {
-        return parent::convertClassKeyToDisplayField($key);
-    }
+        /**
+         * Converts a Key like RecordId to a display like Record Id
+         *
+         * @param string $key
+         * @return string
+         */
+        function convertClassKeyToDisplayField($key)
+        {
+            return parent::convertClassKeyToDisplayField($key);
+        }
 
 
 }

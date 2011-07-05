@@ -50,7 +50,9 @@ class ScaffoldController
             $filename = $pathInfo['filename'];
             if ($pathInfo['extension'] == 'php' && substr($filename, -4) == 'View')
             {
-                $tables[$filename] = substr($filename, 0,  -4);
+                // Convert the filename like SomeTableView.php into "Some Table"
+                $tableName = substr($filename, 0,  -4);
+                $tables[$filename] = $tableName[0].preg_replace('/[A-Z]/', ' $0',substr($tableName,1));
             }
         }
 
@@ -69,7 +71,7 @@ class ScaffoldController
      * @internal string $ascending = func_get_arg(2)
      * @return void
      */
-    public function Index($className)
+    public function Index($className = null)
     {
 
         if (!is_null($className ))
@@ -118,10 +120,33 @@ class ScaffoldController
         $class->retrieve($id);
 
         $data = array('display_name' => $class->DisplayName, 'fields' => $fields, 'class' => $class,
-            'display_href' => $this->base_href.'index/'.$className);
+            'display_href' => $this->base_href.'index/'.$className,
+            'change_href' => $this->base_href.'change/'.$className.'/'.$id);
 
-        $this->view->set('display_name', 'Choose Table To Edit');
+        $this->view->set('display_name', 'View '.$class->DisplayName);
         $this->view->set('body', $this->view->fetch(KrisConfig::APP_PATH . 'views/scaffold/view.php', $data, false));
+
+        $this->view->dump();
+    }
+
+    /**
+     * @param $className
+     * @param $id
+     * @return void
+     */
+    public function Change($className, $id)
+    {
+        $class = $this->GenerateClass($className);
+        $fields = $class->GetDisplayAndDatabaseFields();
+
+        $class->retrieve($id);
+
+        $data = array('display_name' => $class->DisplayName, 'fields' => $fields, 'class' => $class,
+            'display_href' => $this->base_href.'index/'.$className,
+            'change_href' => $this->base_href.'change/'.$className.'/'.$id);
+
+        $this->view->set('display_name', 'View '.$class->DisplayName);
+        $this->view->set('body', $this->view->fetch(KrisConfig::APP_PATH . 'views/scaffold/edit.php', $data, false));
 
         $this->view->dump();
     }

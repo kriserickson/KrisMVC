@@ -13,17 +13,19 @@
     <?php foreach ($class->GetDisplayAndDatabaseFields() as $fieldName => $fieldDisplay): ?>
     <tr>
         <td class="pme-key-odd"><?= $fieldDisplay ?></td>
-        <td class="pme-key-even"><?= $class->GetDisplayValue($fieldName) ?></td>
+        <td class="pme-key-even"><?= $class->GetEditValue($fieldName) ?></td>
     </tr>
     <?php endforeach; ?>
 </table>
 
 <hr size="1" class="pme-hr"/>
 
-<button id="changeButton">Change</button><button id="cancelButton">Cancel</button>
+<button id="saveButton">Save</button><button id="applyButton">Apply</button><button id="cancelButton">Cancel</button>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
 <script>
-    $('#changeButton').click(function() { window.location = '<?= $change_href ?>'; });
+    $('#saveButton').click(function() { window.location = '<?= $save_href ?>'; });
+    $('#applyButton').click(function() { window.location = '<?= $save_href ?>'; });
     $('#cancelButton').click(function() { window.location = '<?= $display_href ?>'; });
 </script>
+

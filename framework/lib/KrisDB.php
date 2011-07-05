@@ -155,6 +155,10 @@ abstract class KrisDB
                 // whether the field is valid or not..
                 $bindTo->_recordSet[$key] = is_null($val) ? '' : $val;
             }
+            else
+            {
+                echo '$key => '.$key;
+            }
         }
         return $bindTo;
     }
@@ -215,12 +219,12 @@ abstract class KrisDB
                 $orderBy = '';
                 foreach ($order as $orderKey)
                 {
-                    $orderBy .= (strlen($orderBy) > 0 ? ', ' : '').$this->convertClassKeyToDBKey($orderKey);
+                    $orderBy .= (strlen($orderBy) > 0 ? ', ' : '').static::convertClassKeyToDBKey($orderKey);
                 }
             }
             else
             {
-                $orderBy = $this->convertClassKeyToDBKey($order);
+                $orderBy = static::convertClassKeyToDBKey($order);
             }
             $sql .= ' ORDER BY '.$orderBy.' '.($orderAscending ? 'ASC' : 'DESC');
         }

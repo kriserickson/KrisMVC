@@ -15,7 +15,18 @@ class KrisCrudModel extends KrisModel
 {
     protected $_foreignKeys = array();
     protected $_fakeFields = array();
+    protected $_fieldTypes = array();
+
+    // Override these to change the sort order.
+    protected $_fieldSortOrder = array();
+
+    // Override these to change any field aliases.
+    protected $_fieldAliases = array();
+
     public $DisplayName;
+    public $SelectClass = 'crudSelect';
+    public $TextAreaClass = 'crudTextArea';
+    public $InputClass = 'crudInput';
 
     /**
      * @param string $primaryKeyName
@@ -35,6 +46,25 @@ class KrisCrudModel extends KrisModel
     public function retrieve($primaryKeyValue)
     {
         return $this->bindRecordSet($this->generateStatement(array($this->_primaryKeyName), array($primaryKeyValue), false)->fetch(PDO::FETCH_ASSOC), $this);
+    }
+
+    /**
+     * Allows for changing of the auto-generated foreign keys...
+     *
+     * @param string $field - field that is to be changed...
+     * @param string|array $name - the name of the field(s) to link to..
+     * @param string $alias - the name of the alias...
+     * @return void
+     */
+    public function SetForeignKey($field, $name, $alias)
+    {
+        $old_alias = $this->_foreignKeys[$field]['alias'];
+        $this->_foreignKeys[$field]['display'] = $name;
+        $this->_foreignKeys[$field]['alias'] = $alias;
+        unset($this->_fakeFields[$this->convertDBKeyToClassKey($old_alias)]);
+        unset($this->_recordSet[$this->convertDBKeyToClassKey($old_alias)]);
+        $this->_recordSet[$this->convertDBKeyToClassKey($alias)] = '';
+        $this->_fakeFields[$this->convertDBKeyToClassKey($alias)] = $field;
     }
 
 
@@ -74,27 +104,23 @@ class KrisCrudModel extends KrisModel
         $tableFields = $this->GetTableFields();
         for ($i = 0; $i < count($tableFields); $i++)
         {
-            $tableFields[$i] = 't1.'.$this->convertClassKeyToDBKey($tableFields[$i]);
+            $tableFields[$i] = 't1.' . KrisDB::convertClassKeyToDBKey($tableFields[$i]);
         }
 
-        $select = 'SELECT '.(implode(',', $tableFields));
-        $from = ' FROM ' . $this->_tableName.' t1';
+        $select = 'SELECT ' . (implode(',', $tableFields));
+        $from = ' FROM ' . $this->_tableName . ' t1';
 
         $tableIndex = 2;
 
         foreach ($this->_foreignKeys as $columnName => $foreignFieldData)
         {
-            if (!isset($tableAliases[$foreignFieldData['table']]))
-            {
-                $tableAlias = $tableAliases[$foreignFieldData['table']] = 't'.$tableIndex++;
-                $from .= ' INNER JOIN '.$foreignFieldData['table'].' '.$tableAlias.' ON (t1.'.$columnName.' = '.$tableAlias.'.'.$foreignFieldData['field'].') ';
-                        
 
-            }
-            $select .= ', '.$tableAliases[$foreignFieldData['table']].'.'.$foreignFieldData['display'].' AS '.$foreignFieldData['alias'];
+            $tableAlias = 't' . $tableIndex++;
+            $from .= ' INNER JOIN ' . $foreignFieldData['table'] . ' ' . $tableAlias . ' ON (t1.' . $columnName . ' = ' . $tableAlias . '.' . $foreignFieldData['field'] . ') ';
+            $select .= ', ' . $tableAlias . '.' . $foreignFieldData['display'] . ' AS ' . $foreignFieldData['alias'];
         }
 
-        $sql =  $select.$from;
+        $sql = $select . $from;
 
         if ((is_array($where) && count($where) > 0) || (!is_array($where) && strlen($where) > 0))
         {
@@ -105,6 +131,8 @@ class KrisCrudModel extends KrisModel
 
 
         $stmt = $dbh->prepare($this->addLimit($this->addOrder($sql, $order, $orderAscending), $count, $offset));
+
+        $this->ValidateStatement($stmt);
 
         $stmt->execute($bindings);
 
@@ -132,22 +160,92 @@ class KrisCrudModel extends KrisModel
     }
 
     /**
-     * Gets the display fields (TableId, Name, etc) rather than the database fields (table_id, name, etc)
+     * Gets the display fields (TableId, Name, etc) rather than the database fields (table_id, name, etc).
+     * Gets their database field name, however...
      *
      * @return array
      */
-    public function GetDisplayFields()
+    private function GetDisplayFields()
     {
         $fields = array();
+        $index = 0;
         foreach (array_keys($this->_recordSet) as $field)
         {
-            if (!$this->isForeignKeyField($field) && $this->convertClassKeyToDBKey($field) != $this->_primaryKeyName)
+            if (!$this->isForeignKeyField($field) && KrisDB::convertClassKeyToDBKey($field) != $this->_primaryKeyName)
             {
-                $fields[] = $field;
+                if (isset($this->_fieldSortOrder[$field]))
+                {
+                    $index = $this->_fieldSortOrder[$field];
+                }
+                $fields[$index++] = $field;
             }
         }
 
+        ksort($fields);
         return $fields;
+    }
+
+    /**
+     * Returns the display value (currently fixes tinyints to be yes/no...)
+     *
+     * @param $key
+     * @return string|int|float
+     */
+    public function GetDisplayValue($key)
+    {
+        $value = $this->get($key);
+        $fixedKey = $this->convertDBKeyToClassKey($key);
+        if (isset($this->_fieldTypes[$fixedKey]))
+        {
+            if ($this->_fieldTypes[$fixedKey] == 'bool')
+            {
+                $value = $value ? 'Yes' : 'No';
+            }
+        }
+        return $value;
+    }
+
+    /**
+     * @param $key
+     *
+     * @internal param $fieldName
+     * @return string
+     */
+    public function GetEditValue($key)
+    {
+        $value = $this->get($key);
+        $fixedKey = $this->convertDBKeyToClassKey($key);
+        if (isset($this->_fakeFields[$fixedKey]))
+        {
+            return $this->getSelect($key, $this->getForeignKeyValues($this->_fakeFields[$fixedKey]), $value, $this->SelectClass);
+        }
+        else {
+            if ($this->_fieldTypes[$fixedKey] == 'bool')
+            {
+                return $this->getSelect($key, array(0 => 'No', 1 => 'Yes'), $value, $this->SelectClass);
+            }
+            else
+            {
+                if ($this->_fieldTypes[$fixedKey] == 'text')
+                {
+                    return $this->getTextArea($key, $value, $this->TextAreaClass);
+                }
+                else
+                {
+                    if ($this->_fieldTypes[$fixedKey] == 'datetime')
+                    {
+                        // Date picker and the following...
+                        // TODO 'timestamp', 'date', 'enum':'
+                        return '';
+                    }
+                    else
+                    {
+                        return $this->getInput($key, $value, $this->InputClass, $this->_fieldTypes[$fixedKey]);
+                    }
+                }
+            }
+        }
+
     }
 
 
@@ -167,7 +265,7 @@ class KrisCrudModel extends KrisModel
         return $fields;
     }
 
-     /**
+    /**
      * Gets the display fields  (TableId, Name, etc) indexed by the database fields (table_id, name, etc)
      *
      * @return array
@@ -182,6 +280,20 @@ class KrisCrudModel extends KrisModel
 
         return $fields;
     }
+
+    /**
+     * @param string $field
+     * @return string
+     */
+    protected function convertClassKeyToDisplayField($field)
+    {
+        if (isset($this->_fieldAliases[$field]))
+        {
+            return $this->_fieldAliases[$field];
+        }
+        return parent::convertClassKeyToDisplayField($field);
+    }
+
 
     /**
      * @param string $fieldName
@@ -200,5 +312,83 @@ class KrisCrudModel extends KrisModel
     {
         return is_array($this->_foreignKeys) && isset($this->_foreignKeys[$this->convertClassKeyToDBKey($fieldName)]);
     }
+
+    /**
+     * @param $foreignField
+     * @return array
+     */
+    private function getForeignKeyValues($foreignField)
+    {
+        $dbh = $this->getDatabaseHandle();
+
+        $stmt = $dbh->prepare('SELECT ' . $this->_foreignKeys[$foreignField]['field'] . ' AS value, ' . $this->_foreignKeys[$foreignField]['display'] . ' AS display' .
+                    ' FROM ' . $this->_foreignKeys[$foreignField]['table']);
+
+        $this->ValidateStatement($stmt);
+
+        $stmt->execute();
+
+        $this->ValidateStatement($stmt);
+
+        $ret = array();
+
+        while ($rs = $stmt->fetch(PDO::FETCH_ASSOC))
+        {
+            $ret[$rs['value']] = $rs['display'];
+        }
+
+        return $ret;
+
+    }
+
+
+    /**
+     * Create an HTML select...
+     *
+     * @param string $key
+     * @param array $values
+     * @param string $defaultValue
+     * @param string $class
+     * @return string
+     */
+    private function getSelect($key, $values, $defaultValue, $class = '')
+    {
+        $select = '<select name="' . $key . '" id="' . $key . '"' . (strlen($class) > 0 ? ' class="' . $class . '"'
+                : '') . '>' . PHP_EOL;
+        foreach ($values as $value => $display)
+        {
+            $select .= '<option value="' . $value . '"' . ($defaultValue == $value ? ' selected="selected"'
+                    : '') . '>' . $display . '</option>.PHP_EOL';
+        }
+        return $select . '</select>' . PHP_EOL;
+    }
+
+
+    /**
+     * Generates a text input...
+     *
+     * @param string $key
+     * @param string $value
+     * @param string $class
+     * @param string $validation
+     * @return string
+     */
+    private function getInput($key, $value, $class, $validation)
+    {
+        // TODO: Validation...
+        return '<input name="' . $key . '" id="' . $key . '" class="' . $class . '" value="' . $value . '"/>';
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @param string $class
+     * @return string
+     */
+    private function getTextArea($key, $value, $class)
+    {
+        return '<textarea name="' . $key . '" id="' . $key . '" class="' . $class . '">' . $value . '</textarea>';
+    }
+
 
 }
