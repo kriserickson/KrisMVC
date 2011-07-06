@@ -69,6 +69,11 @@ class ScaffoldController
      */
     public function Index($className = null)
     {
+        if (isset($_POST['add']))
+        {
+            $this->Add($className);
+            return;
+        }
 
         if (!is_null($className ))
         {
@@ -119,18 +124,61 @@ class ScaffoldController
      */
     public function View($className, $id)
     {
+        if (isset($_POST['changeButton']))
+        {
+            $this->Change($className, $id);
+        }
+        else if (isset($_POST['cancelButton']))
+        {
+            $this->Index($className);
+        }
+        else
+        {
+            $class = $this->GenerateClass($className);
+            $class->retrieve($id);
+
+            $data = array('display_name' => $class->DisplayName, 'fields' => $class->GetDisplayAndDatabaseFields(), 'class' => $class,
+                'form_href' => $this->base_href.'view/'.$className.'/'.$id,
+                 'changeDeleteButton' => '<button id="changeButton">Change</button>');
+
+            $this->view->set('display_name', 'View '.$class->DisplayName);
+            $this->view->set('body', $this->view->fetch(KrisConfig::APP_PATH . 'views/scaffold/view.php', $data, false));
+
+            $this->view->dump();
+        }
+    }
+
+    /**
+     * @param string $className
+     * @param int $id
+     * @return void
+     */
+    public function Delete($className, $id)
+    {
         $class = $this->GenerateClass($className);
-        $fields = $class->GetDisplayAndDatabaseFields();
         $class->retrieve($id);
 
-        $data = array('display_name' => $class->DisplayName, 'fields' => $fields, 'class' => $class,
-            'display_href' => $this->base_href.'index/'.$className,
-            'change_href' => $this->base_href.'change/'.$className.'/'.$id);
+        if (isset($_POST['deleteButton']))
+        {
+            $class->delete();
+            $this->Index($className);
+        }
+        else if (isset($_POST['cancelButton']))
+        {
+            $this->Index($className);
+        }
+        else
+        {
 
-        $this->view->set('display_name', 'View '.$class->DisplayName);
-        $this->view->set('body', $this->view->fetch(KrisConfig::APP_PATH . 'views/scaffold/view.php', $data, false));
+            $data = array('display_name' => 'Delete '.$class->DisplayName, 'fields' => $class->GetDisplayAndDatabaseFields(), 'class' => $class,
+                'form_href' => $this->base_href.'delete/'.$className.'/'.$id,
+                 'changeDeleteButton' => '<button name="deleteButton" id="deleteButton">Delete</button>');
 
-        $this->view->dump();
+            $this->view->set('display_name', 'View '.$class->DisplayName);
+            $this->view->set('body', $this->view->fetch(KrisConfig::APP_PATH . 'views/scaffold/view.php', $data, false));
+
+            $this->view->dump();
+        }
     }
 
     /**
@@ -140,20 +188,59 @@ class ScaffoldController
      */
     public function Change($className, $id)
     {
-        $class = $this->GenerateClass($className);
-        $fields = $class->GetDisplayAndDatabaseFields();
+        if (isset($_POST['cancelButton']))
+        {
+            // Show the tables index...
+            $this->Index($className);
+            return;
+        }
 
+        $class = $this->GenerateClass($className);
         $class->retrieve($id);
 
-        $data = array('display_name' => $class->DisplayName, 'fields' => $fields, 'class' => $class,
-            'display_href' => $this->base_href.'index/'.$className,
-            'change_href' => $this->base_href.'change/'.$className.'/'.$id);
+        if (isset($_POST['saveButton']))
+        {
+            $this->saveClass($class);
+            $this->Index($className);
+            return;
+        }
+        if (isset($_POST['applyButton']))
+        {
+            $this->saveClass($class);
+        }
 
-        $this->view->set('display_name', 'View '.$class->DisplayName);
+        $data = array('display_name' => 'Edit '.$class->DisplayName, 'fields' => $class->GetDisplayAndDatabaseFields(), 'class' => $class,
+            'display_href' => $this->base_href.'index/'.$className, 'change_href' => $this->base_href.'change/'.$className.'/'.$id);
+
+        $this->view->set('display_name', 'Edit '.$class->DisplayName);
         $this->view->set('body', $this->view->fetch(KrisConfig::APP_PATH . 'views/scaffold/edit.php', $data, false));
 
         $this->view->dump();
     }
+
+    /**
+     * @param $className
+     * @return void
+     */
+    public function Add($className)
+    {
+        $class = $this->GenerateClass($className);
+
+        if (isset($_POST['saveButton']))
+        {
+            $this->getUpdatedFields($class);
+            $class->create();
+        }
+
+        $data = array('display_name' => 'Add '.$class->DisplayName, 'fields' => $class->GetDisplayAndDatabaseFields(), 'class' => $class,
+            'display_href' => $this->base_href.'index/'.$className, 'change_href' => $this->base_href.'add/'.$className);
+
+        $this->view->set('display_name', 'Add '.$class->DisplayName);
+        $this->view->set('body', $this->view->fetch(KrisConfig::APP_PATH . 'views/scaffold/edit.php', $data, false));
+
+        $this->view->dump();
+    }
+
 
     /**
      * @throws Exception
@@ -193,7 +280,7 @@ class ScaffoldController
     public function GetIndexView($class, $ascending, $sort, $fields)
     {
         // Get search, where and bindings from the post variables...
-        list($bindings, $where, $search, $searchValues) = $this->GetSearchFromPostVars($fields);
+        list($bindings, $where, $search, $searchValues) = $this->getSearchFromPostVars($fields);
 
         // Get total records from the table...
         $totalRecords = $class->totalRecords($where, $bindings, true);
@@ -201,7 +288,7 @@ class ScaffoldController
         $numPages = ceil($totalRecords / $this->pageSize);
 
         //  Get the current paging location from the post vars.
-        $page = $this->GetPageFromPostVars($numPages);
+        $page = $this->getPageFromPostVars($numPages);
 
         $className = get_class($class);
 
@@ -224,7 +311,7 @@ class ScaffoldController
      * @param $fields
      * @return array
      */
-    protected function GetSearchFromPostVars($fields)
+    protected function getSearchFromPostVars($fields)
     {
         $bindings = array();
         $where = array();
@@ -259,7 +346,7 @@ class ScaffoldController
      * @param int $numPages
      * @return int
      */
-    protected function GetPageFromPostVars($numPages)
+    protected function getPageFromPostVars($numPages)
     {
         $page = isset($_POST['current_page']) ? $_POST['current_page'] : 0;
 
@@ -285,5 +372,43 @@ class ScaffoldController
 
         }
         return $page;
+    }
+
+    /**
+     * @param $class KrisCrudModel
+     * @return void
+     */
+    private function saveClass($class)
+    {
+        $updatedFields = $this->getUpdatedFields($class);
+
+        if (count($updatedFields) > 0)
+        {
+            $class->UpdateSelectedFields($updatedFields);
+        }
+
+    }
+
+    /**
+     * @param $class KrisCrudModel
+     * @return array
+     */
+    private function getUpdatedFields($class)
+    {
+        $fields = $class->GetDatabaseFields();
+        $updatedFields = array();
+        foreach ($fields as $field)
+        {
+            if (isset($_POST[$field]))
+            {
+                $postedVar = $_POST[$field];
+                if ($class->get($field) != $postedVar)
+                {
+                    $class->set($field, $postedVar);
+                    $updatedFields[$field] = $postedVar;
+                }
+            }
+        }
+        return $updatedFields;
     }
 }

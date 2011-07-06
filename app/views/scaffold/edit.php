@@ -6,8 +6,11 @@
 /** @var $class KrisCrudModel */
 /** @var $change_href string */
 /** @var $display_href string */
+/** @var $change_href string */
 
 ?>
+
+<form id="displayForm" method="post" action="<?= $change_href ?>">
 
 <table class="displayTable" summary="<?= $display_name ?>">
     <?php foreach ($class->GetDisplayAndDatabaseFields() as $fieldName => $fieldDisplay): ?>
@@ -20,12 +23,8 @@
 
 <hr size="1" class="horizontalRule"/>
 
-<button id="saveButton">Save</button><button id="applyButton">Apply</button><button id="cancelButton">Cancel</button>
+<button id="saveButton" name="saveButton">Save</button><button id="applyButton" name="applyButton">Apply</button><button name="cancelButton" id="cancelButton">Cancel</button>
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
-<script>
-    $('#saveButton').click(function() { window.location = '<?= $save_href ?>'; });
-    $('#applyButton').click(function() { window.location = '<?= $save_href ?>'; });
-    $('#cancelButton').click(function() { window.location = '<?= $display_href ?>'; });
-</script>
+</form>
+
 

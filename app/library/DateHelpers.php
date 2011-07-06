@@ -7,14 +7,29 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
- 
-class DateHelpers {
 
+/**
+ * Date helpers class...
+ */
+class DateHelpers
+{
+
+    /**
+     * @static
+     * @param string $dbDate
+     * @return string
+     */
     public static function PrintableDate($dbDate)
     {
         return date(KrisConfig::DATE_STR, strtotime($dbDate));
     }
 
+    /**
+     * @static
+     * @param string $start_time
+     * @param int $length
+     * @return string
+     */
     public static function TwentyFourToHuman($start_time, $length)
     {
         $start_time = substr($start_time, 0, 5);
@@ -42,6 +57,12 @@ class DateHelpers {
 
     }
 
+    /**
+     * @static
+     * @param int $hours
+     * @param int $minutes
+     * @return string
+     */
     static function GetAmPm($hours, $minutes)
     {
         if ($hours >= 12)

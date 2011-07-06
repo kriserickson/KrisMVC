@@ -1,14 +1,12 @@
 <?php
-
 // Variables passed into the view...
 
 /** @var $display_name string */
 /** @var $class KrisCrudModel */
-/** @var $change_href string */
-/** @var $display_href string */
+/** @var $form_href string */
+/** @var $changeDeleteButton string */
 
 ?>
-
 <table class="displayTable" summary="<?= $display_name ?>">
     <?php foreach ($class->GetDisplayAndDatabaseFields() as $fieldName => $fieldDisplay): ?>
     <tr>
@@ -20,10 +18,6 @@
 
 <hr size="1" class="horizontalRule"/>
 
-<button id="changeButton">Change</button><button id="cancelButton">Cancel</button>
-
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
-<script>
-    $('#changeButton').click(function() { window.location = '<?= $change_href ?>'; });
-    $('#cancelButton').click(function() { window.location = '<?= $display_href ?>'; });
-</script>
+<form id="displayForm" method="post" action="<?= $form_href ?>">
+    <?= $changeDeleteButton ?><button name="cancelButton" id="cancelButton">Cancel</button>
+</form>
