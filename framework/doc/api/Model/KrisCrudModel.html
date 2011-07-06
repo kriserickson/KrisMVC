@@ -51,40 +51,44 @@
 								</div>
 		<div class="info-box-body">
 			<div class="var-summary">
-																																																																																								<div class="var-title">
-					<span class="var-type">mixed</span>
+																																																																																																<div class="var-title">
+					<span class="var-type">string</span>
 					<a href="#$DisplayName" title="details" class="var-name">$DisplayName</a>
 				</div>
 																<div class="var-title">
-					<span class="var-type">mixed</span>
+					<span class="var-type">string</span>
 					<a href="#$InputClass" title="details" class="var-name">$InputClass</a>
 				</div>
 																<div class="var-title">
-					<span class="var-type">mixed</span>
+					<span class="var-type">string</span>
 					<a href="#$SelectClass" title="details" class="var-name">$SelectClass</a>
 				</div>
 																<div class="var-title">
-					<span class="var-type">mixed</span>
+					<span class="var-type">bool|string</span>
+					<a href="#$SortField" title="details" class="var-name">$SortField</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">string</span>
 					<a href="#$TextAreaClass" title="details" class="var-name">$TextAreaClass</a>
 				</div>
 																<div class="var-title">
-					<span class="var-type">mixed</span>
+					<span class="var-type">array</span>
 					<a href="#$_fakeFields" title="details" class="var-name">$_fakeFields</a>
 				</div>
 																<div class="var-title">
-					<span class="var-type">mixed</span>
+					<span class="var-type">array</span>
 					<a href="#$_fieldAliases" title="details" class="var-name">$_fieldAliases</a>
 				</div>
 																<div class="var-title">
-					<span class="var-type">mixed</span>
+					<span class="var-type">array</span>
 					<a href="#$_fieldSortOrder" title="details" class="var-name">$_fieldSortOrder</a>
 				</div>
 																<div class="var-title">
-					<span class="var-type">mixed</span>
+					<span class="var-type">array</span>
 					<a href="#$_fieldTypes" title="details" class="var-name">$_fieldTypes</a>
 				</div>
 																<div class="var-title">
-					<span class="var-type">mixed</span>
+					<span class="var-type">array</span>
 					<a href="#$_foreignKeys" title="details" class="var-name">$_foreignKeys</a>
 				</div>
 											</div>
@@ -103,7 +107,7 @@
 		</div>
 		<div class="info-box-body">			
 			<div class="method-summary">
-																																																																																				
+																																																																																												
 												<div class="method-definition">
 											<span class="method-result">KrisCrudModel</span>
 										<a href="#__construct" title="details" class="method-name">__construct</a>
@@ -154,6 +158,11 @@
 										<a href="#SetForeignKey" title="details" class="method-name">SetForeignKey</a>
 											(<span class="var-type">string</span>&nbsp;<span class="var-name">$field</span>, <span class="var-type">string|array</span>&nbsp;<span class="var-name">$name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$alias</span>)
 									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#UpdateSelectedFields" title="details" class="method-name">UpdateSelectedFields</a>
+											(<span class="var-type">$fields</span>&nbsp;<span class="var-name">$fields</span>)
+									</div>
 								</div>
 		</div>
 	</div>		
@@ -176,14 +185,15 @@
 
 	<div class="var-header">
 		<span class="var-title">
-			<span class="var-type">mixed</span>
+			<span class="var-type">string</span>
 			<span class="var-name">$DisplayName</span>
-						(line <span class="line-number">27</span>)
+						(line <span class="line-number">45</span>)
 		</span>
 	</div>
 
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
+				<li><span class="field">var:</span> - The name of the table, can be overridden in View.</li>
 				<li><span class="field">access:</span> public</li>
 			</ul>
 	
@@ -197,14 +207,15 @@
 
 	<div class="var-header">
 		<span class="var-title">
-			<span class="var-type">mixed</span>
+			<span class="var-type">string</span>
 			<span class="var-name">$InputClass</span>
-			 = <span class="var-default"> 'crudInput'</span>			(line <span class="line-number">30</span>)
+			 = <span class="var-default"> 'crudInput'</span>			(line <span class="line-number">65</span>)
 		</span>
 	</div>
 
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
+				<li><span class="field">var:</span> - Class name of the inputs</li>
 				<li><span class="field">access:</span> public</li>
 			</ul>
 	
@@ -218,14 +229,37 @@
 
 	<div class="var-header">
 		<span class="var-title">
-			<span class="var-type">mixed</span>
+			<span class="var-type">string</span>
 			<span class="var-name">$SelectClass</span>
-			 = <span class="var-default"> 'crudSelect'</span>			(line <span class="line-number">28</span>)
+			 = <span class="var-default"> 'crudSelect'</span>			(line <span class="line-number">55</span>)
 		</span>
 	</div>
 
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
+				<li><span class="field">var:</span> - Class Name of the selects</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$SortField" id="$SortField"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">bool|string</span>
+			<span class="var-name">$SortField</span>
+			 = <span class="var-default"> false</span>			(line <span class="line-number">50</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">var:</span> - Name of the sort field, can be override in the view.</li>
 				<li><span class="field">access:</span> public</li>
 			</ul>
 	
@@ -235,18 +269,19 @@
 
 </div>
 <a name="var$TextAreaClass" id="$TextAreaClass"><!-- --></A>
-<div class="oddrow">
+<div class="evenrow">
 
 	<div class="var-header">
 		<span class="var-title">
-			<span class="var-type">mixed</span>
+			<span class="var-type">string</span>
 			<span class="var-name">$TextAreaClass</span>
-			 = <span class="var-default"> 'crudTextArea'</span>			(line <span class="line-number">29</span>)
+			 = <span class="var-default"> 'crudTextArea'</span>			(line <span class="line-number">60</span>)
 		</span>
 	</div>
 
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
+				<li><span class="field">var:</span> - Class name of the textareas</li>
 				<li><span class="field">access:</span> public</li>
 			</ul>
 	
@@ -256,18 +291,19 @@
 
 </div>
 <a name="var$_fakeFields" id="$_fakeFields"><!-- --></A>
-<div class="evenrow">
+<div class="oddrow">
 
 	<div class="var-header">
 		<span class="var-title">
-			<span class="var-type">mixed</span>
+			<span class="var-type">array</span>
 			<span class="var-name">$_fakeFields</span>
-			 = <span class="var-default">array()</span>			(line <span class="line-number">18</span>)
+			 = <span class="var-default">array()</span>			(line <span class="line-number">25</span>)
 		</span>
 	</div>
 
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
+				<li><span class="field">var:</span> - List of fields that aren't in the table, but displayed based on joins of foreign keys...  $FakeFieldName =&gt; $FieldId</li>
 				<li><span class="field">access:</span> protected</li>
 			</ul>
 	
@@ -277,18 +313,19 @@
 
 </div>
 <a name="var$_fieldAliases" id="$_fieldAliases"><!-- --></A>
-<div class="oddrow">
+<div class="evenrow">
 
 	<div class="var-header">
 		<span class="var-title">
-			<span class="var-type">mixed</span>
+			<span class="var-type">array</span>
 			<span class="var-name">$_fieldAliases</span>
-			 = <span class="var-default">array()</span>			(line <span class="line-number">25</span>)
+			 = <span class="var-default">array()</span>			(line <span class="line-number">40</span>)
 		</span>
 	</div>
 
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
+				<li><span class="field">var:</span> - Override these to change any field aliases.</li>
 				<li><span class="field">access:</span> protected</li>
 			</ul>
 	
@@ -298,18 +335,19 @@
 
 </div>
 <a name="var$_fieldSortOrder" id="$_fieldSortOrder"><!-- --></A>
-<div class="evenrow">
+<div class="oddrow">
 
 	<div class="var-header">
 		<span class="var-title">
-			<span class="var-type">mixed</span>
+			<span class="var-type">array</span>
 			<span class="var-name">$_fieldSortOrder</span>
-			 = <span class="var-default">array()</span>			(line <span class="line-number">22</span>)
+			 = <span class="var-default">array()</span>			(line <span class="line-number">35</span>)
 		</span>
 	</div>
 
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
+				<li><span class="field">var:</span> - Override these to change the sort order.  FieldName =&gt; Order...</li>
 				<li><span class="field">access:</span> protected</li>
 			</ul>
 	
@@ -319,18 +357,19 @@
 
 </div>
 <a name="var$_fieldTypes" id="$_fieldTypes"><!-- --></A>
-<div class="oddrow">
+<div class="evenrow">
 
 	<div class="var-header">
 		<span class="var-title">
-			<span class="var-type">mixed</span>
+			<span class="var-type">array</span>
 			<span class="var-name">$_fieldTypes</span>
-			 = <span class="var-default">array()</span>			(line <span class="line-number">19</span>)
+			 = <span class="var-default">array()</span>			(line <span class="line-number">30</span>)
 		</span>
 	</div>
 
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
+				<li><span class="field">var:</span> - FieldName -&gt; Type (string, text, int, date, bool, etc)</li>
 				<li><span class="field">access:</span> protected</li>
 			</ul>
 	
@@ -340,18 +379,19 @@
 
 </div>
 <a name="var$_foreignKeys" id="$_foreignKeys"><!-- --></A>
-<div class="evenrow">
+<div class="oddrow">
 
 	<div class="var-header">
 		<span class="var-title">
-			<span class="var-type">mixed</span>
+			<span class="var-type">array</span>
 			<span class="var-name">$_foreignKeys</span>
-			 = <span class="var-default">array()</span>			(line <span class="line-number">17</span>)
+			 = <span class="var-default">array()</span>			(line <span class="line-number">20</span>)
 		</span>
 	</div>
 
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
+				<li><span class="field">var:</span> - Collection of foreign key data... ForeignKeyId =&gt; array('table' =&gt; '', 'field' =&gt; '', 'display' =&gt; '', 'alias' =&gt; '')</li>
 				<li><span class="field">access:</span> protected</li>
 			</ul>
 	
@@ -400,10 +440,10 @@
 			<A NAME='method_detail'></A>
 
 <a name="method__construct" id="__construct"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">Constructor __construct</span> (line <span class="line-number">36</span>)
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">71</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -433,10 +473,10 @@
 			
 	</div>
 <a name="methodconvertClassKeyToDisplayField" id="convertClassKeyToDisplayField"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">convertClassKeyToDisplayField</span> (line <span class="line-number">290</span>)
+		<span class="method-title">convertClassKeyToDisplayField</span> (line <span class="line-number">371</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -466,10 +506,10 @@
 			
 	</div>
 <a name="methodGetDatabaseFields" id="GetDatabaseFields"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">GetDatabaseFields</span> (line <span class="line-number">259</span>)
+		<span class="method-title">GetDatabaseFields</span> (line <span class="line-number">325</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -490,10 +530,10 @@
 			
 	</div>
 <a name="methodGetDisplayAndDatabaseFields" id="GetDisplayAndDatabaseFields"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">GetDisplayAndDatabaseFields</span> (line <span class="line-number">275</span>)
+		<span class="method-title">GetDisplayAndDatabaseFields</span> (line <span class="line-number">356</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -514,10 +554,10 @@
 			
 	</div>
 <a name="methodGetDisplayValue" id="GetDisplayValue"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">GetDisplayValue</span> (line <span class="line-number">195</span>)
+		<span class="method-title">GetDisplayValue</span> (line <span class="line-number">260</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -543,10 +583,10 @@
 			
 	</div>
 <a name="methodGetEditValue" id="GetEditValue"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">GetEditValue</span> (line <span class="line-number">215</span>)
+		<span class="method-title">GetEditValue</span> (line <span class="line-number">280</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -571,10 +611,10 @@
 			
 	</div>
 <a name="methodGetTableFields" id="GetTableFields"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">GetTableFields</span> (line <span class="line-number">149</span>)
+		<span class="method-title">GetTableFields</span> (line <span class="line-number">214</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -594,10 +634,10 @@
 			
 	</div>
 <a name="methodretrieve" id="retrieve"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">retrieve</span> (line <span class="line-number">47</span>)
+		<span class="method-title">retrieve</span> (line <span class="line-number">82</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -629,10 +669,10 @@
 			
 	</div>
 <a name="methodretrieveMultiple" id="retrieveMultiple"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">retrieveMultiple</span> (line <span class="line-number">82</span>)
+		<span class="method-title">retrieveMultiple</span> (line <span class="line-number">117</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -680,10 +720,10 @@
 			
 	</div>
 <a name="methodSetForeignKey" id="SetForeignKey"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">SetForeignKey</span> (line <span class="line-number">60</span>)
+		<span class="method-title">SetForeignKey</span> (line <span class="line-number">95</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -714,6 +754,34 @@
 		
 			
 	</div>
+<a name="methodUpdateSelectedFields" id="UpdateSelectedFields"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">UpdateSelectedFields</span> (line <span class="line-number">341</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			UpdateSelectedFields
+		</span>
+					(<span class="var-type">$fields</span>&nbsp;<span class="var-name">$fields</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">$fields</span>
+				<span class="var-name">$fields</span>			</li>
+				</ul>
+		
+			
+	</div>
 							<h4>Inherited Methods</h4>
 				<a name='inherited_methods'><!-- --></a>	
 									<!-- =========== Summary =========== -->
@@ -729,6 +797,7 @@
 													<span class="method-name"><a href="../Model/KrisModel.html#methodselect">KrisModel::select()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisModel.html#methodtotalRecords">KrisModel::totalRecords()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisModel.html#methodupdate">KrisModel::update()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisModel.html#methodupdateFields">KrisModel::updateFields()</a></span><br>
 											</blockquote>
 									<!-- =========== Summary =========== -->
 					<p>Inherited From <span class="classname"><a href="../Model/KrisDB.html">KrisDB</a></span></p>
@@ -759,7 +828,7 @@
 
 
 	<p class="notes" id="credit">
-		Documentation generated on Tue, 05 Jul 2011 14:09:48 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+		Documentation generated on Wed, 06 Jul 2011 04:10:17 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
 	</p>
 	</div></body>
 </html>
