@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * All Controller tests...
+ */
 class KrisController_AllTests extends PHPUnit_Framework_TestSuite
 {
 	/**

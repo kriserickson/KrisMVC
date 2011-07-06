@@ -51,24 +51,20 @@ abstract class KrisModel extends KrisDB
     {
         $dbh = $this->getDatabaseHandle();
         $s1 = $s2 = '';
+        $params = array();
+
         foreach ($this->_recordSet as $key => $value)
         {
-            if ($key != $this->_primaryKeyName || $value)
+            $dbKey = $this->convertClassKeyToDBKey($key);
+            if ($dbKey != $this->_primaryKeyName || $value)
             {
-                $s1 .= (strlen($s1) > 0 ? ',' : ''). $this->quoteDbObject($key);
+                $s1 .= (strlen($s1) > 0 ? ',' : ''). $this->quoteDbObject($dbKey);
                 $s2 .= (strlen($s2) > 0 ? ',' : '').'?';
+                $params[] = $value;
             }
         }
         $stmt = $dbh->prepare('INSERT INTO ' . $this->quoteDbObject($this->_tableName) . ' (' . $s1 . ') VALUES (' . $s2 . ')');
-        $i = 1;
-        foreach ($this->_recordSet as $key => $value)
-        {
-            if ($key != $this->_primaryKeyName || $value)
-            {
-                $stmt->bindValue($i++, $value);
-            }
-        }
-        $stmt->execute();
+        $stmt->execute($params);
 
         $this->ValidateStatement($stmt);
 
@@ -115,26 +111,10 @@ abstract class KrisModel extends KrisDB
      */
     public function update()
     {
-        $dbh = $this->getDatabaseHandle();
-        $set = '';
-        foreach ($this->_recordSet as $key => $value)
-        {
-            $this->
-            $set .= (strlen($set) > 0 ? ',' : '') . $this->quoteDbObject($key) . '=?';
-        }
-        $stmt = $dbh->prepare('UPDATE ' . $this->quoteDbObject($this->_tableName) . ' SET ' . $set . ' WHERE ' . $this->quoteDbObject($this->_primaryKeyName) . '=?');
-        $i = 1;
-        foreach ($this->_recordSet as $value)
-        {
-            $stmt->bindValue($i++, $value);
-        }
-        $stmt->bindValue($i, $this->_recordSet[$this->_primaryKeyName]);
-        $res = $stmt->execute();
-
-        $this->ValidateStatement($stmt);
-
-        return $res;
+        $this->updateFields($this->_recordSet);
     }
+
+
 
     /**
      * Deletes this model from the table
@@ -144,8 +124,8 @@ abstract class KrisModel extends KrisDB
     public function delete()
     {
         $dbh = $this->getDatabaseHandle();
-        $stmt = $dbh->prepare('DELETE FROM ' . $this->quoteDbObject($this->_tableName) . ' WHERE ' . $this->quoteDbObject($this->_primaryKeyName) . '=?');
-        $stmt->bindValue(1, $this->_recordSet[$this->_primaryKeyName]);
+        $stmt = $dbh->prepare('DELETE FROM ' . $this->quoteDbObject($this->_tableName) . ' WHERE ' . $this->quoteDbObject($this->_primaryKeyName) . ' = ?');
+        $stmt->bindValue(1, $this->PrimaryKey());
         $res = $stmt->execute();
         $this->ValidateStatement($stmt);
 
@@ -238,6 +218,37 @@ abstract class KrisModel extends KrisDB
         return $stmt;
     }
 
+    /**
+     * @param array $fields
+     * @return bool
+     */
+    protected function updateFields($fields)
+    {
+        $dbh = $this->getDatabaseHandle();
+        $set = '';
+        foreach (array_keys($fields) as $key)
+        {
+            $dbKey = $this->convertClassKeyToDBKey($key);
+            if ($dbKey != $this->_primaryKeyName)
+            {
+                $set .= (strlen($set) > 0 ? ',' : '') . $this->quoteDbObject($dbKey) . '=?';
+            }
+        }
+        $stmt = $dbh->prepare('UPDATE ' . $this->quoteDbObject($this->_tableName) . ' SET ' . $set . ' WHERE ' . $this->quoteDbObject($this->_primaryKeyName) . '=?');
+        $i = 1;
+        foreach ($fields as $value)
+        {
+            $stmt->bindValue($i++, $value);
+        }
+
+        $stmt->bindValue($i, $this->PrimaryKey());
+
+        $res = $stmt->execute();
+
+        $this->ValidateStatement($stmt);
+
+        return $res;
+    }
 
 
 }

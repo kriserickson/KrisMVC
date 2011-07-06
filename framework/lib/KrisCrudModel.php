@@ -173,8 +173,6 @@ class KrisCrudModel extends KrisModel
 
         $stmt = $dbh->prepare($this->addLimit($this->addOrder($sql, $order, $orderAscending), $count, $offset));
 
-        $this->ValidateStatement($stmt);
-
         $stmt->execute($bindings);
 
         $this->ValidateStatement($stmt);
@@ -287,7 +285,8 @@ class KrisCrudModel extends KrisModel
             $value = $this->get($this->_fakeFields[$fixedKey]);
             return $this->getSelect($this->_fakeFields[$fixedKey], $this->getForeignKeyValues($this->_fakeFields[$fixedKey]), $value, $this->SelectClass);
         }
-        else {
+        else
+        {
             $value = $this->get($key);
             if ($this->_fieldTypes[$fixedKey] == 'bool')
             {
@@ -332,6 +331,21 @@ class KrisCrudModel extends KrisModel
         }
 
         return $fields;
+    }
+
+
+    /**
+     * @param $fields
+     * @return void
+     */
+    public function UpdateSelectedFields($fields)
+    {
+        $this->updateFields($fields);
+        if (count($this->_foreignKeys) > 0)
+        {
+            $this->retrieve($this->PrimaryKey());
+        }
+
     }
 
     /**
@@ -394,8 +408,6 @@ class KrisCrudModel extends KrisModel
 
         $stmt = $dbh->prepare('SELECT t1.' . $this->_foreignKeys[$foreignField]['field'] . ' AS value ' . $displayFieldSelect .
                     ' FROM ' . $this->_foreignKeys[$foreignField]['table'].' AS t1');
-
-        $this->ValidateStatement($stmt);
 
         $stmt->execute();
 

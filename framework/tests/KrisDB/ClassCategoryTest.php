@@ -11,6 +11,9 @@
  */
 class ClassCategoryTest extends KrisDBView
 {
+    /**
+     * Construct
+     */
     function __construct()
     {
         parent::__construct(array('category' => array('category_id', 'name', 'image', 'code', 'short_description'),

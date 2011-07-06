@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * All View tests...
+ */
 class KrisView_AllTests extends PHPUnit_Framework_TestSuite
 {
 	/**

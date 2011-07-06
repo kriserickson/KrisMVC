@@ -112,12 +112,14 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
         $this->_krisDB->initializeRecordSet(array('testField1'));
 
         $rs = array($testField1 => $testResult1, $testField2 => $testResult2);
+        $this->setExpectedException('KrisDatabaseException', 'Unable to bind TestField2 with value: test_result2');
         $this->_krisDB->bindRecordSet($rs, $this->_krisDB);
 
         $this->assertEquals($testResult1, $this->_krisDB->TestField1);
         $this->assertEquals($testResult1, $this->_krisDB->get('TestField1'));
         $this->assertEquals($testResult1, $this->_krisDB->get($testField1));
 
+        
         $this->setExpectedException('KrisDatabaseException', 'Invalid key: TestField2');
         $this->_krisDB->TestField2;
 

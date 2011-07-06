@@ -51,6 +51,11 @@ class KrisDBViewTest extends PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * Test error handling
+     *
+     * @test
+     */
     public function testErrorHandling()
     {
         $PDOMock = $this->getMock('MockPDO', array('prepare'), array(), '', false);

@@ -157,7 +157,7 @@ abstract class KrisDB
             }
             else
             {
-                echo '$key => '.$key;
+                throw new KrisDatabaseException('Unable to bind '.$key.' with value: '.$val);
             }
         }
         return $bindTo;

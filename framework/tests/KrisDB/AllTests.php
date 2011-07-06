@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * All DB Tests..
+ */
 class KrisDB_AllTests extends PHPUnit_Framework_TestSuite
 {
 	/**

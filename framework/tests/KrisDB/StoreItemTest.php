@@ -15,6 +15,10 @@ class StoreItemTest extends KrisModel
 {
     public $StoreItems = array();
 
+    /**
+     * Constructor
+     * @param string $id
+     */
     function __construct($id = '')
     {
       parent::__construct('store_id', 'store');

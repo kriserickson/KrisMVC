@@ -36,6 +36,9 @@ class ClassModelTest extends KrisCrudModel
 
     protected $_fakeFields = array('Description' => true, 'Name' => true, 'FirstName' => true, 'NameC1' => true);
 
+    /**
+     * Construct
+     */
     function __construct()
     {
         parent::__construct('class_id', 'class');

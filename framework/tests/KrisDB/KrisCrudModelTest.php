@@ -1,9 +1,5 @@
 <?php
 
-class MockPDO
-{
-
-}
 
 require(__DIR__.'/ClassModelTest.php');
 
@@ -47,7 +43,7 @@ class KrisCrudModelTest extends PHPUnit_Framework_TestCase
         $PDOMock->expects($this->once())->method('prepare')->with($sql)->will($this->returnValue($stmtMock));
         
         $stmtMock->expects($this->once())->method('execute')->with(array($classId));
-        $stmtMock->expects($this->exactly(2))->method('errorCode')->will($this->returnValue(0));
+        $stmtMock->expects($this->once())->method('errorCode')->will($this->returnValue(0));
         $stmtMock->expects($this->once())->method('fetch')->with(PDO::FETCH_ASSOC)->will($this->returnValue(array('class_id' => $classId,
             'category_id' => $categoryId, 'sub_category_id' => $subcategoryId, 'day' => $day, 'start_time' => $startTime,'length' => $length,
             'cost' => $cost, 'instructor_id' => $instructorId, 'max_students' => $maxStudents, 'start_date' => $startDate, 'end_date' => $endDate,
@@ -84,4 +80,14 @@ class KrisCrudModelTest extends PHPUnit_Framework_TestCase
 
     }
 }
+
+/**
+ * MockPDO class allows mocking of the PDO object which doens't normally work...
+ */
+class MockPDO
+{
+
+}
+
+
 ?>
