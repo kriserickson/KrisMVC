@@ -294,8 +294,6 @@ EOT;
             (c.CONSTRAINT_NAME = cu.CONSTRAINT_NAME AND cu.TABLE_NAME = c.TABLE_NAME AND cu.TABLE_SCHEMA = c.TABLE_SCHEMA)
             WHERE c.CONSTRAINT_TYPE = ? AND c.TABLE_SCHEMA = ? AND c.TABLE_NAME = ?");
 
-        $this->ValidateStatement($stmt);
-
         $foreignKeys = array();
 
         if ($stmt->execute(array('FOREIGN KEY', KrisConfig::DB_DATABASE, $table)))
@@ -348,16 +346,16 @@ EOT;
         // TODO: Make this work with non-mysql types...
         switch ($type)
         {
-            case 'varchar' : case 'text': case 'char': case 'mediumblob': case 'mediumtext': case 'set': case 'blob':
-            case 'tinytext': case 'longblob':
+            case 'varchar' : case 'char': case 'set':
                 return 'string';
-
+            case 'mediumblob': case 'blob': case 'longblob':
+                return 'blob';
+            case 'text': case 'mediumtext': case 'tinytext':
+                return 'text';
             case 'time': case 'timestamp': case 'datetime': case 'date': case 'enum':
                 return $type;
-
             case 'bigint': case 'longtext': case 'int': case 'mediumint': case 'smallint':
                 return 'int';
-
             case 'tinyint':
                 return 'bool';
 
@@ -381,8 +379,6 @@ EOT;
         $dbh = $this->getDatabaseHandle();
 
         $stmt = $dbh->prepare("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?");
-
-        $this->ValidateStatement($stmt);
 
         if ($stmt->execute(array(KrisConfig::DB_DATABASE, $tableName)))
         {
