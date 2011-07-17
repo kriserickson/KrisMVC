@@ -1,7 +1,7 @@
 <?php
 
 
-require(__DIR__.'/ClassModelTest.php');
+require(dirname(__FILE__).'/ClassModelTest.php');
 
 /**
  * Test class for KrisModel.

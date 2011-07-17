@@ -219,12 +219,12 @@ abstract class KrisDB
                 $orderBy = '';
                 foreach ($order as $orderKey)
                 {
-                    $orderBy .= (strlen($orderBy) > 0 ? ', ' : '').static::convertClassKeyToDBKey($orderKey);
+                    $orderBy .= (strlen($orderBy) > 0 ? ', ' : '').$this->convertClassKeyToDBKey($orderKey);
                 }
             }
             else
             {
-                $orderBy = static::convertClassKeyToDBKey($order);
+                $orderBy = $this->convertClassKeyToDBKey($order);
             }
             $sql .= ' ORDER BY '.$orderBy.' '.($orderAscending ? 'ASC' : 'DESC');
         }
@@ -302,7 +302,8 @@ abstract class KrisDB
         if (strpos($key, '_') === false || $key[0] != strtolower($key[0]))
         {
             $key = strtolower(substr($key, 0, 1)).substr($key, 1);
-            return preg_replace_callback('/_?[A-Z]/', function($matches) { return '_'.strtolower($matches[0]);}, $key);
+            return preg_replace_callback('/_?[A-Z]/', create_function('$matches', 'return "_".strtolower($matches[0]);'), $key);
+                
         }
         return $key;
     }
@@ -311,7 +312,7 @@ abstract class KrisDB
      * @param string $key
      * @return string
      */
-    protected function convertClassKeyToDisplayField($key)
+    protected function convertFieldToDisplayField($key)
     {
         if (strpos($key, '_') > 0 && $key[0] == strtolower($key[0]))
         {

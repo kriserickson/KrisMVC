@@ -3,7 +3,7 @@
 /**
  * All View tests...
  */
-class KrisView_AllTests extends PHPUnit_Framework_TestSuite
+class View_AllTests extends PHPUnit_Framework_TestSuite
 {
 	/**
 	 * Creates the suite.

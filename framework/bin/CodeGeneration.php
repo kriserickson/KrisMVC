@@ -17,47 +17,157 @@ class KrisCG extends KrisDB
 
     const UNDERSCORE_PLACEHOLDER = '+=+';
 
-    private $applicationDirectory;
-    private $baseModelDirectory;
-    private $generatedDirectory;
-    private $crudDirectory;
+    private $_applicationDirectory;
+    private $_baseModelDirectory;
+    private $_generatedDirectory;
+    private $_crudDirectory;
+    private $_siteLocation;
 
     /**
      * Constructor
-     * @param string $appPath
+     * @param string $siteLocation
      * @return KrisCG
      */
-    public function __construct($appPath = '')
+    public function __construct($siteLocation)
     {
-        if (strlen($appPath) == 0)
-        {
-            $appPath = __DIR__ . '/..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
-        }
-
-        $this->applicationDirectory = str_replace('/', DIRECTORY_SEPARATOR, KrisConfig::APP_PATH);
-        $this->baseModelDirectory = $this->applicationDirectory . 'models';
-        $this->generatedDirectory = $appPath . $this->baseModelDirectory . DIRECTORY_SEPARATOR . 'generated';
-        $this->crudDirectory = $appPath . $this->baseModelDirectory . DIRECTORY_SEPARATOR . 'crud';
-        
-
-        if (!file_exists($this->generatedDirectory))
-        {
-            mkdir($this->generatedDirectory);
-        }
-        if (!file_exists($this->crudDirectory))
-        {
-            mkdir($this->crudDirectory);
-            
-        }        
+        $this->_siteLocation = $siteLocation;
     }
 
     /**
+     * @return void
+     */
+    public function SetupDirectories()
+    {
+        $this->_applicationDirectory =  $this->_siteLocation . DIRECTORY_SEPARATOR . KrisConfig::APP_PATH;
+        $this->_baseModelDirectory = $this->_applicationDirectory . 'models';
+        $this->_generatedDirectory = $this->_baseModelDirectory . DIRECTORY_SEPARATOR . 'generated';
+        $this->_crudDirectory = $this->_baseModelDirectory . DIRECTORY_SEPARATOR . 'crud';
+
+
+    }
+
+    /**
+     * Includes the config file...
+     *
+     * @return void
+     */
+    public function IncludeConfigFile()
+    {
+        $configLocation = $this->_siteLocation.'/config/KrisConfig.php';
+
+        if (!file_exists($configLocation))
+        {
+            die('Config file does not exist');
+        }
+
+        require_once($configLocation);
+
+        if (!class_exists('KrisConfig'))
+        {
+            die('Config file not located at '.$configLocation);
+        }
+        $this->SetupDirectories();
+    }
+
+    /**
+     * Creates a new site in location
+     * @param string $site
+     * @param string $host
+     * @param string $database
+     * @param string $user
+     * @param string $password
+     * @param string $type
+     *
+     * @internal param string $siteName
+     * @return void
+     */
+    public function CreateSite($site, $host, $database, $user, $password, $type)
+    {
+
+        if (strtolower(substr($site,0,7)) != 'http://')
+        {
+            $site = 'http://'.$site;
+        }
+        $fp = fopen($site, 'r');
+        if ($fp === false)
+        {
+            die('Could not access http://'.$site.'  Pleae make the site accessible before starting...');
+        }
+        fclose($fp);
+
+        $webFolder = '/'.basename($site);
+
+        $configLocation = $this->_siteLocation . '/config/KrisConfig.php';
+        if (file_exists($configLocation))
+        {
+            die('Cannot create a site where one already exists');
+        }
+
+        if (!in_array($type, array('MYSQL', 'MSSQL', 'SQLITE', 'POSTGRESQL')))
+        {
+            die('Database type ('.$type.') invalid, must be be one of MYSQL, MSSQL, SQLITE, POSTGRESQL');
+        }
+
+        $this->CreateDirectoryDie($this->_siteLocation.DIRECTORY_SEPARATOR.'config');
+
+        $configContents = file_get_contents(dirname(__FILE__).'/assets/KrisConfig.php');
+        $configContents = str_replace(array('@@FRAMEWORK_DIR@@', '@@WEB_FOLDER@@', '@@SITE_LOCATION@@', '@@DB_HOST@@', '@@DB_DATABASE@@',
+            '@@DB_USER@@', '@@DB_PASSWORD@@', 'KrisConfig::DB_TYPE_MYSQL'),
+            array(dirname(dirname(__FILE__)), $webFolder, $this->_siteLocation, $host, $database, $user, $password, 'KrisConfig::DB_TYPE_'.$type),
+            $configContents);
+
+        file_put_contents($configLocation, $configContents);
+
+        $this->IncludeConfigFile();
+
+        // Create the rest of the directories..
+        $this->CreateDirectoryDie($this->_applicationDirectory);
+        $this->CreateDirectoryDie($this->_applicationDirectory.'/controllers/main');
+        $this->CreateDirectoryDie($this->_applicationDirectory.'/library');
+        $this->CreateDirectoryDie($this->_applicationDirectory.'/views/layouts');
+        $this->CreateDirectoryDie($this->_applicationDirectory.'/views/main');
+        $this->CreateDirectoryDie($this->_baseModelDirectory);
+        $this->CreateDirectoryDie($this->_siteLocation.'/css');
+        $this->CreateDirectoryDie($this->_siteLocation.'/images');
+        $this->CreateDirectoryDie($this->_siteLocation.'/js');
+
+        // Create the blocking htaccess files...
+        $htaccessDeny = 'deny from all';
+        file_put_contents($this->_siteLocation.'/config/.htaccess', $htaccessDeny);
+        file_put_contents($this->_applicationDirectory.'/.htaccess', $htaccessDeny);
+
+        // Create the index file and .htaccess
+        $htaccessContents = file_get_contents(dirname(__FILE__).'/assets/.htaccess');
+        $htaccessContents = str_replace('@@WEB_FOLDER@@', $webFolder, $htaccessContents);
+        file_put_contents($this->_siteLocation.'/.htaccess', $htaccessContents);
+
+        copy(dirname(__FILE__).'/assets/index.php', $this->_siteLocation.'/index.php');
+        copy(dirname(__FILE__).'/assets/MainController.php', $this->_applicationDirectory.'/controllers/main/MainController.php');
+        copy(dirname(__FILE__).'/assets/layout.php', $this->_applicationDirectory.'/views/layouts/layout.php');
+        copy(dirname(__FILE__).'/assets/MainView.php', $this->_applicationDirectory.'/views/main/MainView.php');
+        copy(dirname(__FILE__).'/assets/style.css', $this->_siteLocation.'/css/style.css');
+
+        echo 'Site created at '.$this->_siteLocation.PHP_EOL;
+
+    }
+
+
+    /**
      * Generates a model based on a table name
-     * @param $tableName
+     * @param string $tableName
      * @return void
      */
     public function GenerateModel($tableName)
     {
+        if (!file_exists($this->_generatedDirectory))
+        {
+            mkdir($this->_generatedDirectory);
+        }
+        if (!file_exists($this->_crudDirectory))
+        {
+            mkdir($this->_crudDirectory);
+        }
+
         $tableName = strtolower($tableName);
 
         if (!$this->TableExists($tableName))
@@ -85,7 +195,7 @@ class KrisCG extends KrisDB
         $this->GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields, $fakeFields, $primaryKey, $fieldTypes);
 
         // Don't overwrite a class that has changes....
-        if (!file_exists($this->crudDirectory . DIRECTORY_SEPARATOR . $filename))
+        if (!file_exists($this->_crudDirectory . DIRECTORY_SEPARATOR . $filename))
         {
             $this->GenerateDerivedClass($filename, $safeClassName, $className);
         }
@@ -185,7 +295,7 @@ class KrisCG extends KrisDB
         $output = <<<EOT
 <?php
 /**
- * Generated Code, do not edit, edit the file ${filename} in {$this->baseModelDirectory}
+ * Generated Code, do not edit, edit the file ${filename} in {$this->_baseModelDirectory}
  */
 
 /**
@@ -211,7 +321,7 @@ class ${className}Model extends KrisCrudModel
 }
 ?>
 EOT;
-        $filePath = $this->generatedDirectory . DIRECTORY_SEPARATOR . $className . 'Model' . '.php';
+        $filePath = $this->_generatedDirectory . DIRECTORY_SEPARATOR . $className . 'Model' . '.php';
         if (file_exists($filePath))
         {
             unlink($filePath);
@@ -248,7 +358,7 @@ class ${safeClassName} extends ${className}Model
 ?>
 EOT;
 
-        $fp = fopen($this->crudDirectory . DIRECTORY_SEPARATOR . $filename, 'w');
+        $fp = fopen($this->_crudDirectory . DIRECTORY_SEPARATOR . $filename, 'w');
         fwrite($fp, $output);
         fclose($fp);
     }
@@ -388,6 +498,14 @@ EOT;
         }
 
         return false;
+    }
+
+    private function CreateDirectoryDie($directory)
+    {
+        if (!FileHelpers::EnsureDirectoryExists($directory))
+        {
+            die('Failed to create directory: '.$directory);
+        }
     }
 
 

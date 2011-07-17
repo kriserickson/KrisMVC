@@ -3,7 +3,7 @@
 /**
  * All DB Tests..
  */
-class KrisDB_AllTests extends PHPUnit_Framework_TestSuite
+class Orm_AllTests extends PHPUnit_Framework_TestSuite
 {
 	/**
 	 * Creates the suite.

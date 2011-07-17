@@ -6,14 +6,13 @@ around with Symfony, Yii, CodeIgniter, Kohana and Cake I decided that Rasmus was
 [No-Framework MVC] (http://toys.lerdorf.com/archives/38-The-no-framework-PHP-MVC-framework.html) so I decided to roll out my own.
 My problems with these frameworks varied:
 
-    1. Not built on OO concepts, lots of files of functions.
-    2. The number of config files you had to edit (and use of strange markups like Yaml).
-    3. The steep learning curve required to be locked into one framework
-    4. The fact that in PHPStorm most of them look like an explosion of Red and Yellow errors in the trough
-       (seeing a nice green square at the top of makes me happy).
-    5. Documented in a way that intellisense and goto/function wasn't working.
-    6. Didn't use PHPUnit for testing (want to be able to run unit tests in PHPStorm).
-    7. The amount of magic required.
+1. Not built on OO concepts, lots of files of functions.
+2. The number of config files you had to edit (and use of strange markups like Yaml).
+3. The steep learning curve required to be locked into one framework
+4. The fact that in PHPStorm most of them look like an explosion of Red and Yellow errors in the trough (seeing a nice green square at the top of makes me happy).
+5. Documented in a way that intellisense and goto/function wasn't working.
+6. Didn't use PHPUnit for testing (want to be able to run unit tests in PHPStorm).
+7. The amount of magic required.
 
 Basically I wanted something that would work very well with [PHPStorm] (http://www.jetbrains.com/phpstorm/) and looked
 and felt the way I felt a MVC framework should feel like.  Half-way through starting I was researching the easiest way to do

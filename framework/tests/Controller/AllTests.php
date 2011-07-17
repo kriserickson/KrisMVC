@@ -3,7 +3,7 @@
 /**
  * All Controller tests...
  */
-class KrisController_AllTests extends PHPUnit_Framework_TestSuite
+class Controller_AllTests extends PHPUnit_Framework_TestSuite
 {
 	/**
 	 * Creates the suite.

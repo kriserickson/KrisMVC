@@ -48,12 +48,12 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
      */
     function convertClassKeyToDisplayTest()
     {
-        $this->assertEquals('Record Id', $this->_krisDB->convertClassKeyToDisplayField('RecordId'));
-        $this->assertEquals('Sub Category Id', $this->_krisDB->convertClassKeyToDisplayField('SubCategoryId'));
-        $this->assertEquals('Sub Category Id', $this->_krisDB->convertClassKeyToDisplayField('sub_category_id'));
+        $this->assertEquals('Record Id', $this->_krisDB->convertFieldToDisplayField('RecordId'));
+        $this->assertEquals('Sub Category Id', $this->_krisDB->convertFieldToDisplayField('SubCategoryId'));
+        $this->assertEquals('Sub Category Id', $this->_krisDB->convertFieldToDisplayField('sub_category_id'));
 
-        $this->assertEquals($this->_krisDB->convertClassKeyToDisplayField('RecordId'),
-            $this->_krisDB->convertClassKeyToDisplayField($this->_krisDB->convertDBKeyToClassKey('record_id')));
+        $this->assertEquals($this->_krisDB->convertFieldToDisplayField('RecordId'),
+            $this->_krisDB->convertFieldToDisplayField($this->_krisDB->convertDBKeyToClassKey('record_id')));
     }
 
     /**
@@ -281,9 +281,9 @@ class KrisDBExposeProtected extends KrisDB
          * @param string $key
          * @return string
          */
-        function convertClassKeyToDisplayField($key)
+        function convertFieldToDisplayField($key)
         {
-            return parent::convertClassKeyToDisplayField($key);
+            return parent::convertFieldToDisplayField($key);
         }
 
 

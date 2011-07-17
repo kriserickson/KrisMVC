@@ -1,16 +1,22 @@
 <?php
 
+/**
+ * Configuration of the application...
+ */
 class KrisConfig
 {
-    // Change Config options here... TODO: Load these from some config file
-    const APP_PATH = 'app/';
-    const WEB_FOLDER = '/krismvc';
+    // Change Config options here...
+    const APP_PATH = 'app/';    // APP_PATH must end in a slash...
+    const WEB_FOLDER = '/';
+    const BASE_DIR = 'localhost';
 
-    // Change Database connections here... TODO: Load these from some config file
+    // Change Database connections here...
     const DB_HOST = 'localhost';
-    const DB_DATABASE = '';
-    const DB_USER = '';
-    const DB_PASSWORD = '';
+    const DB_DATABASE = 'test';
+    const DB_USER = 'test';
+    const DB_PASSWORD = 'test';
+
+    const FRAMEWORK_DIR = '/framework';
 
     // Quote style
     public static $DATABASE_TYPE = KrisConfig::DB_TYPE_MYSQL;
@@ -80,18 +86,18 @@ class KrisConfig
      */
     public static function GetDatabaseHandle()
     {
-        if (is_null(static::$DB_CONNECTION))
+        if (is_null(KrisConfig::$DB_CONNECTION))
         {
             try
             {
-                static::$DB_CONNECTION = new PDO('mysql:host='.self::DB_HOST.';dbname='.self::DB_DATABASE, self::DB_USER, self::DB_PASSWORD);
+                KrisConfig::$DB_CONNECTION = new PDO('mysql:host='.self::DB_HOST.';dbname='.self::DB_DATABASE, self::DB_USER, self::DB_PASSWORD);
             }
             catch (PDOException $e)
             {
                 die('Connection failed: ' . $e->getMessage());
             }
         }
-        return static::$DB_CONNECTION;
+        return KrisConfig::$DB_CONNECTION;
     }
 
     /**
@@ -102,7 +108,7 @@ class KrisConfig
      */
     public static function HasClass($className)
     {
-        return isset(static::$ClassLoader[$className]);
+        return isset(KrisConfig::$ClassLoader[$className]);
     }
 
     /**
@@ -114,7 +120,7 @@ class KrisConfig
      */
     public static function Autoload($className)
     {
-        require(self::APP_PATH.static::$ClassLoader[$className]);
+        require(KrisConfig::$ClassLoader[$className]);
     }
 
     /**
@@ -123,13 +129,18 @@ class KrisConfig
      * KrisConfig::AddClass('DateHelpers', 'app/library/DateHelpers.php');
      *
      * @static
-     * @param $className
-     * @param $classLocation
+     * @param string $className
+     * @param string $classLocation
+     * @param bool $isFramework
      * @return void
      */
-    public static function AddClass($className, $classLocation)
+    public static function AddClass($className, $classLocation, $isFramework = false)
     {
-        static::$ClassLoader[$className] = $classLocation;
+        if (!$isFramework)
+        {
+            $classLocation = self::APP_PATH.$classLocation;
+        }
+        KrisConfig::$ClassLoader[$className] = $classLocation;
     }
 
 

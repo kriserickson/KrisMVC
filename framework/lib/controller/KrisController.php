@@ -46,7 +46,7 @@ class KrisController
     protected  function explode_http_request()
     {
         $requestUri = $_SERVER['REQUEST_URI'];
-        if (strpos($requestUri, $this->_webFolder) === 0)
+        if (strlen($this->_webFolder) == 0 || strpos($requestUri, $this->_webFolder) === 0)
         {
             $requestUri = substr($requestUri, strlen($this->_webFolder.'/'));
         }
@@ -125,7 +125,7 @@ class KrisController
 
         if (!method_exists($controller, $function))
         {
-            $this->request_not_found('Function not found: ' . $function);
+            $this->request_not_found('Function not found: ' . $function. ' in controller: '. $controllerClass);
         }
         else
         {

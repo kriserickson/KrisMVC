@@ -25,7 +25,7 @@ class KrisCrudModel extends KrisModel
     protected $_fakeFields = array();
 
     /**
-     * @var array - FieldName -> Type (string, text, int, date, bool, etc)
+     * @var array - FieldName -> Type (string, text, int, date, bool, image, upload, etc)
      */
     protected $_fieldTypes = array();
 
@@ -404,7 +404,7 @@ class KrisCrudModel extends KrisModel
         $fields = array();
         foreach ($this->GetDisplayFields() as $field)
         {
-            $fields[$this->convertClassKeyToDBKey($field)] = $this->convertClassKeyToDisplayField($field);
+            $fields[$this->convertClassKeyToDBKey($field)] = $this->convertFieldToDisplayField($field);
         }
 
         return $fields;
@@ -414,13 +414,13 @@ class KrisCrudModel extends KrisModel
      * @param string $field
      * @return string
      */
-    protected function convertClassKeyToDisplayField($field)
+    protected function convertFieldToDisplayField($field)
     {
         if (isset($this->_fieldAliases[$field]))
         {
             return $this->_fieldAliases[$field];
         }
-        return parent::convertClassKeyToDisplayField($field);
+        return parent::convertFieldToDisplayField($field);
     }
 
 
@@ -539,6 +539,55 @@ class KrisCrudModel extends KrisModel
             }
         }
         return $uploads;
+    }
+
+    /**
+     * @param string $field - dbField to be validated...
+     * @param string $value -
+     * @return string - error message or a blank string if there is no validation error.
+     */
+    public function ValidateField($field, $value)
+    {
+        $fieldType = $this->_fieldTypes[$this->convertDBKeyToClassKey($field)];
+        $error = '';
+        switch ($fieldType)
+        {
+            case 'string':
+                // We should probably know the max string length but for now we will make sure that it is not more 255 characters.
+                if (strlen($value) > 255)
+                {
+                    $error = 'String too long';
+                }
+                break;
+            case 'int' :
+                if (!is_int($value))
+                {
+                    $error = 'Must be an integer.';
+                }
+                break;
+            case 'date':
+                if (strtotime($value) === false)
+                {
+                    $error = 'Must be a valid date.';
+                }
+                break;
+            case 'bool':
+                if ($value != 1 && $value != 0)
+                {
+                    $error = 'Must be a valid boolean';
+                }
+            case 'text': // Nothing to validate in text...
+            case 'image': case 'upload':// Image and upload are validated in the controller
+                default:
+                break;
+
+        }
+
+        if (strlen($error) > 0)
+        {
+            return $this->convertFieldToDisplayField($field).' value "'.$value.'" is invalid. '.$error;
+        }
+        return '';
     }
 
 
