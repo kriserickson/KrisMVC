@@ -55,7 +55,7 @@ class KrisCrudModelTest extends PHPUnit_Framework_TestCase
         $crudMock->expects($this->once())->method('getDatabaseHandle')->will($this->returnValue($PDOMock));
 
         /** @var $crudMock ClassModelTest */
-        $crudMock->retrieve($classId);
+        $crudMock->Retrieve($classId);
 
 
         $this->assertEquals($classId, $crudMock->ClassId);

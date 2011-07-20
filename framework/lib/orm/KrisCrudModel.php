@@ -83,7 +83,7 @@ class KrisCrudModel extends KrisModel
      * @param $primaryKeyValue
      * @return bool|KrisDB
      */
-    public function retrieve($primaryKeyValue)
+    public function Retrieve($primaryKeyValue)
     {
         return $this->bindRecordSet($this->generateStatement(array($this->_primaryKeyName), array($primaryKeyValue), false)->fetch(PDO::FETCH_ASSOC), $this);
     }
@@ -118,7 +118,7 @@ class KrisCrudModel extends KrisModel
      * @param bool $orderAscending
      * @return bool|KrisCrudModel
      */
-    public function retrieveMultiple($where, $bindings, $likeQuery = false, $count = 0, $offset = 0, $orderBy = '', $orderAscending = true)
+    public function RetrieveMultiple($where, $bindings, $likeQuery = false, $count = 0, $offset = 0, $orderBy = '', $orderAscending = true)
     {
         return $this->returnMultiple($this->generateStatement($where, $bindings, $likeQuery, $count, $offset, $orderBy, $orderAscending));
     }
@@ -263,7 +263,7 @@ class KrisCrudModel extends KrisModel
      */
     public function GetDisplayValue($key)
     {
-        $value = $this->get($key);
+        $value = $this->Get($key);
         $fixedKey = $this->convertDBKeyToClassKey($key);
         if (isset($this->_fieldTypes[$fixedKey]))
         {
@@ -292,11 +292,11 @@ class KrisCrudModel extends KrisModel
         {
             $key = $this->_fakeFields[$fixedKey];
             $this->AddJavascript('Edit', 'Select', $key);
-            return HtmlHelpers::CreateSelect($key, $this->getForeignKeyValues($key), $this->get($key), '',  $this->GetClass('Edit', 'Select'));
+            return HtmlHelpers::CreateSelect($key, $this->getForeignKeyValues($key), $this->Get($key), '',  $this->GetClass('Edit', 'Select'));
         }
         else
         {
-            $value = $this->get($key);
+            $value = $this->Get($key);
             switch ($this->_fieldTypes[$fixedKey])
             {
                 case 'bool':
@@ -389,7 +389,7 @@ class KrisCrudModel extends KrisModel
         $this->updateFields($fields);
         if (count($this->_foreignKeys) > 0)
         {
-            $this->retrieve($this->PrimaryKey());
+            $this->Retrieve($this->PrimaryKey());
         }
 
     }

@@ -34,7 +34,7 @@ class KrisController
         $this->_webFolder = $web_folder;
         $this->_controller = $default_controller;
         $this->_action = $default_action;
-        $this->explode_http_request()->parse_http_request()->route_request();
+        $this->ExplodeHttpRequest()->ParseHttpRequest()->RouteWebRequest();
     }
 
 
@@ -43,12 +43,12 @@ class KrisController
      *
      * @return KrisController
      */
-    protected  function explode_http_request()
+    protected function ExplodeHttpRequest()
     {
         $requestUri = $_SERVER['REQUEST_URI'];
         if (strlen($this->_webFolder) == 0 || strpos($requestUri, $this->_webFolder) === 0)
         {
-            $requestUri = substr($requestUri, strlen($this->_webFolder.'/'));
+            $requestUri = substr($requestUri, strlen($this->_webFolder . '/'));
         }
         $this->_requestUriParts = $requestUri ? explode('/', $requestUri) : array();
         return $this;
@@ -59,7 +59,7 @@ class KrisController
      *
      * @return KrisController
      */
-    protected function parse_http_request()
+    protected function ParseHttpRequest()
     {
         $this->_params = array();
         $p = $this->_requestUriParts;
@@ -74,7 +74,7 @@ class KrisController
         if (isset($p[2]))
         {
             $this->_params = array();
-            foreach( array_slice($p, 2) as $array_item)
+            foreach (array_slice($p, 2) as $array_item)
             {
                 $this->_params[] = urldecode($array_item);
             }
@@ -95,43 +95,65 @@ class KrisController
      *
      * @return KrisController
      */
-    protected function route_request()
+    protected function RouteWebRequest()
     {
-        $controllerClass = ucfirst($this->_controller). 'Controller';
+        return $this->ParseRequest($this->_controller, $this->_action, $this->_params);
+    }
 
-        $controllerFile = $this->_controllerPath . $this->_controller . '/' . $controllerClass.'.php';
+    /**
+     * @param string $controller
+     * @param string $action
+     * @param array $params
+     * @return KrisController
+     */
+    protected function ParseRequest($controller, $action, $params)
+    {
+        $controllerClass = ucfirst($controller) . 'Controller';
 
-        if (!preg_match('#^[a-z0-9_-]+$#i', $this->_controller) || !file_exists($controllerFile))
+        $controllerFile = $this->_controllerPath . $controller . '/' . $controllerClass . '.php';
+
+        if (!preg_match('#^[a-z0-9_-]+$#i', $controller) || !file_exists($controllerFile))
         {
-            $this->request_not_found('Controller file not found: ' . $controllerFile);
-        }
-
-        $function = ucfirst($this->_action);
-
-        if (!preg_match('#^\w[a-z0-9_-]*$#i', $function))
-        {
-            $this->request_not_found('Invalid function name: ' . $function);
-        }
-
-        /** @noinspection PhpIncludeInspection */
-        require($controllerFile);
-
-        if (!class_exists($controllerClass))
-        {
-            $this->request_not_found('Controller class ('.$controllerClass.') not found');
-        }
-
-        $controller = new $controllerClass($this->_action, $this->_params);
-
-        if (!method_exists($controller, $function))
-        {
-            $this->request_not_found('Function not found: ' . $function. ' in controller: '. $controllerClass);
+            $this->RequestNotFound('Controller file not found: ' . $controllerFile);
         }
         else
         {
-            call_user_func_array(array($controller, $function), $this->_params);
-        }
 
+            $function = ucfirst($action);
+
+            if (!preg_match('#^\w[a-z0-9_-]*$#i', $function))
+            {
+                $this->RequestNotFound('Invalid function name: ' . $function);
+            }
+            else
+            {
+                /** @noinspection PhpIncludeInspection */
+                require($controllerFile);
+
+                if (!class_exists($controllerClass))
+                {
+                    $this->RequestNotFound('Controller class (' . $controllerClass . ') not found');
+                }
+                else
+                {
+                    $controller = new $controllerClass($action, $params);
+
+                    if (!method_exists($controller, $function))
+                    {
+                        $this->RequestNotFound('Function not found: ' . $function . ' in controller: ' . $controllerClass);
+                    }
+                    else
+                    {
+                        $res = call_user_func_array(array($controller, $function), $params);
+                        if (!is_null($res) && get_class($res) == 'RouteRequest')
+                        {
+                            /** @var $res RouteRequest */
+                            return $this->ParseRequest($res->Controller, $res->Action, $res->Params);
+                        }
+                    }
+                }
+            }
+        }
         return $this;
     }
 
@@ -141,7 +163,7 @@ class KrisController
      * @param string $msg
      * @return void
      */
-    protected function request_not_found($msg = '')
+    protected function RequestNotFound($msg = '')
     {
         $displayedError = false;
 
@@ -152,22 +174,22 @@ class KrisController
                 if (function_exists(KrisConfig::$Error404Handler))
                 {
                     call_user_func(KrisConfig::$Error404Handler, $msg);
+                    $displayedError = true;
                 }
                 else
                 {
-                    KrisConfig::LogError('Unable to call Error404Handler, function '.KrisConfig::$Error404Handler.' does not exist');
+                    KrisConfig::LogError('Unable to call Error404Handler, function ' . KrisConfig::$Error404Handler . ' does not exist');
                 }
             }
         }
 
 
-
         if (!$displayedError)
         {
             header("HTTP/1.0 404 Not Found");
-            die('<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>' . $msg .
-                '<p>The requested URL was not found on this server.</p><p>Please go <a href="javascript: history.back(1)">back</a>'.
-                ' and try again.</p><hr /></body></html>');
+            echo '<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>' . $msg .
+                    '<p>The requested URL was not found on this server.</p><p>Please go <a href="javascript: history.back(1)">back</a>' .
+                    ' and try again.</p><hr /></body></html>';
         }
     }
 }

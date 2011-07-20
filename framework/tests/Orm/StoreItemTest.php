@@ -25,7 +25,7 @@ class StoreItemTest extends KrisModel
       $this->initializeRecordSet(array('StoreId', 'Name','Description','Price','Image','Multiple'));
       if ($id)
       {
-          $this->retrieve($id);
+          $this->Retrieve($id);
       }
     }
 

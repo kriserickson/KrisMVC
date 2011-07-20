@@ -36,9 +36,9 @@ abstract class KrisModel extends KrisDB
      *
      * @return string
      */
-    function PrimaryKey()
+    public function PrimaryKey()
     {
-        return $this->get($this->_primaryKeyName);
+        return $this->Get($this->_primaryKeyName);
     }
 
     /**
@@ -47,7 +47,7 @@ abstract class KrisModel extends KrisDB
      *
      * @return bool|KrisModel
      */
-    public function create()
+    public function Create()
     {
         $dbh = $this->getDatabaseHandle();
         $s1 = $s2 = '';
@@ -72,7 +72,7 @@ abstract class KrisModel extends KrisDB
         {
             return false;
         }
-        $this->set($this->_primaryKeyName, $dbh->lastInsertId());
+        $this->Set($this->_primaryKeyName, $dbh->lastInsertId());
         return $this;
     }
 
@@ -80,11 +80,19 @@ abstract class KrisModel extends KrisDB
      * Retrieves (hopefully) one record from the table based on the primary key...
      *
      * @param $primaryKeyValue
+     * @param null|array $value
      * @return bool|KrisDB
      */
-    public function retrieve($primaryKeyValue)
+    public function Retrieve($primaryKeyValue, $value = null)
     {
-        return $this->bindRecordSet($this->generateStatement('*',array($this->_primaryKeyName), array($primaryKeyValue), false)->fetch(PDO::FETCH_ASSOC), $this);
+        if (is_null($value))
+        {
+            return $this->bindRecordSet($this->generateStatement(null, array($this->_primaryKeyName), array($primaryKeyValue), false)->fetch(PDO::FETCH_ASSOC), $this);
+        }
+        else
+        {
+            return $this->bindRecordSet($this->generateStatement(null, $primaryKeyValue, $value, false)->fetch(PDO::FETCH_ASSOC), $this);
+        }
     }
 
 
@@ -97,9 +105,9 @@ abstract class KrisModel extends KrisDB
      * @param string $orderBy
      * @return bool|KrisModel
      */
-    public function retrieveMultiple($where, $bindings, $likeQuery = false, $count = 0, $offset, $orderBy = '')
+    public function RetrieveMultiple($where, $bindings, $likeQuery = false, $count = 0, $offset, $orderBy = '')
     {
-        return $this->returnMultiple($this->generateStatement('*', $where, $bindings, $likeQuery, $count, $offset, $orderBy));
+        return $this->returnMultiple($this->generateStatement(null, $where, $bindings, $likeQuery, $count, $offset, $orderBy));
     }
 
 
@@ -109,7 +117,7 @@ abstract class KrisModel extends KrisDB
      *
      * @return bool
      */
-    public function update()
+    public function Update()
     {
         $this->updateFields($this->_recordSet);
     }
@@ -121,7 +129,7 @@ abstract class KrisModel extends KrisDB
      *
      * @return bool
      */
-    public function delete()
+    public function Delete()
     {
         $dbh = $this->getDatabaseHandle();
         $stmt = $dbh->prepare('DELETE FROM ' . $this->quoteDbObject($this->_tableName) . ' WHERE ' . $this->quoteDbObject($this->_primaryKeyName) . ' = ?');
@@ -139,7 +147,7 @@ abstract class KrisModel extends KrisDB
      * @param bool $checkDB
      * @return bool|int
      */
-    public function exists($checkDB = false)
+    public function Exists($checkDB = false)
     {
         if ((int)$this->_recordSet[$this->_primaryKeyName] < 1)
         {
@@ -160,27 +168,29 @@ abstract class KrisModel extends KrisDB
      * @param bool $likeQuery
      * @return
      */
-    public function totalRecords($where = '', $bindings = '', $likeQuery)
+    public function TotalRecords($where = '', $bindings = '', $likeQuery)
     {
-        $res = $this->select('count('.$this->_primaryKeyName.') AS num_records', $where, $bindings, $likeQuery);
+        $res = $this->Select('count('.$this->_primaryKeyName.') AS num_records', $where, $bindings, $likeQuery);
         $row = current($res);
         return $row['num_records'];
     }
 
     /**
-     * Returns an array of what/where
+     * Returns an array of rows
      *
      * @param string|array $what
      * @param string|array $where
      * @param string|array $bindings
-     * @param bool $likeQuery     *
+     * @param bool $likeQuery
      * @param int $pdoFetchMode
      * @return array
      */
-    public function select($what = '*', $where = '', $bindings = '', $likeQuery = false, $pdoFetchMode = PDO::FETCH_ASSOC)
+    public function Select($what = null, $where = '', $bindings = '', $likeQuery = false, $pdoFetchMode = PDO::FETCH_ASSOC)
     {
         return $this->generateStatement($what, $where, $bindings, $likeQuery)->fetchAll($pdoFetchMode);
     }
+
+
 
     /**
      * @param string|array $what

@@ -18,10 +18,10 @@ class KrisConfig
 
     const FRAMEWORK_DIR = '@@FRAMEWORK_DIR@@';
 
-    // Quote style
-    public static $DATABASE_TYPE = KrisConfig::DB_TYPE_MYSQL;
+    const DEBUG = true;
 
-    const DATE_STR = 'l jS \of F Y';
+    public static $AUTH_TYPE = KrisConfig::AUTH_TYPE_DB;     // Currently only DB is implimented...
+    public static $DATABASE_TYPE = KrisConfig::DB_TYPE_MYSQL;
 
     /**
      * Database quote style enumeration.
@@ -33,7 +33,10 @@ class KrisConfig
     const DB_TYPE_SQLITE = 'SQLITE';
     const DB_TYPE_POSTGRESQL = 'POSTGRESQL';
 
-
+    const AUTH_TYPE_DB = 'DB';
+    const AUTH_TYPE_File = 'File';
+    const AUTH_TYPE_LDAP = 'LDAP';
+    const AUTH_TYPE_OpenAuth = 'OpenAuth';
 
 
     /**
@@ -86,18 +89,18 @@ class KrisConfig
      */
     public static function GetDatabaseHandle()
     {
-        if (is_null(KrisConfig::$DB_CONNECTION))
+        if (is_null(self::$DB_CONNECTION))
         {
             try
             {
-                KrisConfig::$DB_CONNECTION = new PDO('mysql:host='.self::DB_HOST.';dbname='.self::DB_DATABASE, self::DB_USER, self::DB_PASSWORD);
+                self::$DB_CONNECTION = new PDO('mysql:host='.self::DB_HOST.';dbname='.self::DB_DATABASE, self::DB_USER, self::DB_PASSWORD);
             }
             catch (PDOException $e)
             {
                 die('Connection failed: ' . $e->getMessage());
             }
         }
-        return KrisConfig::$DB_CONNECTION;
+        return self::$DB_CONNECTION;
     }
 
     /**
@@ -108,7 +111,7 @@ class KrisConfig
      */
     public static function HasClass($className)
     {
-        return isset(KrisConfig::$ClassLoader[$className]);
+        return isset(self::$ClassLoader[$className]);
     }
 
     /**
@@ -120,7 +123,7 @@ class KrisConfig
      */
     public static function Autoload($className)
     {
-        require(KrisConfig::$ClassLoader[$className]);
+        require(self::$ClassLoader[$className]);
     }
 
     /**
@@ -140,37 +143,19 @@ class KrisConfig
         {
             $classLocation = self::APP_PATH.$classLocation;
         }
-        KrisConfig::$ClassLoader[$className] = $classLocation;
+        self::$ClassLoader[$className] = $classLocation;
     }
 
-
-
-
 }
 
 //===============================================
-// Session
+// Debug
 //===============================================
-/*
-session_start();
-*/
-
-//===============================================
-// Uncaught Exception Handling
-//===============================================s
-/*
-set_exception_handler('uncaught_exception_handler');
-
-function uncaught_exception_handler($e) {
-  ob_end_clean(); //dump out remaining buffered text
-  $vars['message']=$e;
-  die(View::do_fetch(KrisConfig::APP_PATH.'errors/exception_uncaught.php',$vars));
+if (KrisConfig::DEBUG)
+{
+    ini_set('display_errors', 'On');
+    error_reporting(E_ALL);
 }
 
-function custom_error($msg='') {
-  $vars['msg']=$msg;
-  die(View::do_fetch(KrisConfig::APP_PATH.'errors/custom_error.php',$vars));
-}
-*/
 
 ?>

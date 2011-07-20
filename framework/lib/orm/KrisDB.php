@@ -29,7 +29,7 @@ abstract class KrisDB
      * @param string $key
      * @return string
      */
-    public function get($key)
+    public function Get($key)
     {
         $fixedKey = $this->convertDBKeyToClassKey($key);
         if (!isset($this->_recordSet[$fixedKey]))
@@ -48,7 +48,7 @@ abstract class KrisDB
      * @param string $val
      * @return KrisDB
      */
-    public function set($key, $val)
+    public function Set($key, $val)
     {
         $key = $this->convertDBKeyToClassKey($key);
         if (!$this->_initializedRecordSet || isset($this->_recordSet[$key]))
@@ -68,7 +68,7 @@ abstract class KrisDB
      */
     public function __get($key)
     {
-        return $this->get($key);
+        return $this->Get($key);
     }
 
     /**
@@ -80,7 +80,7 @@ abstract class KrisDB
      */
     public function __set($key, $val)
     {
-        return $this->set($key, $val);
+        return $this->Set($key, $val);
     }
 
     /**
@@ -239,15 +239,21 @@ abstract class KrisDB
      */
     protected function generateWhat($what)
     {
+        if (is_null($what))
+        {
+            $what = array_keys($this->_recordSet);
+        }
+
         if (is_array($what))
         {
             $whatString = '';
             foreach ($what as $whereName)
             {
-                $whatString .= (strlen($whatString) > 0 ? ', ' : '') . $this->quoteDbObject($whereName);
+                $whatString .= (strlen($whatString) > 0 ? ', ' : '') . $this->quoteDbObject($this->convertClassKeyToDBKey($whereName));
             }
             return $whatString;
         }
+
         return $what;
     }
 
@@ -271,7 +277,7 @@ abstract class KrisDB
             $whereString = '';
             foreach ($where as $whereName)
             {
-                $whereString .= (strlen($whereString) > 0 ? ' AND ' : '') . $this->quoteDbObject($whereName). ($likeQuery ? ' LIKE ?' : ' = ?');
+                $whereString .= (strlen($whereString) > 0 ? ' AND ' : '') . $this->quoteDbObject($this->convertClassKeyToDBKey($whereName)). ($likeQuery ? ' LIKE ?' : ' = ?');
             }
             return $whereString;
         }

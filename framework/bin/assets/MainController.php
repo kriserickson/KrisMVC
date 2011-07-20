@@ -3,7 +3,7 @@
 /**
  *
  */
-class MainController
+class MainController extends DefaultController
 {
     const DEFAULT_TITLE = 'KrisMCV Website';
 
@@ -12,7 +12,7 @@ class MainController
      */
     function __construct()
     {
-        $this->view = new KrisView(KrisConfig::APP_PATH . 'views/layouts/layout.php');
+        $this->_view = new KrisView(KrisConfig::APP_PATH . 'views/layouts/layout.php');
     }
 
 
@@ -24,10 +24,10 @@ class MainController
     {
 
         $data = array();
-        $data['body'] = $this->view->fetch(KrisConfig::APP_PATH . 'views/main/MainView.php',
+        $data['body'] = $this->_view->fetch(KrisConfig::APP_PATH . 'views/main/MainView.php',
             array('content' => 'Hello World!'), false);
         $data['title'] = self::DEFAULT_TITLE;
-        $this->view->dump($data);
+        $this->_view->dump($data);
     }
 
 
