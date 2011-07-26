@@ -23,7 +23,7 @@ class KrisView
      * @param string $file
      * @param null|array $vars
      */
-    function __construct($file = '', $vars = null)
+    public function __construct($file = '', $vars = null)
     {
         if ($file)
         {
@@ -39,9 +39,9 @@ class KrisView
     /**
      * @param string $key
      * @param string|int $var
-     * @return KrisView
+     * @return \KrisView
      */
-    function __set($key, $var)
+    public function __set($key, $var)
     {
         return $this->set($key, $var);
     }
@@ -49,9 +49,9 @@ class KrisView
     /**
      * @param string $key
      * @param string|int $var
-     * @return KrisView
+     * @return \KrisView
      */
-    function set($key, $var)
+    public function set($key, $var)
     {
         $this->_vars[$key] = $var;
         return $this;
@@ -62,11 +62,12 @@ class KrisView
      *  for adding to an array
      * @param string $key
      * @param string|int $var
-     * @return void
+     * @return \KrisView
      */
-    function add($key, $var)
+    public function add($key, $var)
     {
         $this->_vars[$key][] = $var;
+        return $this;
     }
 
     /**
@@ -75,7 +76,7 @@ class KrisView
      * @param bool $merge
      * @return string
      */
-    function fetch($file = '', $vars = array(), $merge = true)
+    public function fetch($file = '', $vars = array(), $merge = true)
     {
         if ($merge)
         {
@@ -98,7 +99,7 @@ class KrisView
      * @param array|null $vars
      * @return void
      */
-    function dump($vars = null)
+    public function dump($vars = null)
     {
         if (is_array($vars))
         {

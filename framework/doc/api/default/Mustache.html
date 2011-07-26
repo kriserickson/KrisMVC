@@ -1,0 +1,1573 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos -->
+			<title>Docs For Class Mustache</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+			<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+		</head>
+		<body>
+			<div class="page-body">			
+<h2 class="class-name">Class Mustache</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+											<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+						
+			</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">A Mustache implementation in PHP.</p>
+<p class="description"><p><a href="http://defunkt.github.com/mustache">http://defunkt.github.com/mustache</a></p><p>Mustache is a framework-agnostic logic-less templating language. It enforces separation of view  logic from template files. In fact, it is not even possible to embed logic in the template.</p><p>This is very, very rad.</p></p>
+	<ul class="tags">
+				<li><span class="field">author:</span> Justin Hileman <a href="http://justinhileman.com">http://justinhileman.com</a></li>
+			</ul>
+		<p class="notes">
+			Located in <a class="field" href="_view---Mustache.php.html">/view/Mustache.php</a> (line <span class="field">15</span>)
+		</p>
+		
+				
+		<pre></pre>
+	
+			</div>
+</div>
+
+
+	<a name="sec-const-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constant Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Constants</span> (<a href="#sec-consts">details</a>)
+												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="const-summary">
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#PRAGMA_UNESCAPED" title="details" class="const-name">PRAGMA_UNESCAPED</a> = 					<span class="var-type"> 'UNESCAPED'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#SECTION_TYPES" title="details" class="const-name">SECTION_TYPES</a> = 					<span class="var-type"> '\^#\/'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#TAG_TYPES" title="details" class="const-name">TAG_TYPES</a> = 					<span class="var-type"> '#\^\/=!&lt;&gt;\\{&amp;'</span>
+
+				</div>
+								<div class="const-title">
+					<img src="../media/images/Constant.png" alt=" " />
+					<a href="#VERSION" title="details" class="const-name">VERSION</a> = 					<span class="var-type"> '0.7.1'</span>
+
+				</div>
+							</div>
+		</div>
+	</div>
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																																																																																								<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_charset" title="details" class="var-name">$_charset</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_context" title="details" class="var-name">$_context</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_ctag" title="details" class="var-name">$_ctag</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_localPragmas" title="details" class="var-name">$_localPragmas</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_otag" title="details" class="var-name">$_otag</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_partials" title="details" class="var-name">$_partials</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_pragmas" title="details" class="var-name">$_pragmas</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_pragmasImplemented" title="details" class="var-name">$_pragmasImplemented</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_tagRegEx" title="details" class="var-name">$_tagRegEx</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_template" title="details" class="var-name">$_template</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_throwsExceptions" title="details" class="var-name">$_throwsExceptions</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																																																																																																																																																																																												
+												<div class="method-definition">
+											<span class="method-result">\Mustache</span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type">string|null</span>&nbsp;<span class="var-name">$template</span> = <span class="var-default">null</span>], [<span class="var-type">mixed|null</span>&nbsp;<span class="var-name">$view</span> = <span class="var-default">null</span>], [<span class="var-type">array|null</span>&nbsp;<span class="var-name">$partials</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#render" title="details" class="method-name">render</a>
+											([<span class="var-type">string</span>&nbsp;<span class="var-name">$template</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$view</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$partials</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_changeDelimiter" title="details" class="method-name">_changeDelimiter</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$leading</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$trailing</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">array</span>
+										<a href="#_findSection" title="details" class="method-name">_findSection</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$template</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_findVariableInContext" title="details" class="method-name">_findVariableInContext</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$context</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_getPartial" title="details" class="method-name">_getPartial</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">mixed</span>
+										<a href="#_getPragmaOptions" title="details" class="method-name">_getPragmaOptions</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$pragma_name</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_getVariable" title="details" class="method-name">_getVariable</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">bool</span>
+										<a href="#_hasPragma" title="details" class="method-name">_hasPragma</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$pragma_name</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#_popContext" title="details" class="method-name">_popContext</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_preparePragmaRegEx" title="details" class="method-name">_preparePragmaRegEx</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$otag</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$ctag</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_prepareSectionRegEx" title="details" class="method-name">_prepareSectionRegEx</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$otag</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$ctag</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_prepareTagRegEx" title="details" class="method-name">_prepareTagRegEx</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$otag</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$ctag</span>, [<span class="var-type">bool</span>&nbsp;<span class="var-name">$first</span> = <span class="var-default">false</span>])
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#_pushContext" title="details" class="method-name">_pushContext</a>
+											(<span class="var-type">array</span>&nbsp;<span class="var-name">&$local_context</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_renderComment" title="details" class="method-name">_renderComment</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$leading</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$trailing</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_renderEscaped" title="details" class="method-name">_renderEscaped</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$leading</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$trailing</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_renderPartial" title="details" class="method-name">_renderPartial</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$leading</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$trailing</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_renderPragma" title="details" class="method-name">_renderPragma</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$matches</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_renderPragmas" title="details" class="method-name">_renderPragmas</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$template</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_renderTag" title="details" class="method-name">_renderTag</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$modifier</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$leading</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$trailing</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_renderTags" title="details" class="method-name">_renderTags</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$template</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_renderTemplate" title="details" class="method-name">_renderTemplate</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$template</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#_renderUnescaped" title="details" class="method-name">_renderUnescaped</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$leading</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$trailing</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#_setOptions" title="details" class="method-name">_setOptions</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$options</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">boolean</span>
+										<a href="#_stringHasR" title="details" class="method-name">_stringHasR</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#_throwsException" title="details" class="method-name">_throwsException</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$exception</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">bool</span>
+										<a href="#_varIsIterable" title="details" class="method-name">_varIsIterable</a>
+											(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$var</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#__clone" title="details" class="method-name">__clone</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#__toString" title="details" class="method-name">__toString</a>
+										()
+									</div>
+								</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+												<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$_charset" id="$_charset"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_charset</span>
+			 = <span class="var-default"> 'UTF-8'</span>			(line <span class="line-number">33</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_context" id="$_context"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_context</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">67</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_ctag" id="$_ctag"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_ctag</span>
+			 = <span class="var-default"> '}}'</span>			(line <span class="line-number">62</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_localPragmas" id="$_localPragmas"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_localPragmas</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">75</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_otag" id="$_otag"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_otag</span>
+			 = <span class="var-default"> '{{'</span>			(line <span class="line-number">61</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_partials" id="$_partials"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_partials</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">68</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_pragmas" id="$_pragmas"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_pragmas</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">69</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_pragmasImplemented" id="$_pragmasImplemented"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_pragmasImplemented</span>
+			 = <span class="var-default">array(<br />		self::PRAGMA_UNESCAPED<br />	)</span>			(line <span class="line-number">71</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_tagRegEx" id="$_tagRegEx"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_tagRegEx</span>
+						(line <span class="line-number">64</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_template" id="$_template"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_template</span>
+			 = <span class="var-default"> ''</span>			(line <span class="line-number">66</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_throwsExceptions" id="$_throwsExceptions"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_throwsExceptions</span>
+			 = <span class="var-default">array(<br />		MustacheException::UNKNOWN_VARIABLE         =&gt; false,<br />		MustacheException::UNCLOSED_SECTION         =&gt; true,<br />		MustacheException::UNEXPECTED_CLOSE_SECTION =&gt; true,<br />		MustacheException::UNKNOWN_PARTIAL          =&gt; false,<br />		MustacheException::UNKNOWN_PRAGMA           =&gt; true,<br />	)</span>			(line <span class="line-number">24</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Should this Mustache throw exceptions when it finds unexpected tags?</p>
+	<ul class="tags">
+				<li><span class="field">see:</span> self::_throwsException()</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+						
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																			<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">105</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Mustache class constructor.</p>
+<p class="description"><p>This method accepts a $template string and a $view object. Optionally, pass an associative  array of partials as well.</p><p>Passing an $options array allows overriding certain Mustache options during instantiation:</p><p>$options = array(          // `charset` -- must be supported by `htmlspecialentities()`. defaults to 'UTF-8'          'charset' =&gt; 'ISO-8859-1',</p><p>// opening and closing delimiters, as an array or a space-separated string          'delimiters' =&gt; '&lt;% %&gt;',</p><p>// an array of pragmas to enable          'pragmas' =&gt; array(              Mustache::PRAGMA_UNESCAPED          ),      );</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">\Mustache</span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type">string|null</span>&nbsp;<span class="var-name">$template</span> = <span class="var-default">null</span>], [<span class="var-type">mixed|null</span>&nbsp;<span class="var-name">$view</span> = <span class="var-default">null</span>], [<span class="var-type">array|null</span>&nbsp;<span class="var-name">$partials</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$options</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string|null</span>
+				<span class="var-name">$template</span><span class="var-description">: (default: null)</span>			</li>
+					<li>
+				<span class="var-type">mixed|null</span>
+				<span class="var-name">$view</span><span class="var-description">: (default: null)</span>			</li>
+					<li>
+				<span class="var-type">array|null</span>
+				<span class="var-name">$partials</span><span class="var-description">: (default: null)</span>			</li>
+					<li>
+				<span class="var-type">array|null</span>
+				<span class="var-name">$options</span><span class="var-description">: (default: array())</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodrender" id="render"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">render</span> (line <span class="line-number">177</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Render the given template and view object.</p>
+<p class="description"><p>Defaults to the template and view passed to the class constructor unless a new one is provided.  Optionally, pass an associative array of partials as well.</p></p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Rendered Mustache template.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			render
+		</span>
+					([<span class="var-type">string</span>&nbsp;<span class="var-name">$template</span> = <span class="var-default">null</span>], [<span class="var-type">mixed</span>&nbsp;<span class="var-name">$view</span> = <span class="var-default">null</span>], [<span class="var-type">array</span>&nbsp;<span class="var-name">$partials</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$template</span><span class="var-description">: (default: null)</span>			</li>
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$view</span><span class="var-description">: (default: null)</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$partials</span><span class="var-description">: (default: null)</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_changeDelimiter" id="_changeDelimiter"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_changeDelimiter</span> (line <span class="line-number">688</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Change the Mustache tag delimiter. This method also replaces this object's current  tag RegEx with one using the new delimiters.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_changeDelimiter
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$leading</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$trailing</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$tag_name</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$leading</span><span class="var-description">: Whitespace</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$trailing</span><span class="var-description">: Whitespace</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_findSection" id="_findSection"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_findSection</span> (line <span class="line-number">289</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Extract the first section from $template.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> $type, $tag_name, $content and $after</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			_findSection
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$template</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$template</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_findVariableInContext" id="_findVariableInContext"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_findVariableInContext</span> (line <span class="line-number">780</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get a variable from the context array. Internal helper used by getVariable() to abstract  variable traversal for dot notation.</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> MustacheException Unknown variable name.</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_findVariableInContext
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$context</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$tag_name</span>			</li>
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$context</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_getPartial" id="_getPartial"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_getPartial</span> (line <span class="line-number">810</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Retrieve the partial corresponding to the requested tag name.</p>
+<p class="description"><p>Silently fails (i.e. returns '') when the requested partial is not found.</p></p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> MustacheException Unknown partial name.</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_getPartial
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$tag_name</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_getPragmaOptions" id="_getPragmaOptions"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_getPragmaOptions</span> (line <span class="line-number">445</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Return pragma options, if any.</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> MustacheException Unknown pragma</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">mixed</span>
+		<span class="method-name">
+			_getPragmaOptions
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$pragma_name</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$pragma_name</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_getVariable" id="_getVariable"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_getVariable</span> (line <span class="line-number">751</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get a variable from the context array.</p>
+<p class="description"><p>If the view is an array, returns the value with array key $tag_name.  If the view is an object, this will check for a public member variable  named $tag_name. If none is available, this method will execute and return  any class method named $tag_name. Failing all of the above, this method will  return an empty string.</p></p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> MustacheException Unknown variable name.</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_getVariable
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$tag_name</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_hasPragma" id="_hasPragma"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_hasPragma</span> (line <span class="line-number">429</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Check whether this Mustache has a specific pragma.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">bool</span>
+		<span class="method-name">
+			_hasPragma
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$pragma_name</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$pragma_name</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_popContext" id="_popContext"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_popContext</span> (line <span class="line-number">726</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Remove the latest context from the stack.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_popContext
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="method_preparePragmaRegEx" id="_preparePragmaRegEx"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_preparePragmaRegEx</span> (line <span class="line-number">361</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Prepare a pragma RegEx for the given opening/closing tags.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_preparePragmaRegEx
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$otag</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$ctag</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$otag</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$ctag</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_prepareSectionRegEx" id="_prepareSectionRegEx"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_prepareSectionRegEx</span> (line <span class="line-number">273</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Prepare a section RegEx string for the given opening/closing tags.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_prepareSectionRegEx
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$otag</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$ctag</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$otag</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$ctag</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_prepareTagRegEx" id="_prepareTagRegEx"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_prepareTagRegEx</span> (line <span class="line-number">475</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Prepare a tag RegEx for the given opening/closing tags.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_prepareTagRegEx
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$otag</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$ctag</span>, [<span class="var-type">bool</span>&nbsp;<span class="var-name">$first</span> = <span class="var-default">false</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$otag</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$ctag</span>			</li>
+					<li>
+				<span class="var-type">bool</span>
+				<span class="var-name">$first</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_pushContext" id="_pushContext"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_pushContext</span> (line <span class="line-number">711</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Push a local context onto the stack.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_pushContext
+		</span>
+					(<span class="var-type">array</span>&nbsp;<span class="var-name">&$local_context</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">&$local_context</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_renderComment" id="_renderComment"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_renderComment</span> (line <span class="line-number">630</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Render a comment (i.e. return an empty string).</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_renderComment
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$leading</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$trailing</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$tag_name</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$leading</span><span class="var-description">: Whitespace</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$trailing</span><span class="var-description">: Whitespace</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_renderEscaped" id="_renderEscaped"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_renderEscaped</span> (line <span class="line-number">617</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Escape and return the requested tag.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_renderEscaped
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$leading</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$trailing</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$tag_name</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$leading</span><span class="var-description">: Whitespace</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$trailing</span><span class="var-description">: Whitespace</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_renderPartial" id="_renderPartial"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_renderPartial</span> (line <span class="line-number">662</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Render the requested partial.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_renderPartial
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$leading</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$trailing</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$tag_name</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$leading</span><span class="var-description">: Whitespace</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$trailing</span><span class="var-description">: Whitespace</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_renderPragma" id="_renderPragma"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_renderPragma</span> (line <span class="line-number">396</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">A preg_replace helper to remove {{%PRAGMA}} tags and enable requested pragma.</p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> MustacheException unknown pragma</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_renderPragma
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$matches</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$matches</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_renderPragmas" id="_renderPragmas"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_renderPragmas</span> (line <span class="line-number">376</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Initialize pragmas and remove all pragma tags.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_renderPragmas
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$template</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$template</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_renderTag" id="_renderTag"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_renderTag</span> (line <span class="line-number">553</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Render the named tag, given the specified modifier.</p>
+<p class="description"><p>Accepted modifiers are `=` (change delimiter), `!` (comment), `&gt;` (partial)  `{` or `&amp;` (don't escape output), or none (render escaped output).</p></p>
+	<ul class="tags">
+				<li><span class="field">throws:</span> MustacheException Unmatched section tag encountered.</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_renderTag
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$modifier</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$leading</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$trailing</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$modifier</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$tag_name</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$leading</span><span class="var-description">: Whitespace</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$trailing</span><span class="var-description">: Whitespace</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_renderTags" id="_renderTags"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_renderTags</span> (line <span class="line-number">492</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Loop through and render individual Mustache tags.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_renderTags
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$template</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$template</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_renderTemplate" id="_renderTemplate"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_renderTemplate</span> (line <span class="line-number">223</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Internal render function, used for recursive calls.</p>
+	<ul class="tags">
+				<li><span class="field">return:</span> Rendered Mustache template.</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_renderTemplate
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$template</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$template</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_renderUnescaped" id="_renderUnescaped"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_renderUnescaped</span> (line <span class="line-number">649</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Return the requested tag unescaped.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			_renderUnescaped
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$tag_name</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$leading</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$trailing</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$tag_name</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$leading</span><span class="var-description">: Whitespace</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$trailing</span><span class="var-description">: Whitespace</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_setOptions" id="_setOptions"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_setOptions</span> (line <span class="line-number">119</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Helper function for setting options from constructor args.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_setOptions
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$options</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">array</span>
+				<span class="var-name">$options</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_stringHasR" id="_stringHasR"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_stringHasR</span> (line <span class="line-number">599</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns true if any of its args contains the &quot;\r&quot; character.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">boolean</span>
+		<span class="method-name">
+			_stringHasR
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="method_throwsException" id="_throwsException"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_throwsException</span> (line <span class="line-number">462</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Check whether this Mustache instance throws a given exception.</p>
+<p class="description"><p>Expects exceptions to be MustacheException error codes (i.e. class constants).</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_throwsException
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$exception</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$exception</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method_varIsIterable" id="_varIsIterable"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_varIsIterable</span> (line <span class="line-number">829</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Check whether the given $var should be iterated (i.e. in a section context).</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">bool</span>
+		<span class="method-name">
+			_varIsIterable
+		</span>
+					(<span class="var-type">mixed</span>&nbsp;<span class="var-name">$var</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">mixed</span>
+				<span class="var-name">$var</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="method__clone" id="__clone"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">__clone</span> (line <span class="line-number">152</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Mustache class clone method.</p>
+<p class="description"><p>A cloned Mustache instance should have pragmas, delimeters and root context  reset to default values.</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			__clone
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="method__toString" id="__toString"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">__toString</span> (line <span class="line-number">205</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Wrap the render() function for string conversion.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			__toString
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+						
+		</div>
+	</div>
+
+	<a name="sec-consts"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constants</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Constants</a> (<span class="disabled">details</span>)
+						
+			
+												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+														| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="constPRAGMA_UNESCAPED" id="PRAGMA_UNESCAPED"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">PRAGMA_UNESCAPED</span>
+			 = <span class="const-default"> 'UNESCAPED'</span>
+			(line <span class="line-number">53</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">The {{%UNESCAPED}} pragma swaps the meaning of the {{normal}} and {{{unescaped}}}  Mustache tags. That is, once this pragma is activated the {{normal}} tag will not be  escaped while the {{{unescaped}}} tag will be escaped.</p>
+<p class="description"><p>Pragmas apply only to the current template. Partials, even those included after the  {{%UNESCAPED}} call, will need their own pragma declaration.</p><p>This may be useful in non-HTML Mustache situations.</p></p>
+	
+	
+</div>
+<a name="constSECTION_TYPES" id="SECTION_TYPES"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">SECTION_TYPES</span>
+			 = <span class="const-default"> '\^#\/'</span>
+			(line <span class="line-number">58</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Constants used for section and tag RegEx</p>
+	
+	
+</div>
+<a name="constTAG_TYPES" id="TAG_TYPES"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">TAG_TYPES</span>
+			 = <span class="const-default"> '#\^\/=!&lt;&gt;\\{&amp;'</span>
+			(line <span class="line-number">59</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constVERSION" id="VERSION"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<img src="../media/images/Variable.png" />
+		<span class="const-title">
+			<span class="const-name">VERSION</span>
+			 = <span class="const-default"> '0.7.1'</span>
+			(line <span class="line-number">17</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+						
+		</div>
+	</div>
+
+	<p class="notes" id="credit">
+		Documentation generated on Mon, 25 Jul 2011 21:33:17 -0700 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>

@@ -2,12 +2,12 @@ CREATE TABLE  `auth` (
   `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `login_name` varchar(45) NOT NULL,
   `password_hash` varchar(70) NOT NULL,
-  `failed_login_count` int(10) unsigned NOT NULL,
-  `display_name` varchar(45) NOT NULL,
-  `email` varchar(45) NOT NULL,
-  `ip` varchar(45) NOT NULL,
+  `failed_login_count` int(10) unsigned NOT NULL DEFAULT '0',
+  `display_name` varchar(45) NOT NULL DEFAULT '',
+  `email` varchar(45) NOT NULL DEFAULT '',
+  `ip` varchar(45) NOT NULL DEFAULT '',
   `last_login` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `data` text NOT NULL,
-  `acl` text NOT NULL,
+  `data` text,
+  `acl` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`user_id`)
-) DEFAULT CHARSET=utf8;
+) CHARSET=utf8;

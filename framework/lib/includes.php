@@ -10,58 +10,56 @@
 
 // These are the bare bones files required to run the application...
 
+/** @noinspection PhpIncludeInspection */
 require KrisConfig::FRAMEWORK_DIR.'/lib/controller/KrisController.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/controller/DefaultController.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/controller/RouteRequest.php';
+require KrisConfig::FRAMEWORK_DIR.'/lib/controller/Request.php';
+require KrisConfig::FRAMEWORK_DIR.'/lib/plumbing/BucketContainer.php';
+require KrisConfig::FRAMEWORK_DIR.'/lib/plumbing/AutoLoader.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/view/KrisView.php';
 
 // This will be loaded as needed...
-KrisConfig::AddClass('KrisDB', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisDB.php', true);
-KrisConfig::AddClass('KrisModel', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisModel.php', true);
-KrisConfig::AddClass('KrisDBView', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisDBView.php', true);
-KrisConfig::AddClass('KrisCrudModel', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisCrudModel.php', true);
+AutoLoader::AddClass('KrisDB', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisDB.php', true);
+AutoLoader::AddClass('KrisModel', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisModel.php', true);
+AutoLoader::AddClass('KrisDBView', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisDBView.php', true);
+AutoLoader::AddClass('KrisCrudModel', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisCrudModel.php', true);
 
 // Authentication
-KrisConfig::AddClass('Auth', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Auth.php', true);
-KrisConfig::AddClass('Auth_DB', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Auth_DB.php', true);
-KrisConfig::AddClass('PasswordHash', KrisConfig::FRAMEWORK_DIR.'/lib/auth/PasswordHash.php', true);
-KrisConfig::AddClass('Session', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Session.php', true);
-KrisConfig::AddClass('User', KrisConfig::FRAMEWORK_DIR.'/lib/auth/User.php', true);
+AutoLoader::AddClass('Auth', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Auth.php', true);
+AutoLoader::AddClass('Auth_DB', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Auth_DB.php', true);
+AutoLoader::AddClass('PasswordHash', KrisConfig::FRAMEWORK_DIR.'/lib/auth/PasswordHash.php', true);
+AutoLoader::AddClass('Session', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Session.php', true);
+AutoLoader::AddClass('User', KrisConfig::FRAMEWORK_DIR.'/lib/auth/User.php', true);
 
 // Helpers
-KrisConfig::AddClass('HtmlHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/HtmlHelpers.php', true);
-KrisConfig::AddClass('ImageResizer', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/ImageResizer.php', true);
-KrisConfig::AddClass('NumberHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/NumberHelpers.php', true);
+AutoLoader::AddClass('HtmlHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/HtmlHelpers.php', true);
+AutoLoader::AddClass('ImageResizer', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/ImageResizer.php', true);
+AutoLoader::AddClass('NumberHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/NumberHelpers.php', true);
 
-/**
- * Autoloading for Business Classes
- *
- * @param $className
- * @return void
- */
-function __autoload($className)
+AutoLoader::$Container = new bucket_Container();
+
+//===============================================
+// Debug
+//===============================================
+if (KrisConfig::DEBUG)
 {
-    if (KrisConfig::HasClass($className))
-    {
-        KrisConfig::Autoload($className);
-    }
-    else
-    {
-        $path = '';
-        if (strtolower(substr($className, -5)) == 'model')
-        {
-            $path = 'generated/';
-        }
-        else if (strtolower(substr($className, -4)) == 'view')
-        {
-            $path = 'crud/';
-        }
-
-        require(KrisConfig::APP_PATH . 'models/'. $path . $className . '.php');
-
-    }
+    // Setup debug
+    ini_set('display_errors', 'On');
+    error_reporting(E_ALL);
+    AutoLoader::AddClass('DebugController', KrisConfig::FRAMEWORK_DIR.'/lib/controller/DebugController.php', true);
+    AutoLoader::AddClass('DebugPDO', KrisConfig::FRAMEWORK_DIR.'/lib/orm/DebugPDO.php', true);
+    AutoLoader::$Container->registerImplementation('Controller', 'DebugController');
 
 }
+else
+{
+    ini_set('display_errors', 'Off');
+    error_reporting(E_ERROR);
+    AutoLoader::$Container->registerImplementation('Controller', 'KrisController');
+}
+
+
 
 
 ?>

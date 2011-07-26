@@ -19,7 +19,7 @@ class KrisModelTest extends PHPUnit_Framework_TestCase
      */
     public function testModelRetrieveOne()
     {
-        $sql = 'SELECT * FROM store WHERE `store_id` = ?';
+        $sql = 'SELECT `store_id`, `name`, `description`, `price`, `image`, `multiple` FROM store WHERE `store_id` = ?';
         $store_id = 12;
         $name = '$20 Gift Certificate';
         $description = 'Good for $20 towards any class or workshop at Ammara Dance Studio. ';

@@ -8,109 +8,62 @@
  * with this source code in the file LICENSE.
  */
 
+interface Controller
+{
+    /**
+     * @abstract
+     * @param $controllerPath
+     * @return void
+     */
+    function Route($controllerPath);
+}
+
 /**
  * Controller
  * Parses the HTTP request and routes to the appropriate function
  * @package Controller
  */
-class KrisController
+class KrisController implements Controller
 {
+    /**
+     * @var string
+     */
     protected $_controllerPath = '../app/controllers/'; //with trailing slash
+
+    /**
+     * @var string
+     */
     protected $_webFolder = '/'; //with trailing slash
-    protected $_requestUriParts = array();
-    protected $_controller;
-    protected $_action;
-    protected $_params = array();
 
     /**
-     * @param string $controller_path
-     * @param string $web_folder
-     * @param string $default_controller
-     * @param string $default_action
+     * @var Request
      */
-    function __construct($controller_path, $web_folder, $default_controller, $default_action)
-    {
-        $this->_controllerPath = $controller_path;
-        $this->_webFolder = $web_folder;
-        $this->_controller = $default_controller;
-        $this->_action = $default_action;
-        $this->ExplodeHttpRequest()->ParseHttpRequest()->RouteWebRequest();
-    }
-
+    protected $_request;
 
     /**
-     * Converts the http request into its URI parts
-     *
-     * @return KrisController
+     * @param string $controllerPath
+     * @return void
      */
-    protected function ExplodeHttpRequest()
+    public function Route($controllerPath)
     {
-        $requestUri = $_SERVER['REQUEST_URI'];
-        if (strlen($this->_webFolder) == 0 || strpos($requestUri, $this->_webFolder) === 0)
-        {
-            $requestUri = substr($requestUri, strlen($this->_webFolder . '/'));
-        }
-        $this->_requestUriParts = $requestUri ? explode('/', $requestUri) : array();
-        return $this;
-    }
-
-    /**
-     * This function parses the HTTP request to get the controller name, action name and parameter array.
-     *
-     * @return KrisController
-     */
-    protected function ParseHttpRequest()
-    {
-        $this->_params = array();
-        $p = $this->_requestUriParts;
-        if (isset($p[0]) && $p[0])
-        {
-            $this->_controller = $p[0];
-        }
-        if (isset($p[1]) && $p[1])
-        {
-            $this->_action = $p[1];
-        }
-        if (isset($p[2]))
-        {
-            $this->_params = array();
-            foreach (array_slice($p, 2) as $array_item)
-            {
-                $this->_params[] = urldecode($array_item);
-            }
-
-        }
-        return $this;
-    }
-
-
-    /**
-     * This function maps the controller name and action name to the file location of the .php file to include
-     *
-     * All Controllers have to be named XXXController where XXX is the name of controller in the url.
-     * For example http://localhost/main/hello would load the MainController class from the MainController.php
-     * file and call the Index function on that MainController class.  Function names must start with a word
-     * and only contain letters,numbers and the underscore character.
-     *
-     *
-     * @return KrisController
-     */
-    protected function RouteWebRequest()
-    {
-        return $this->ParseRequest($this->_controller, $this->_action, $this->_params);
+        $this->_controllerPath = $controllerPath;
+        $route =  RouteRequest::CreateFromUri($_SERVER['REQUEST_URI']);
+        $this->ParseRequest($route->Controller, $route->Action, $route->Params);
     }
 
     /**
      * @param string $controller
      * @param string $action
      * @param array $params
-     * @return KrisController
+     * @return void
      */
     protected function ParseRequest($controller, $action, $params)
     {
         $controllerClass = ucfirst($controller) . 'Controller';
 
         $controllerFile = $this->_controllerPath . $controller . '/' . $controllerClass . '.php';
+
+        $this->_request = new Request($controller, $action, $params);
 
         if (!preg_match('#^[a-z0-9_-]+$#i', $controller) || !file_exists($controllerFile))
         {
@@ -120,6 +73,7 @@ class KrisController
         {
 
             $function = ucfirst($action);
+
 
             if (!preg_match('#^\w[a-z0-9_-]*$#i', $function))
             {
@@ -136,7 +90,8 @@ class KrisController
                 }
                 else
                 {
-                    $controller = new $controllerClass($action, $params);
+
+                    $controller = new $controllerClass($this->_request);
 
                     if (!method_exists($controller, $function))
                     {
@@ -148,13 +103,13 @@ class KrisController
                         if (!is_null($res) && get_class($res) == 'RouteRequest')
                         {
                             /** @var $res RouteRequest */
-                            return $this->ParseRequest($res->Controller, $res->Action, $res->Params);
+                            $this->ParseRequest($res->Controller, $res->Action, $res->Params);
                         }
                     }
                 }
             }
         }
-        return $this;
+
     }
 
     /**
@@ -178,6 +133,7 @@ class KrisController
                 }
                 else
                 {
+                    
                     KrisConfig::LogError('Unable to call Error404Handler, function ' . KrisConfig::$Error404Handler . ' does not exist');
                 }
             }
@@ -186,10 +142,9 @@ class KrisController
 
         if (!$displayedError)
         {
-            header("HTTP/1.0 404 Not Found");
-            echo '<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>' . $msg .
+            $this->_request->SetError(404, '<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>' . $msg .
                     '<p>The requested URL was not found on this server.</p><p>Please go <a href="javascript: history.back(1)">back</a>' .
-                    ' and try again.</p><hr /></body></html>';
+                    ' and try again.</p><hr /></body></html>');
         }
     }
 }

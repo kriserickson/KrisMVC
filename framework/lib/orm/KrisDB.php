@@ -108,7 +108,7 @@ abstract class KrisDB
     {
         if (is_null($this->_dbh))
         {
-            $this->_dbh = KrisConfig::GetDatabaseHandle();
+            $this->_dbh = AutoLoader::GetDatabaseHandle();
         }
         return $this->_dbh;
     }

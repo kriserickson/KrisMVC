@@ -30,9 +30,9 @@ class User
     private $_data;
 
     /**
-     * @var array
+     * @var int - bitfield
      */
-    private $_saveDataFunction;
+    private $_acl;
 
 
     /**
@@ -40,18 +40,16 @@ class User
      * @param string $displayName
      * @param string $email
      * @param string $data
-     * @param array $acl
-     * @param array $saveDataFunction -
+     * @param int $acl
      * @return \User
      *
      */
-    function __construct($userId, $displayName, $email, $data, $acl, $saveDataFunction)
+    function __construct($userId, $displayName, $email, $data, $acl)
     {
         $this->_userId = $userId;
         $this->_displayName = $displayName;
         $this->_email = $email;
         $this->_data = unserialize($data);
-        $this->_saveDataFunction = $saveDataFunction;
         $this->_acl = $acl;
     }
 
@@ -101,12 +99,25 @@ class User
     public function SetUserData($name, $value)
     {
         $this->_data[$name] = $value;
-        call_user_func_array($this->_saveDataFunction, array(serialize($this->_data)));
+        Auth::instance()->SaveUserData($this->_userId, serialize($this->_data));
     }
 
+    /**
+     * @param int $acl
+     * @return bool
+     */
     public function HasAcl($acl)
     {
-        return isset($this->_acl[$acl]);
+        return $acl & $this->_acl;
+    }
+
+    /**
+     * @param int $acl
+     * @return bool
+     */
+    public function HasAclOrGreater($acl)
+    {
+        return $this->_acl >= $acl;
     }
 
 

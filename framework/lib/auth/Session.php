@@ -49,7 +49,7 @@ class Session
      * @param int $expire - set when the cache expires...
      * @return int
      */
-    public function cache_expire($expire)
+    public function CacheExpire($expire)
     {
         return session_cache_expire($expire);
     }
@@ -57,18 +57,14 @@ class Session
     /**
      * @return bool
      */
-    public function destroy()
+    public function Destroy()
     {
-        session_start();
-
         $_SESSION = array();
 
-        if (ini_get("session.use_cookies")) {
+        if (ini_get("session.use_cookies"))
+        {
             $params = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 42000,
-                $params["path"], $params["domain"],
-                $params["secure"], $params["httponly"]
-            );
+            setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
         }
         return session_destroy();
     }
@@ -92,7 +88,7 @@ class Session
      * @param mixed $default
      * @return mixed
      */
-    public function get($name, $default)
+    public function Get($name, $default = '')
     {
         return (isset($_SESSION[$name])) ? $_SESSION[$name] : $default;
     }
@@ -102,7 +98,7 @@ class Session
      * @param mixed $value
      * @return Session
      */
-    public function set($name, $value)
+    public function Set($name, $value)
     {
         $_SESSION[$name] = $value;
         return $this;

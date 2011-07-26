@@ -27,7 +27,7 @@
 				<li><span class="field">abstract:</span> </li>
 			</ul>
 		<p class="notes">
-			Located in <a class="field" href="_KrisModel.php.html">/KrisModel.php</a> (line <span class="field">18</span>)
+			Located in <a class="field" href="_orm---KrisModel.php.html">/orm/KrisModel.php</a> (line <span class="field">18</span>)
 		</p>
 		
 				
@@ -53,6 +53,12 @@
 				<tr>
 					<th class="class-table-header">Class</th>
 					<th class="class-table-header">Description</th>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../Model/DBAuth.html">DBAuth</a></td>
+					<td>
+											Database Class for
+										</td>
 				</tr>
 								<tr>
 					<td style="padding-right: 2em"><a href="../Model/KrisCrudModel.html">KrisCrudModel</a></td>
@@ -111,17 +117,17 @@
 									</div>
 																<div class="method-definition">
 											<span class="method-result">bool|<a href="../Model/KrisModel.html">KrisModel</a></span>
-										<a href="#create" title="details" class="method-name">create</a>
+										<a href="#Create" title="details" class="method-name">Create</a>
 										()
 									</div>
 																<div class="method-definition">
 											<span class="method-result">bool</span>
-										<a href="#delete" title="details" class="method-name">delete</a>
+										<a href="#Delete" title="details" class="method-name">Delete</a>
 										()
 									</div>
 																<div class="method-definition">
 											<span class="method-result">bool|int</span>
-										<a href="#exists" title="details" class="method-name">exists</a>
+										<a href="#Exists" title="details" class="method-name">Exists</a>
 											([<span class="var-type">bool</span>&nbsp;<span class="var-name">$checkDB</span> = <span class="var-default">false</span>])
 									</div>
 																<div class="method-definition">
@@ -130,28 +136,28 @@
 										()
 									</div>
 																<div class="method-definition">
-											<span class="method-result">bool|<a href="../Model/KrisDB.html">KrisDB</a></span>
-										<a href="#retrieve" title="details" class="method-name">retrieve</a>
-											(<span class="var-type">$primaryKeyValue</span>&nbsp;<span class="var-name">$primaryKeyValue</span>)
+											<span class="method-result">bool|<a href="../Model/KrisModel.html">KrisModel</a></span>
+										<a href="#Retrieve" title="details" class="method-name">Retrieve</a>
+											(<span class="var-type">$primaryKeyValue</span>&nbsp;<span class="var-name">$primaryKeyValue</span>, [<span class="var-type">null|array</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
 									</div>
 																<div class="method-definition">
 											<span class="method-result">bool|<a href="../Model/KrisModel.html">KrisModel</a></span>
-										<a href="#retrieveMultiple" title="details" class="method-name">retrieveMultiple</a>
+										<a href="#RetrieveMultiple" title="details" class="method-name">RetrieveMultiple</a>
 											(<span class="var-type">array|string</span>&nbsp;<span class="var-name">$where</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$bindings</span>, [<span class="var-type">bool</span>&nbsp;<span class="var-name">$likeQuery</span> = <span class="var-default">false</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$count</span> = <span class="var-default">0</span>], <span class="var-type">int</span>&nbsp;<span class="var-name">$offset</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$orderBy</span> = <span class="var-default">''</span>])
 									</div>
 																<div class="method-definition">
 											<span class="method-result">array</span>
-										<a href="#select" title="details" class="method-name">select</a>
-											([<span class="var-type">string|array</span>&nbsp;<span class="var-name">$what</span> = <span class="var-default">'*'</span>], [<span class="var-type">string|array</span>&nbsp;<span class="var-name">$where</span> = <span class="var-default">''</span>], [<span class="var-type">string|array</span>&nbsp;<span class="var-name">$bindings</span> = <span class="var-default">''</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$likeQuery</span> = <span class="var-default">false</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$pdoFetchMode</span> = <span class="var-default">PDO::FETCH_ASSOC</span>])
+										<a href="#Select" title="details" class="method-name">Select</a>
+											([<span class="var-type">string|array</span>&nbsp;<span class="var-name">$what</span> = <span class="var-default">null</span>], [<span class="var-type">string|array</span>&nbsp;<span class="var-name">$where</span> = <span class="var-default">''</span>], [<span class="var-type">string|array</span>&nbsp;<span class="var-name">$bindings</span> = <span class="var-default">''</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$likeQuery</span> = <span class="var-default">false</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$pdoFetchMode</span> = <span class="var-default">PDO::FETCH_ASSOC</span>])
 									</div>
 																<div class="method-definition">
 											<span class="method-result">void</span>
-										<a href="#totalRecords" title="details" class="method-name">totalRecords</a>
+										<a href="#TotalRecords" title="details" class="method-name">TotalRecords</a>
 											([<span class="var-type">string</span>&nbsp;<span class="var-name">$where</span> = <span class="var-default">''</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$bindings</span> = <span class="var-default">''</span>], <span class="var-type">bool</span>&nbsp;<span class="var-name">$likeQuery</span>)
 									</div>
 																<div class="method-definition">
 											<span class="method-result">bool</span>
-										<a href="#update" title="details" class="method-name">update</a>
+										<a href="#Update" title="details" class="method-name">Update</a>
 										()
 									</div>
 																<div class="method-definition">
@@ -178,7 +184,7 @@
 					</div>
 		<div class="info-box-body">
 			<a name="var$_primaryKeyName" id="$_primaryKeyName"><!-- --></A>
-<div class="evenrow">
+<div class="oddrow">
 
 	<div class="var-header">
 		<span class="var-title">
@@ -199,7 +205,7 @@
 
 </div>
 <a name="var$_tableName" id="$_tableName"><!-- --></A>
-<div class="oddrow">
+<div class="evenrow">
 
 	<div class="var-header">
 		<span class="var-title">
@@ -251,7 +257,7 @@
 			<A NAME='method_detail'></A>
 
 <a name="method__construct" id="__construct"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
 		<span class="method-title">Constructor __construct</span> (line <span class="line-number">28</span>)
@@ -281,15 +287,19 @@
 		<div class="notes">Redefined in descendants as:</div>
 		<ul class="redefinitions">
 					<li>
+				<a href="../Model/DBAuth.html#method__construct">DBAuth::__construct()</a>
+								: return DBAuth
+							</li>
+					<li>
 				<a href="../Model/KrisCrudModel.html#method__construct">KrisCrudModel::__construct()</a>
 							</li>
 				</ul>
 	</div>
-<a name="methodcreate" id="create"><!-- --></a>
-<div class="oddrow">
+<a name="methodCreate" id="Create"><!-- --></a>
+<div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">create</span> (line <span class="line-number">50</span>)
+		<span class="method-title">Create</span> (line <span class="line-number">50</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -301,7 +311,7 @@
 	<div class="method-signature">
 		<span class="method-result">bool|<a href="../Model/KrisModel.html">KrisModel</a></span>
 		<span class="method-name">
-			create
+			Create
 		</span>
 				()
 			</div>
@@ -309,11 +319,11 @@
 		
 			
 	</div>
-<a name="methoddelete" id="delete"><!-- --></a>
-<div class="evenrow">
+<a name="methodDelete" id="Delete"><!-- --></a>
+<div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">delete</span> (line <span class="line-number">124</span>)
+		<span class="method-title">Delete</span> (line <span class="line-number">132</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -325,7 +335,7 @@
 	<div class="method-signature">
 		<span class="method-result">bool</span>
 		<span class="method-name">
-			delete
+			Delete
 		</span>
 				()
 			</div>
@@ -333,11 +343,11 @@
 		
 			
 	</div>
-<a name="methodexists" id="exists"><!-- --></a>
-<div class="oddrow">
+<a name="methodExists" id="Exists"><!-- --></a>
+<div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">exists</span> (line <span class="line-number">142</span>)
+		<span class="method-title">Exists</span> (line <span class="line-number">150</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -349,7 +359,7 @@
 	<div class="method-signature">
 		<span class="method-result">bool|int</span>
 		<span class="method-name">
-			exists
+			Exists
 		</span>
 					([<span class="var-type">bool</span>&nbsp;<span class="var-name">$checkDB</span> = <span class="var-default">false</span>])
 			</div>
@@ -363,7 +373,7 @@
 			
 	</div>
 <a name="methodPrimaryKey" id="PrimaryKey"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
 		<span class="method-title">PrimaryKey</span> (line <span class="line-number">39</span>)
@@ -371,6 +381,9 @@
 	
 	<!-- ========== Info from phpDoc block ========= -->
 <p class="short-description">Returns the primary key</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
 	
 	<div class="method-signature">
 		<span class="method-result">string</span>
@@ -383,11 +396,11 @@
 		
 			
 	</div>
-<a name="methodretrieve" id="retrieve"><!-- --></a>
-<div class="oddrow">
+<a name="methodRetrieve" id="Retrieve"><!-- --></a>
+<div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">retrieve</span> (line <span class="line-number">85</span>)
+		<span class="method-title">Retrieve</span> (line <span class="line-number">86</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -397,14 +410,17 @@
 			</ul>
 	
 	<div class="method-signature">
-		<span class="method-result">bool|<a href="../Model/KrisDB.html">KrisDB</a></span>
+		<span class="method-result">bool|<a href="../Model/KrisModel.html">KrisModel</a></span>
 		<span class="method-name">
-			retrieve
+			Retrieve
 		</span>
-					(<span class="var-type">$primaryKeyValue</span>&nbsp;<span class="var-name">$primaryKeyValue</span>)
+					(<span class="var-type">$primaryKeyValue</span>&nbsp;<span class="var-name">$primaryKeyValue</span>, [<span class="var-type">null|array</span>&nbsp;<span class="var-name">$value</span> = <span class="var-default">null</span>])
 			</div>
 	
 			<ul class="parameters">
+					<li>
+				<span class="var-type">null|array</span>
+				<span class="var-name">$value</span>			</li>
 					<li>
 				<span class="var-type">$primaryKeyValue</span>
 				<span class="var-name">$primaryKeyValue</span>			</li>
@@ -415,16 +431,16 @@
 		<div class="notes">Redefined in descendants as:</div>
 		<ul class="redefinitions">
 					<li>
-				<a href="../Model/KrisCrudModel.html#methodretrieve">KrisCrudModel::retrieve()</a>
+				<a href="../Model/KrisCrudModel.html#methodRetrieve">KrisCrudModel::Retrieve()</a>
 								: Retrieves (hopefully) one record from the table based on the primary key...
 							</li>
 				</ul>
 	</div>
-<a name="methodretrieveMultiple" id="retrieveMultiple"><!-- --></a>
-<div class="evenrow">
+<a name="methodRetrieveMultiple" id="RetrieveMultiple"><!-- --></a>
+<div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">retrieveMultiple</span> (line <span class="line-number">100</span>)
+		<span class="method-title">RetrieveMultiple</span> (line <span class="line-number">108</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -435,7 +451,7 @@
 	<div class="method-signature">
 		<span class="method-result">bool|<a href="../Model/KrisModel.html">KrisModel</a></span>
 		<span class="method-name">
-			retrieveMultiple
+			RetrieveMultiple
 		</span>
 					(<span class="var-type">array|string</span>&nbsp;<span class="var-name">$where</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$bindings</span>, [<span class="var-type">bool</span>&nbsp;<span class="var-name">$likeQuery</span> = <span class="var-default">false</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$count</span> = <span class="var-default">0</span>], <span class="var-type">int</span>&nbsp;<span class="var-name">$offset</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$orderBy</span> = <span class="var-default">''</span>])
 			</div>
@@ -466,19 +482,19 @@
 		<div class="notes">Redefined in descendants as:</div>
 		<ul class="redefinitions">
 					<li>
-				<a href="../Model/KrisCrudModel.html#methodretrieveMultiple">KrisCrudModel::retrieveMultiple()</a>
+				<a href="../Model/KrisCrudModel.html#methodRetrieveMultiple">KrisCrudModel::RetrieveMultiple()</a>
 							</li>
 				</ul>
 	</div>
-<a name="methodselect" id="select"><!-- --></a>
-<div class="oddrow">
+<a name="methodSelect" id="Select"><!-- --></a>
+<div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">select</span> (line <span class="line-number">180</span>)
+		<span class="method-title">Select</span> (line <span class="line-number">188</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
-<p class="short-description">Returns an array of what/where</p>
+<p class="short-description">Returns an array of rows</p>
 	<ul class="tags">
 				<li><span class="field">access:</span> public</li>
 			</ul>
@@ -486,9 +502,9 @@
 	<div class="method-signature">
 		<span class="method-result">array</span>
 		<span class="method-name">
-			select
+			Select
 		</span>
-					([<span class="var-type">string|array</span>&nbsp;<span class="var-name">$what</span> = <span class="var-default">'*'</span>], [<span class="var-type">string|array</span>&nbsp;<span class="var-name">$where</span> = <span class="var-default">''</span>], [<span class="var-type">string|array</span>&nbsp;<span class="var-name">$bindings</span> = <span class="var-default">''</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$likeQuery</span> = <span class="var-default">false</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$pdoFetchMode</span> = <span class="var-default">PDO::FETCH_ASSOC</span>])
+					([<span class="var-type">string|array</span>&nbsp;<span class="var-name">$what</span> = <span class="var-default">null</span>], [<span class="var-type">string|array</span>&nbsp;<span class="var-name">$where</span> = <span class="var-default">''</span>], [<span class="var-type">string|array</span>&nbsp;<span class="var-name">$bindings</span> = <span class="var-default">''</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$likeQuery</span> = <span class="var-default">false</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$pdoFetchMode</span> = <span class="var-default">PDO::FETCH_ASSOC</span>])
 			</div>
 	
 			<ul class="parameters">
@@ -503,7 +519,7 @@
 				<span class="var-name">$bindings</span>			</li>
 					<li>
 				<span class="var-type">bool</span>
-				<span class="var-name">$likeQuery</span><span class="var-description">: *</span>			</li>
+				<span class="var-name">$likeQuery</span>			</li>
 					<li>
 				<span class="var-type">int</span>
 				<span class="var-name">$pdoFetchMode</span>			</li>
@@ -511,11 +527,11 @@
 		
 			
 	</div>
-<a name="methodtotalRecords" id="totalRecords"><!-- --></a>
-<div class="evenrow">
+<a name="methodTotalRecords" id="TotalRecords"><!-- --></a>
+<div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">totalRecords</span> (line <span class="line-number">163</span>)
+		<span class="method-title">TotalRecords</span> (line <span class="line-number">171</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -526,7 +542,7 @@
 	<div class="method-signature">
 		<span class="method-result">void</span>
 		<span class="method-name">
-			totalRecords
+			TotalRecords
 		</span>
 					([<span class="var-type">string</span>&nbsp;<span class="var-name">$where</span> = <span class="var-default">''</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$bindings</span> = <span class="var-default">''</span>], <span class="var-type">bool</span>&nbsp;<span class="var-name">$likeQuery</span>)
 			</div>
@@ -545,11 +561,11 @@
 		
 			
 	</div>
-<a name="methodupdate" id="update"><!-- --></a>
-<div class="oddrow">
+<a name="methodUpdate" id="Update"><!-- --></a>
+<div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">update</span> (line <span class="line-number">112</span>)
+		<span class="method-title">Update</span> (line <span class="line-number">120</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -561,7 +577,7 @@
 	<div class="method-signature">
 		<span class="method-result">bool</span>
 		<span class="method-name">
-			update
+			Update
 		</span>
 				()
 			</div>
@@ -570,10 +586,10 @@
 			
 	</div>
 <a name="methodupdateFields" id="updateFields"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">updateFields</span> (line <span class="line-number">225</span>)
+		<span class="method-title">updateFields</span> (line <span class="line-number">235</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -606,18 +622,18 @@
 													<span class="method-name"><a href="../Model/KrisDB.html#methodaddOrder">KrisDB::addOrder()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodbindRecordSet">KrisDB::bindRecordSet()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodconvertClassKeyToDBKey">KrisDB::convertClassKeyToDBKey()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisDB.html#methodconvertClassKeyToDisplayField">KrisDB::convertClassKeyToDisplayField()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodconvertDBKeyToClassKey">KrisDB::convertDBKeyToClassKey()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodconvertFieldToDisplayField">KrisDB::convertFieldToDisplayField()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodgenerateWhat">KrisDB::generateWhat()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodgenerateWhere">KrisDB::generateWhere()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisDB.html#methodget">KrisDB::get()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodGet">KrisDB::Get()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodGetAllFields">KrisDB::GetAllFields()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodGetBindings">KrisDB::GetBindings()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodgetDatabaseHandle">KrisDB::getDatabaseHandle()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodinitializeRecordSet">KrisDB::initializeRecordSet()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodquoteDbObject">KrisDB::quoteDbObject()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodreturnMultiple">KrisDB::returnMultiple()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisDB.html#methodset">KrisDB::set()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodSet">KrisDB::Set()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodValidateStatement">KrisDB::ValidateStatement()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#method__get">KrisDB::__get()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#method__set">KrisDB::__set()</a></span><br>
@@ -628,7 +644,7 @@
 
 
 	<p class="notes" id="credit">
-		Documentation generated on Wed, 06 Jul 2011 04:10:19 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+		Documentation generated on Mon, 25 Jul 2011 21:33:17 -0700 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
 	</p>
 	</div></body>
 </html>

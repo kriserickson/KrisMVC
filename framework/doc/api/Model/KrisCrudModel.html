@@ -24,7 +24,7 @@
         		<!-- ========== Info from phpDoc block ========= -->
 <p class="short-description">CrudModel, used for scaffolding and simple crud generation</p>
 		<p class="notes">
-			Located in <a class="field" href="_KrisCrudModel.php.html">/KrisCrudModel.php</a> (line <span class="field">15</span>)
+			Located in <a class="field" href="_orm---KrisCrudModel.php.html">/orm/KrisCrudModel.php</a> (line <span class="field">15</span>)
 		</p>
 		
 				
@@ -56,20 +56,8 @@
 					<a href="#$DisplayName" title="details" class="var-name">$DisplayName</a>
 				</div>
 																<div class="var-title">
-					<span class="var-type">string</span>
-					<a href="#$InputClass" title="details" class="var-name">$InputClass</a>
-				</div>
-																<div class="var-title">
-					<span class="var-type">string</span>
-					<a href="#$SelectClass" title="details" class="var-name">$SelectClass</a>
-				</div>
-																<div class="var-title">
 					<span class="var-type">bool|string</span>
 					<a href="#$SortField" title="details" class="var-name">$SortField</a>
-				</div>
-																<div class="var-title">
-					<span class="var-type">string</span>
-					<a href="#$TextAreaClass" title="details" class="var-name">$TextAreaClass</a>
 				</div>
 																<div class="var-title">
 					<span class="var-type">array</span>
@@ -78,6 +66,10 @@
 																<div class="var-title">
 					<span class="var-type">array</span>
 					<a href="#$_fieldAliases" title="details" class="var-name">$_fieldAliases</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">array</span>
+					<a href="#$_fieldData" title="details" class="var-name">$_fieldData</a>
 				</div>
 																<div class="var-title">
 					<span class="var-type">array</span>
@@ -90,6 +82,14 @@
 																<div class="var-title">
 					<span class="var-type">array</span>
 					<a href="#$_foreignKeys" title="details" class="var-name">$_foreignKeys</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">array</span>
+					<a href="#$_javascript" title="details" class="var-name">$_javascript</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">array</span>
+					<a href="#$_javascriptEditLibraries" title="details" class="var-name">$_javascriptEditLibraries</a>
 				</div>
 											</div>
 		</div>
@@ -107,7 +107,7 @@
 		</div>
 		<div class="info-box-body">			
 			<div class="method-summary">
-																																																																																												
+																																																																																																																																																				
 												<div class="method-definition">
 											<span class="method-result">KrisCrudModel</span>
 										<a href="#__construct" title="details" class="method-name">__construct</a>
@@ -115,7 +115,7 @@
 									</div>
 																<div class="method-definition">
 											<span class="method-result">string</span>
-										<a href="#convertClassKeyToDisplayField" title="details" class="method-name">convertClassKeyToDisplayField</a>
+										<a href="#convertFieldToDisplayField" title="details" class="method-name">convertFieldToDisplayField</a>
 											(<span class="var-type">string</span>&nbsp;<span class="var-name">$field</span>)
 									</div>
 																<div class="method-definition">
@@ -140,17 +140,47 @@
 									</div>
 																<div class="method-definition">
 											<span class="method-result">array</span>
+										<a href="#getForeignKeyValues" title="details" class="method-name">getForeignKeyValues</a>
+											(<span class="var-type">$foreignField</span>&nbsp;<span class="var-name">$foreignField</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#GetJavascript" title="details" class="method-name">GetJavascript</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$view</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">array</span>
 										<a href="#GetTableFields" title="details" class="method-name">GetTableFields</a>
 										()
 									</div>
 																<div class="method-definition">
+											<span class="method-result">array</span>
+										<a href="#GetUploads" title="details" class="method-name">GetUploads</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">bool</span>
+										<a href="#HasUploads" title="details" class="method-name">HasUploads</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">bool</span>
+										<a href="#isFakeField" title="details" class="method-name">isFakeField</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$fieldName</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">bool</span>
+										<a href="#isForeignKeyField" title="details" class="method-name">isForeignKeyField</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$fieldName</span>)
+									</div>
+																<div class="method-definition">
 											<span class="method-result">bool|<a href="../Model/KrisDB.html">KrisDB</a></span>
-										<a href="#retrieve" title="details" class="method-name">retrieve</a>
+										<a href="#Retrieve" title="details" class="method-name">Retrieve</a>
 											(<span class="var-type">$primaryKeyValue</span>&nbsp;<span class="var-name">$primaryKeyValue</span>)
 									</div>
 																<div class="method-definition">
 											<span class="method-result">bool|<a href="../Model/KrisCrudModel.html">KrisCrudModel</a></span>
-										<a href="#retrieveMultiple" title="details" class="method-name">retrieveMultiple</a>
+										<a href="#RetrieveMultiple" title="details" class="method-name">RetrieveMultiple</a>
 											(<span class="var-type">array</span>&nbsp;<span class="var-name">$where</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$bindings</span>, [<span class="var-type">bool</span>&nbsp;<span class="var-name">$likeQuery</span> = <span class="var-default">false</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$count</span> = <span class="var-default">0</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$offset</span> = <span class="var-default">0</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$orderBy</span> = <span class="var-default">''</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$orderAscending</span> = <span class="var-default">true</span>])
 									</div>
 																<div class="method-definition">
@@ -162,6 +192,11 @@
 											<span class="method-result">void</span>
 										<a href="#UpdateSelectedFields" title="details" class="method-name">UpdateSelectedFields</a>
 											(<span class="var-type">$fields</span>&nbsp;<span class="var-name">$fields</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#ValidateField" title="details" class="method-name">ValidateField</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$field</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
 									</div>
 								</div>
 		</div>
@@ -187,57 +222,13 @@
 		<span class="var-title">
 			<span class="var-type">string</span>
 			<span class="var-name">$DisplayName</span>
-						(line <span class="line-number">45</span>)
+						(line <span class="line-number">61</span>)
 		</span>
 	</div>
 
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
 				<li><span class="field">var:</span> - The name of the table, can be overridden in View.</li>
-				<li><span class="field">access:</span> public</li>
-			</ul>
-	
-	
-		
-		
-
-</div>
-<a name="var$InputClass" id="$InputClass"><!-- --></A>
-<div class="oddrow">
-
-	<div class="var-header">
-		<span class="var-title">
-			<span class="var-type">string</span>
-			<span class="var-name">$InputClass</span>
-			 = <span class="var-default"> 'crudInput'</span>			(line <span class="line-number">65</span>)
-		</span>
-	</div>
-
-	<!-- ========== Info from phpDoc block ========= -->
-	<ul class="tags">
-				<li><span class="field">var:</span> - Class name of the inputs</li>
-				<li><span class="field">access:</span> public</li>
-			</ul>
-	
-	
-		
-		
-
-</div>
-<a name="var$SelectClass" id="$SelectClass"><!-- --></A>
-<div class="evenrow">
-
-	<div class="var-header">
-		<span class="var-title">
-			<span class="var-type">string</span>
-			<span class="var-name">$SelectClass</span>
-			 = <span class="var-default"> 'crudSelect'</span>			(line <span class="line-number">55</span>)
-		</span>
-	</div>
-
-	<!-- ========== Info from phpDoc block ========= -->
-	<ul class="tags">
-				<li><span class="field">var:</span> - Class Name of the selects</li>
 				<li><span class="field">access:</span> public</li>
 			</ul>
 	
@@ -253,7 +244,7 @@
 		<span class="var-title">
 			<span class="var-type">bool|string</span>
 			<span class="var-name">$SortField</span>
-			 = <span class="var-default"> false</span>			(line <span class="line-number">50</span>)
+			 = <span class="var-default"> false</span>			(line <span class="line-number">66</span>)
 		</span>
 	</div>
 
@@ -268,30 +259,8 @@
 		
 
 </div>
-<a name="var$TextAreaClass" id="$TextAreaClass"><!-- --></A>
-<div class="evenrow">
-
-	<div class="var-header">
-		<span class="var-title">
-			<span class="var-type">string</span>
-			<span class="var-name">$TextAreaClass</span>
-			 = <span class="var-default"> 'crudTextArea'</span>			(line <span class="line-number">60</span>)
-		</span>
-	</div>
-
-	<!-- ========== Info from phpDoc block ========= -->
-	<ul class="tags">
-				<li><span class="field">var:</span> - Class name of the textareas</li>
-				<li><span class="field">access:</span> public</li>
-			</ul>
-	
-	
-		
-		
-
-</div>
 <a name="var$_fakeFields" id="$_fakeFields"><!-- --></A>
-<div class="oddrow">
+<div class="evenrow">
 
 	<div class="var-header">
 		<span class="var-title">
@@ -313,7 +282,7 @@
 
 </div>
 <a name="var$_fieldAliases" id="$_fieldAliases"><!-- --></A>
-<div class="evenrow">
+<div class="oddrow">
 
 	<div class="var-header">
 		<span class="var-title">
@@ -326,6 +295,28 @@
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
 				<li><span class="field">var:</span> - Override these to change any field aliases.</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_fieldData" id="$_fieldData"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$_fieldData</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">56</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">var:</span> - Any data associated with a field, for example images have their upload directory here...</li>
 				<li><span class="field">access:</span> protected</li>
 			</ul>
 	
@@ -369,7 +360,7 @@
 
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
-				<li><span class="field">var:</span> - FieldName -&gt; Type (string, text, int, date, bool, etc)</li>
+				<li><span class="field">var:</span> - FieldName -&gt; Type (string, text, int, date, bool, image, upload, etc)</li>
 				<li><span class="field">access:</span> protected</li>
 			</ul>
 	
@@ -392,6 +383,50 @@
 	<!-- ========== Info from phpDoc block ========= -->
 	<ul class="tags">
 				<li><span class="field">var:</span> - Collection of foreign key data... ForeignKeyId =&gt; array('table' =&gt; '', 'field' =&gt; '', 'display' =&gt; '', 'alias' =&gt; '')</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_javascript" id="$_javascript"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$_javascript</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">45</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">var:</span> - Any javascript created gets placed at the bottom of the page...</li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_javascriptEditLibraries" id="$_javascriptEditLibraries"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">array</span>
+			<span class="var-name">$_javascriptEditLibraries</span>
+			 = <span class="var-default">array()</span>			(line <span class="line-number">50</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">var:</span> - Add any javascript libraries to this array in the derived class...</li>
 				<li><span class="field">access:</span> protected</li>
 			</ul>
 	
@@ -443,7 +478,7 @@
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">Constructor __construct</span> (line <span class="line-number">71</span>)
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">75</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -472,11 +507,11 @@
 					</dl>
 			
 	</div>
-<a name="methodconvertClassKeyToDisplayField" id="convertClassKeyToDisplayField"><!-- --></a>
+<a name="methodconvertFieldToDisplayField" id="convertFieldToDisplayField"><!-- --></a>
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">convertClassKeyToDisplayField</span> (line <span class="line-number">371</span>)
+		<span class="method-title">convertFieldToDisplayField</span> (line <span class="line-number">417</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -487,7 +522,7 @@
 	<div class="method-signature">
 		<span class="method-result">string</span>
 		<span class="method-name">
-			convertClassKeyToDisplayField
+			convertFieldToDisplayField
 		</span>
 					(<span class="var-type">string</span>&nbsp;<span class="var-name">$field</span>)
 			</div>
@@ -501,7 +536,7 @@
 			<hr class="separator" />
 		<div class="notes">Redefinition of:</div>
 		<dl>
-			<dt><a href="../Model/KrisDB.html#methodconvertClassKeyToDisplayField">KrisDB::convertClassKeyToDisplayField()</a></dt>
+			<dt><a href="../Model/KrisDB.html#methodconvertFieldToDisplayField">KrisDB::convertFieldToDisplayField()</a></dt>
 					</dl>
 			
 	</div>
@@ -509,7 +544,7 @@
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">GetDatabaseFields</span> (line <span class="line-number">325</span>)
+		<span class="method-title">GetDatabaseFields</span> (line <span class="line-number">371</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -533,7 +568,7 @@
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">GetDisplayAndDatabaseFields</span> (line <span class="line-number">356</span>)
+		<span class="method-title">GetDisplayAndDatabaseFields</span> (line <span class="line-number">402</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -557,7 +592,7 @@
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">GetDisplayValue</span> (line <span class="line-number">260</span>)
+		<span class="method-title">GetDisplayValue</span> (line <span class="line-number">264</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -586,7 +621,7 @@
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">GetEditValue</span> (line <span class="line-number">280</span>)
+		<span class="method-title">GetEditValue</span> (line <span class="line-number">288</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -610,11 +645,67 @@
 		
 			
 	</div>
+<a name="methodgetForeignKeyValues" id="getForeignKeyValues"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getForeignKeyValues</span> (line <span class="line-number">449</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			getForeignKeyValues
+		</span>
+					(<span class="var-type">$foreignField</span>&nbsp;<span class="var-name">$foreignField</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">$foreignField</span>
+				<span class="var-name">$foreignField</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodGetJavascript" id="GetJavascript"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">GetJavascript</span> (line <span class="line-number">341</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			GetJavascript
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$view</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$view</span><span class="var-description">: (edit, index, view)</span>			</li>
+				</ul>
+		
+			
+	</div>
 <a name="methodGetTableFields" id="GetTableFields"><!-- --></a>
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">GetTableFields</span> (line <span class="line-number">214</span>)
+		<span class="method-title">GetTableFields</span> (line <span class="line-number">218</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -633,11 +724,113 @@
 		
 			
 	</div>
-<a name="methodretrieve" id="retrieve"><!-- --></a>
+<a name="methodGetUploads" id="GetUploads"><!-- --></a>
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">retrieve</span> (line <span class="line-number">82</span>)
+		<span class="method-title">GetUploads</span> (line <span class="line-number">530</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">array</span>
+		<span class="method-name">
+			GetUploads
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodHasUploads" id="HasUploads"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">HasUploads</span> (line <span class="line-number">324</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">bool</span>
+		<span class="method-name">
+			HasUploads
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodisFakeField" id="isFakeField"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">isFakeField</span> (line <span class="line-number">431</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">bool</span>
+		<span class="method-name">
+			isFakeField
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$fieldName</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$fieldName</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodisForeignKeyField" id="isForeignKeyField"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">isForeignKeyField</span> (line <span class="line-number">440</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">bool</span>
+		<span class="method-name">
+			isForeignKeyField
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$fieldName</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$fieldName</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodRetrieve" id="Retrieve"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">Retrieve</span> (line <span class="line-number">86</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -649,7 +842,7 @@
 	<div class="method-signature">
 		<span class="method-result">bool|<a href="../Model/KrisDB.html">KrisDB</a></span>
 		<span class="method-name">
-			retrieve
+			Retrieve
 		</span>
 					(<span class="var-type">$primaryKeyValue</span>&nbsp;<span class="var-name">$primaryKeyValue</span>)
 			</div>
@@ -663,16 +856,16 @@
 			<hr class="separator" />
 		<div class="notes">Redefinition of:</div>
 		<dl>
-			<dt><a href="../Model/KrisModel.html#methodretrieve">KrisModel::retrieve()</a></dt>
+			<dt><a href="../Model/KrisModel.html#methodRetrieve">KrisModel::Retrieve()</a></dt>
 						<dd>Retrieves (hopefully) one record from the table based on the primary key...</dd>
 					</dl>
 			
 	</div>
-<a name="methodretrieveMultiple" id="retrieveMultiple"><!-- --></a>
+<a name="methodRetrieveMultiple" id="RetrieveMultiple"><!-- --></a>
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">retrieveMultiple</span> (line <span class="line-number">117</span>)
+		<span class="method-title">RetrieveMultiple</span> (line <span class="line-number">121</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -683,7 +876,7 @@
 	<div class="method-signature">
 		<span class="method-result">bool|<a href="../Model/KrisCrudModel.html">KrisCrudModel</a></span>
 		<span class="method-name">
-			retrieveMultiple
+			RetrieveMultiple
 		</span>
 					(<span class="var-type">array</span>&nbsp;<span class="var-name">$where</span>, <span class="var-type">array</span>&nbsp;<span class="var-name">$bindings</span>, [<span class="var-type">bool</span>&nbsp;<span class="var-name">$likeQuery</span> = <span class="var-default">false</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$count</span> = <span class="var-default">0</span>], [<span class="var-type">int</span>&nbsp;<span class="var-name">$offset</span> = <span class="var-default">0</span>], [<span class="var-type">string</span>&nbsp;<span class="var-name">$orderBy</span> = <span class="var-default">''</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$orderAscending</span> = <span class="var-default">true</span>])
 			</div>
@@ -715,7 +908,7 @@
 			<hr class="separator" />
 		<div class="notes">Redefinition of:</div>
 		<dl>
-			<dt><a href="../Model/KrisModel.html#methodretrieveMultiple">KrisModel::retrieveMultiple()</a></dt>
+			<dt><a href="../Model/KrisModel.html#methodRetrieveMultiple">KrisModel::RetrieveMultiple()</a></dt>
 					</dl>
 			
 	</div>
@@ -723,7 +916,7 @@
 <div class="oddrow">
 	
 	<div class="method-header">
-		<span class="method-title">SetForeignKey</span> (line <span class="line-number">95</span>)
+		<span class="method-title">SetForeignKey</span> (line <span class="line-number">99</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -758,7 +951,7 @@
 <div class="evenrow">
 	
 	<div class="method-header">
-		<span class="method-title">UpdateSelectedFields</span> (line <span class="line-number">341</span>)
+		<span class="method-title">UpdateSelectedFields</span> (line <span class="line-number">387</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -782,21 +975,53 @@
 		
 			
 	</div>
+<a name="methodValidateField" id="ValidateField"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">ValidateField</span> (line <span class="line-number">549</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">return:</span> - error message or a blank string if there is no validation error.</li>
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			ValidateField
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$field</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$value</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$field</span><span class="var-description">: - dbField to be validated...</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$value</span><span class="var-description">: -</span>			</li>
+				</ul>
+		
+			
+	</div>
 							<h4>Inherited Methods</h4>
 				<a name='inherited_methods'><!-- --></a>	
 									<!-- =========== Summary =========== -->
 					<p>Inherited From <span class="classname"><a href="../Model/KrisModel.html">KrisModel</a></span></p>
 					<blockquote>
 													<span class="method-name"><a href="../Model/KrisModel.html#method__construct">KrisModel::__construct()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisModel.html#methodcreate">KrisModel::create()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisModel.html#methoddelete">KrisModel::delete()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisModel.html#methodexists">KrisModel::exists()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisModel.html#methodCreate">KrisModel::Create()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisModel.html#methodDelete">KrisModel::Delete()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisModel.html#methodExists">KrisModel::Exists()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisModel.html#methodPrimaryKey">KrisModel::PrimaryKey()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisModel.html#methodretrieve">KrisModel::retrieve()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisModel.html#methodretrieveMultiple">KrisModel::retrieveMultiple()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisModel.html#methodselect">KrisModel::select()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisModel.html#methodtotalRecords">KrisModel::totalRecords()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisModel.html#methodupdate">KrisModel::update()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisModel.html#methodRetrieve">KrisModel::Retrieve()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisModel.html#methodRetrieveMultiple">KrisModel::RetrieveMultiple()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisModel.html#methodSelect">KrisModel::Select()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisModel.html#methodTotalRecords">KrisModel::TotalRecords()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisModel.html#methodUpdate">KrisModel::Update()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisModel.html#methodupdateFields">KrisModel::updateFields()</a></span><br>
 											</blockquote>
 									<!-- =========== Summary =========== -->
@@ -806,18 +1031,18 @@
 													<span class="method-name"><a href="../Model/KrisDB.html#methodaddOrder">KrisDB::addOrder()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodbindRecordSet">KrisDB::bindRecordSet()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodconvertClassKeyToDBKey">KrisDB::convertClassKeyToDBKey()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisDB.html#methodconvertClassKeyToDisplayField">KrisDB::convertClassKeyToDisplayField()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodconvertDBKeyToClassKey">KrisDB::convertDBKeyToClassKey()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodconvertFieldToDisplayField">KrisDB::convertFieldToDisplayField()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodgenerateWhat">KrisDB::generateWhat()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodgenerateWhere">KrisDB::generateWhere()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisDB.html#methodget">KrisDB::get()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodGet">KrisDB::Get()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodGetAllFields">KrisDB::GetAllFields()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodGetBindings">KrisDB::GetBindings()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodgetDatabaseHandle">KrisDB::getDatabaseHandle()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodinitializeRecordSet">KrisDB::initializeRecordSet()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodquoteDbObject">KrisDB::quoteDbObject()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodreturnMultiple">KrisDB::returnMultiple()</a></span><br>
-													<span class="method-name"><a href="../Model/KrisDB.html#methodset">KrisDB::set()</a></span><br>
+													<span class="method-name"><a href="../Model/KrisDB.html#methodSet">KrisDB::Set()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#methodValidateStatement">KrisDB::ValidateStatement()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#method__get">KrisDB::__get()</a></span><br>
 													<span class="method-name"><a href="../Model/KrisDB.html#method__set">KrisDB::__set()</a></span><br>
@@ -828,7 +1053,7 @@
 
 
 	<p class="notes" id="credit">
-		Documentation generated on Wed, 06 Jul 2011 04:10:17 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+		Documentation generated on Mon, 25 Jul 2011 21:33:16 -0700 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
 	</p>
 	</div></body>
 </html>

@@ -81,7 +81,7 @@ abstract class KrisModel extends KrisDB
      *
      * @param $primaryKeyValue
      * @param null|array $value
-     * @return bool|KrisDB
+     * @return bool|KrisModel
      */
     public function Retrieve($primaryKeyValue, $value = null)
     {
@@ -91,7 +91,7 @@ abstract class KrisModel extends KrisDB
         }
         else
         {
-            return $this->bindRecordSet($this->generateStatement(null, $primaryKeyValue, $value, false)->fetch(PDO::FETCH_ASSOC), $this);
+            return $this->bindRecordSet($this->generateStatement(null, array($primaryKeyValue), $value, false)->fetch(PDO::FETCH_ASSOC), $this);
         }
     }
 
@@ -236,17 +236,20 @@ abstract class KrisModel extends KrisDB
     {
         $dbh = $this->getDatabaseHandle();
         $set = '';
-        foreach (array_keys($fields) as $key)
+        $values = array();
+        foreach ($fields as $key => $value)
         {
             $dbKey = $this->convertClassKeyToDBKey($key);
             if ($dbKey != $this->_primaryKeyName)
             {
                 $set .= (strlen($set) > 0 ? ',' : '') . $this->quoteDbObject($dbKey) . '=?';
+                $values[] = $value;
             }
         }
         $stmt = $dbh->prepare('UPDATE ' . $this->quoteDbObject($this->_tableName) . ' SET ' . $set . ' WHERE ' . $this->quoteDbObject($this->_primaryKeyName) . '=?');
         $i = 1;
-        foreach ($fields as $value)
+
+        foreach ($values as $value)
         {
             $stmt->bindValue($i++, $value);
         }
