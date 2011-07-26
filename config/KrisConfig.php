@@ -2,13 +2,16 @@
 
 /**
  * Configuration of the application...
+ *
+ * Change Config options here...
  */
 class KrisConfig
 {
-    // Change Config options here...
+    // Paths
     const APP_PATH = 'app/';    // APP_PATH must end in a slash...
     const WEB_FOLDER = '/';
     const BASE_DIR = 'localhost';
+	const FRAMEWORK_DIR = '/framework';
 
     // Change Database connections here...
     const DB_HOST = 'localhost';
@@ -16,11 +19,18 @@ class KrisConfig
     const DB_USER = 'test';
     const DB_PASSWORD = 'test';
 
+	// Debug
 	const DEBUG = true;
 
-    const FRAMEWORK_DIR = '/framework';
+    // Controllers and Actions
+    const AUTH_CONTROLLER = 'auth';
+    const DEFAULT_CONTROLLER = 'main';
+    const DEFAULT_ACTION = 'index';
 
+
+    // Options
     public static $AUTH_TYPE = KrisConfig::AUTH_TYPE_DB;     // Currently only DB is implimented...
+
     public static $DATABASE_TYPE = KrisConfig::DB_TYPE_MYSQL;
 
     /**
@@ -148,14 +158,7 @@ class KrisConfig
 
 }
 
-//===============================================
-// Debug
-//===============================================
-if (KrisConfig::DEBUG)
-{
-    ini_set('display_errors', 'On');
-    error_reporting(E_ALL);
-}
+
 
 
 ?>
