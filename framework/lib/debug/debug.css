@@ -1,0 +1,121 @@
+/*-- Bottom Toolbar --*/
+
+div#krisMvcWebBar, div#krisMvcWebBarButton,  div#krisMvcDebugDataHolder
+{
+    position: fixed; /* set fixed position for the bar */
+    z-index: 9999; /* keep the bar on top  */
+    background-color: #C7C7C7;
+    -moz-border-radius-topleft: 8px;
+    -webkit-border-top-left-radius: 8px;
+    -moz-border-radius-topright: 8px;
+    -webkit-border-top-right-radius: 8px;
+    box-shadow: 0 1px 10px #666;
+    border-top: 1px solid #eee;
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+    color: #000000;
+    font:14px/18px Arial, Helvetica, sans-serif;
+    padding:  0;
+    display: none;
+}
+
+ul#debugConfig
+{
+    padding: 0;
+    margin: 0;
+}
+
+div#krisMvcWebBar, div#krisMvcWebBarButton
+{
+    bottom: 0;
+    height: 36px;
+    right: 0;
+}
+
+
+
+div#krisMvcDebugDataHolder
+{
+    bottom: 36px;
+    height: 300px;
+    width: 80%;
+    left: 10%;
+    width: 80%;
+}
+
+div#krisMvcDebugData
+{
+    padding: 20px;
+    overflow: auto;
+    height: 290px;
+}
+
+div#krisMvcWebBar {
+    width: 85%;
+    min-width: 700px; /* to limit the width when an excessive window resize */
+    margin:0 auto; /* centered toolbar */
+    left:0;
+}
+
+div#krisMvcWebBarButton {
+    /* div for the 'hide status' */
+    width: 60px;
+    height: 15px;
+    margin-right: 3%;
+}
+
+
+
+span.showbar a {
+    /* show button */
+    padding: 5px;
+    font-size: 10px;
+    color: #989898;
+}
+
+.leftside {
+    float: left;
+}
+
+.rightside {
+    float: right;
+}
+
+/*-- Left Side --*/
+
+ul#debugConfig li {
+    display: inline-block;
+    margin: 10px 10px 10px 10px;
+    border-right: 1px solid;
+    padding-right: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+ul#debugConfig li img {
+    padding-right: 5px;
+}
+
+ul#debugConfig li:last-child 
+{
+    border-right: 0;
+    padding-right: 0;
+}
+
+
+/*-- Right Side --*/
+
+span.downarr {
+    /* hide button */
+    float: right;
+    border-left: 1px solid #a4a4a4;
+}
+
+span.downarr a {
+    display: block;
+    width: 36px;
+    height: 26px;
+    padding: 25px 0 0 10px;
+    background: url(downarrow.png) no-repeat 5px 7px;
+}
+
