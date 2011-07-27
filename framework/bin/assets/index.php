@@ -9,5 +9,8 @@ require KrisConfig::FRAMEWORK_DIR.'/lib/includes.php';
 //===============================================
 // Start the controller
 //===============================================
-$controller = new KrisController(dirname(__FILE__).'/'.KrisConfig::APP_PATH . 'controllers/');
+
+/** @var $controller Controller */
+$controller = AutoLoader::$Container->create('Controller');
+$controller->Route(dirname(__FILE__).'/'.KrisConfig::APP_PATH . 'controllers/');
 ?>

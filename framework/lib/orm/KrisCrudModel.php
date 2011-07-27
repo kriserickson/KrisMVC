@@ -559,8 +559,14 @@ class KrisCrudModel extends KrisModel
                     $error = 'String too long';
                 }
                 break;
+            case 'float':
+                if (!is_numeric($value))
+                {
+                    $error = 'Must be a number.';
+                }
+                break;
             case 'int' :
-                if (!is_int($value))
+                if ((int)$value != $value)
                 {
                     $error = 'Must be an integer.';
                 }

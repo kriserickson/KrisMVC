@@ -21,10 +21,17 @@ I started using it, and then started getting annoyed by little things that I am 
 fork it and make my own version.  I decided to release it, in cause anyone else in the world had similar opinions and
 wanted to use it as a basis of their own very simple MVC.  The word KrisMVC is a play on kissmvc as my name is Kris...
 
+Included Projects
+-----------------
+
+Portable PHP password hashing framework. -  http://www.openwall.com/phpass/
+Bucket DI Container - https://github.com/troelskn/bucket
+Mustache - http://defunkt.github.com/mustache
+FamFamFam Silk Icons - http://www.famfamfam.com/lab/icons/silk/
+
+
 About KrisMVC
 -------------
 
-Basically the MVC is 5 classes, index.php a bunch of .htaccess files and a directory structure.   Eventually I hope to
-add Model generation, Authentication, Multilingual support, a better ORM and caching, but for now it is very very simple.
 
  

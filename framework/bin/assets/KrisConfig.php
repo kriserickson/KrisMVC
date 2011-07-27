@@ -45,9 +45,9 @@ class KrisConfig
     const DB_TYPE_POSTGRESQL = 'POSTGRESQL';
 
     const AUTH_TYPE_DB = 'DB';
-    const AUTH_TYPE_File = 'File';
+    const AUTH_TYPE_FILE = 'File';
     const AUTH_TYPE_LDAP = 'LDAP';
-    const AUTH_TYPE_OpenAuth = 'OpenAuth';
+    const AUTH_TYPE_OPEN_AUTH = 'OpenAuth';
 
 
     /**
@@ -78,95 +78,9 @@ class KrisConfig
         error_log($message);
     }
 
-    // End of user configuration...  Don't change the following unless you know what you are doing...
-
-    /**
-     * @var PDO
-     */
-    private static $DB_CONNECTION;
-
-    /**
-     * @var array
-     */
-    private static $ClassLoader = array();
-
-
-
-    /**
-     * Used by KrisDB and it's child classes to get a database connection.  Edit the DB_* static variables to configure
-     *
-     * @static
-     * @return PDO
-     */
-    public static function GetDatabaseHandle()
-    {
-        if (is_null(self::$DB_CONNECTION))
-        {
-            try
-            {
-                self::$DB_CONNECTION = new PDO('mysql:host='.self::DB_HOST.';dbname='.self::DB_DATABASE, self::DB_USER, self::DB_PASSWORD);
-            }
-            catch (PDOException $e)
-            {
-                die('Connection failed: ' . $e->getMessage());
-            }
-        }
-        return self::$DB_CONNECTION;
-    }
-
-    /**
-     *  Used by the autoloader to autoload classes...
-     * @static
-     * @param $className
-     * @return bool
-     */
-    public static function HasClass($className)
-    {
-        return isset(self::$ClassLoader[$className]);
-    }
-
-    /**
-     * Used by the autoloader to autoload classes...
-     *
-     * @static
-     * @param $className
-     * @return void
-     */
-    public static function Autoload($className)
-    {
-        require(self::$ClassLoader[$className]);
-    }
-
-    /**
-     * Add a class to the AutoLoader.  For example if you wanted to add the DateHelpers class
-     *
-     * KrisConfig::AddClass('DateHelpers', 'app/library/DateHelpers.php');
-     *
-     * @static
-     * @param string $className
-     * @param string $classLocation
-     * @param bool $isFramework
-     * @return void
-     */
-    public static function AddClass($className, $classLocation, $isFramework = false)
-    {
-        if (!$isFramework)
-        {
-            $classLocation = self::APP_PATH.$classLocation;
-        }
-        self::$ClassLoader[$className] = $classLocation;
-    }
 
 }
 
-//===============================================
-// Debug
-//===============================================
-if (KrisConfig::DEBUG)
-{
-    ini_set('display_errors', 'On');
-    error_reporting(E_ALL);
-}
 
 
 ?>
