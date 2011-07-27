@@ -24,10 +24,10 @@ wanted to use it as a basis of their own very simple MVC.  The word KrisMVC is a
 Included Projects
 -----------------
 
-Portable PHP password hashing framework. -  http://www.openwall.com/phpass/
-Bucket DI Container - https://github.com/troelskn/bucket
-Mustache - http://defunkt.github.com/mustache
-FamFamFam Silk Icons - http://www.famfamfam.com/lab/icons/silk/
+ + Portable PHP password hashing framework. -  http://www.openwall.com/phpass/
+ + Bucket DI Container - https://github.com/troelskn/bucket
+ + Mustache - http://defunkt.github.com/mustache
+ + FamFamFam Silk Icons - http://www.famfamfam.com/lab/icons/silk/
 
 
 About KrisMVC
