@@ -67,7 +67,7 @@ class Request
      */
     public function Action()
     {
-        return $this->_controller;
+        return $this->_action;
     }
 
     /**
@@ -97,7 +97,7 @@ class Request
     {
         if (isset(self::$_post[$key]))
         {
-            return self::$_post[$key];
+            return get_magic_quotes_gpc() ? stripslashes(self::$_post[$key]) : self::$_post[$key];
         }
         return $default;
     }

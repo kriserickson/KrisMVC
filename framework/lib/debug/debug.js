@@ -2,74 +2,75 @@
     var lastVisible = false;
 
 
-    function debugLoaded() {
+    function debugLoaded()
+    {
+        $(document).ready(function(){
+            $('#krisMvcWebBar').slideDown('fast');
 
-        $('#krisMvcWebBar').slideDown('fast');
-        
-        //hide toolbar and make visible the 'show' button
-        $('span.downarr a').click(function() {
-            $('#krisMvcWebBar').slideToggle('fast');
-            $('#krisMvcDebugDataHolder').hide();
-            $('#krisMvcWebBarButton').fadeIn('slow');
-        });
+            //hide toolbar and make visible the 'show' button
+            $('span.downarr a').click(function() {
+                $('#krisMvcWebBar').slideToggle('fast');
+                $('#krisMvcDebugDataHolder').hide();
+                $('#krisMvcWebBarButton').fadeIn('slow');
+            });
 
-        //show toolbar and hide the 'show' button
-        $('span.showbar a').click(function() {
-            $('#krisMvcWebBar').slideToggle('fast');
-            $('#krisMvcWebBarButton').fadeOut();
-        });
+            //show toolbar and hide the 'show' button
+            $('span.showbar a').click(function() {
+                $('#krisMvcWebBar').slideToggle('fast');
+                $('#krisMvcWebBarButton').fadeOut();
+            });
 
-        $('.debugList').click(function()
-        {
-            var debugWhat = $(this).attr('id'), holder = $('#krisMvcDebugDataHolder'), visible = holder.is(':visible'), text = '';
-            
-            if (lastVisible == debugWhat && visible)
+            $('.debugList').click(function()
             {
-                holder.slideToggle('fast');
-                lastVisible = false;
-            }
-            else
-            {
+                var debugWhat = $(this).attr('id'), holder = $('#krisMvcDebugDataHolder'), visible = holder.is(':visible'), text = '';
 
-                switch (debugWhat)
+                if (lastVisible == debugWhat && visible)
                 {
-                    /** @namespace dbLog */
-                    /** @namespace timeLog */
-                    /** @namespace memoryLog */
-                    case 'database' :
-                            text += '<h2>Database Log</h2><ol>';
-                            for (var i = 0; i < dbLog.length; i++)
-                            {
-
-                                text += '<li>' + dbLog[i].func + ' [' + dbLog[i].milliseconds + ' milliseconds]: ' + dbLog[i].query + '</li>';
-                            }
-                            text += '</ol>';
-                        break;
-                    case 'time' : text = timeLog;
-                        break;
-                    case 'memory' : text = memoryLog;
-                        break;
-                    case 'logs' : text = '<h2>Log Info</h2>Not yet implemented...';
-                        break;
-                    case 'config' : text = '<h2>Config Info</h2>Not yet implemented...';
-                        break;
-                    default: text = '';
+                    holder.slideToggle('fast');
+                    lastVisible = false;
                 }
-
-                if (text.length > 0)
+                else
                 {
-                    if (visible)
+
+                    switch (debugWhat)
                     {
+                        /** @namespace dbLog */
+                        /** @namespace timeLog */
+                        /** @namespace memoryLog */
+                        case 'database' :
+                                text += '<h2>Database Log</h2><ol>';
+                                for (var i = 0; i < dbLog.length; i++)
+                                {
+
+                                    text += '<li>' + dbLog[i].func + ' [' + dbLog[i].milliseconds + ' milliseconds]: ' + dbLog[i].query + '</li>';
+                                }
+                                text += '</ol>';
+                            break;
+                        case 'time' : text = timeLog;
+                            break;
+                        case 'memory' : text = memoryLog;
+                            break;
+                        case 'logs' : text = '<h2>Log Info</h2>Not yet implemented...';
+                            break;
+                        case 'config' : text = '<h2>Config Info</h2>Not yet implemented...';
+                            break;
+                        default: text = '';
+                    }
+
+                    if (text.length > 0)
+                    {
+                        if (visible)
+                        {
+                            holder.slideToggle('fast');
+                        }
+                        $('#krisMvcDebugData').html(text);
                         holder.slideToggle('fast');
                     }
-                    $('#krisMvcDebugData').html(text);
-                    holder.slideToggle('fast');
+
+                    lastVisible = debugWhat;
                 }
-
-                lastVisible = debugWhat;
-            }
+            });
         });
-
     }
 
     // If jquery isn't on the page, load jquery....

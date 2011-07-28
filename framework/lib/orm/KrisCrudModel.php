@@ -116,9 +116,9 @@ class KrisCrudModel extends KrisModel
      * @param int $offset
      * @param string $orderBy
      * @param bool $orderAscending
-     * @return bool|KrisCrudModel
+     * @return bool|array
      */
-    public function RetrieveMultiple($where, $bindings, $likeQuery = false, $count = 0, $offset = 0, $orderBy = '', $orderAscending = true)
+    public function RetrieveMultiple($where = null, $bindings = null, $likeQuery = false, $count = 0, $offset = 0, $orderBy = '', $orderAscending = true)
     {
         return $this->returnMultiple($this->generateStatement($where, $bindings, $likeQuery, $count, $offset, $orderBy, $orderAscending));
     }
@@ -173,7 +173,6 @@ class KrisCrudModel extends KrisModel
         }
 
         $bindings = $this->GetBindings($bindings, $likeQuery);
-
 
         $stmt = $dbh->prepare($this->addLimit($this->addOrder($sql, $order, $orderAscending), $count, $offset));
 
@@ -275,6 +274,10 @@ class KrisCrudModel extends KrisModel
             {
                 $value = HtmlHelpers::CreateImage($key, $value,$this->GetFieldData($fixedKey, 'directory'), $this->GetClass('Edit', 'Image'));
             }
+            else if ($this->_fieldTypes[$fixedKey] == 'enum')
+            {
+                $value = isset($this->_fieldData[$fixedKey][$value]) ? $this->_fieldData[$fixedKey][$value] : '';
+            }
         }
         return $value;
     }
@@ -305,6 +308,9 @@ class KrisCrudModel extends KrisModel
                 case 'text':
                     $this->AddJavascript('Edit', 'TextArea', $key);
                     return HtmlHelpers::CreateTextarea($key, $value, $key, $this->GetClass('Edit', 'TextArea'));
+                case 'enum':
+                    $this->AddJavascript('Edit', 'Select', $key);
+                    return HtmlHelpers::CreateSelect($key, $this->_fieldData[$fixedKey], $value, '', $this->GetClass('Edit', 'Select'));
                 case 'image':
                     $this->AddJavascript('Edit', 'Image', $key);
                     return HtmlHelpers::CreateImage('img'.$key, $value, $this->GetFieldData($fixedKey, 'directory'), $this->GetClass('Edit', 'Image')).
@@ -548,7 +554,8 @@ class KrisCrudModel extends KrisModel
      */
     public function ValidateField($field, $value)
     {
-        $fieldType = $this->_fieldTypes[$this->convertDBKeyToClassKey($field)];
+        $fieldKey = $this->convertDBKeyToClassKey($field);
+        $fieldType = $this->_fieldTypes[$fieldKey];
         $error = '';
         switch ($fieldType)
         {
@@ -582,6 +589,13 @@ class KrisCrudModel extends KrisModel
                 {
                     $error = 'Must be a valid boolean';
                 }
+                break;
+            case 'enum':
+                if (!isset($this->_fieldData[$fieldKey]))
+                {
+                    $error = 'Must be a valid part of the enumeration';
+                }
+                break;
             case 'text': // Nothing to validate in text...
             case 'image': case 'upload':// Image and upload are validated in the controller
                 default:

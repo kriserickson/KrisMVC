@@ -34,7 +34,14 @@ class DebugPDO
      */
 	public function prepare ($statement, array $driver_options = array())
     {
-        return new DebugPDOStatement($this->_pdo->prepare($statement, $driver_options), $this);
+        $startTime = microtime(true);
+        $ret = new DebugPDOStatement($this->_pdo->prepare($statement, $driver_options), $this);
+        $endTime = microtime(true);
+
+        $this->AddLog('pdo::prepare', $statement, $endTime - $startTime);
+
+        return $ret;
+
     }
 
     /**
@@ -143,6 +150,15 @@ class DebugPDO
     {
         $this->DatabaseLog[] = array('function' => $function, 'query' => $query, 'microseconds' => $microseconds);
     }
+
+    /**
+     * @param int $addMicroseconds
+     * @return void
+     */
+    public function AddToLog($addMicroseconds)
+    {
+        $this->DatabaseLog[count($this->DatabaseLog) - 1]['microseconds'] += $addMicroseconds;
+    }
 }
 
 /**
@@ -185,7 +201,7 @@ class DebugPDOStatement
         $ret = $this->_statement->execute($input_parameters);
         $endTime = microtime(true);
 
-        $this->_debugPdo->AddLog('pdoStatement::execute', $this->queryString, $endTime - $startTime);
+        $this->_debugPdo->AddToLog($endTime - $startTime);
 
         return $ret;
     }
@@ -198,7 +214,13 @@ class DebugPDOStatement
      */
 	public function fetch ($fetch_style = null, $cursor_orientation = null, $cursor_offset = null)
     {
-        return $this->_statement->fetch($fetch_style, $cursor_orientation, $cursor_offset);
+        $startTime = microtime(true);
+        $ret = $this->_statement->fetch($fetch_style, $cursor_orientation, $cursor_offset);
+        $endTime = microtime(true);
+
+        $this->_debugPdo->AddToLog($endTime - $startTime);
+
+        return $ret;
     }
 
     /**
@@ -262,7 +284,14 @@ class DebugPDOStatement
      */
 	public function fetchAll ($fetch_style = null)
     {
-        return $this->_statement->fetchAll($fetch_style);
+        $startTime = microtime(true);
+        $ret = $this->_statement->fetchAll($fetch_style);
+        $endTime = microtime(true);
+
+        $this->_debugPdo->AddToLog($endTime - $startTime);
+
+        return $ret;
+
     }
 
     /**

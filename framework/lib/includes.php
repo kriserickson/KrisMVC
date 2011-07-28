@@ -39,6 +39,7 @@ AutoLoader::AddClass('NumberHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/Nu
 
 AutoLoader::$Container = new bucket_Container();
 
+
 //===============================================
 // Debug
 //===============================================
