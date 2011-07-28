@@ -108,7 +108,7 @@ class KrisCG extends KrisDB
             die('Database type ('.$type.') invalid, must be be one of MYSQL, MSSQL, SQLITE, POSTGRESQL');
         }
 
-        $this->CreateDirectoryDie($this->_siteLocation.DIRECTORY_SEPARATOR.'config');
+        $this->CreateDirectoryOrDie($this->_siteLocation.DIRECTORY_SEPARATOR.'config');
 
         $configContents = file_get_contents(dirname(__FILE__).'/assets/KrisConfig.php');
         $configContents = str_replace(array('@@FRAMEWORK_DIR@@', '@@WEB_FOLDER@@', '@@SITE_LOCATION@@', '@@DB_HOST@@', '@@DB_DATABASE@@',
@@ -121,15 +121,15 @@ class KrisCG extends KrisDB
         $this->IncludeConfigFile();
 
         // Create the rest of the directories..
-        $this->CreateDirectoryDie($this->_applicationDirectory);
-        $this->CreateDirectoryDie($this->_applicationDirectory.'/controllers/main');
-        $this->CreateDirectoryDie($this->_applicationDirectory.'/library');
-        $this->CreateDirectoryDie($this->_applicationDirectory.'/views/layouts');
-        $this->CreateDirectoryDie($this->_applicationDirectory.'/views/main');
-        $this->CreateDirectoryDie($this->_baseModelDirectory);
-        $this->CreateDirectoryDie($this->_siteLocation.'/css');
-        $this->CreateDirectoryDie($this->_siteLocation.'/images');
-        $this->CreateDirectoryDie($this->_siteLocation.'/js');
+        $this->CreateDirectoryOrDie($this->_applicationDirectory);
+        $this->CreateDirectoryOrDie($this->_applicationDirectory.'/controllers/main');
+        $this->CreateDirectoryOrDie($this->_applicationDirectory.'/library');
+        $this->CreateDirectoryOrDie($this->_applicationDirectory.'/views/layouts');
+        $this->CreateDirectoryOrDie($this->_applicationDirectory.'/views/main');
+        $this->CreateDirectoryOrDie($this->_baseModelDirectory);
+        $this->CreateDirectoryOrDie($this->_siteLocation.'/css');
+        $this->CreateDirectoryOrDie($this->_siteLocation.'/images');
+        $this->CreateDirectoryOrDie($this->_siteLocation.'/js');
 
         // Create the blocking htaccess files...
         $htaccessDeny = 'deny from all';
@@ -500,7 +500,11 @@ EOT;
         return false;
     }
 
-    private function CreateDirectoryDie($directory)
+    /**
+     * @param string $directory
+     * @return void
+     */
+    private function CreateDirectoryOrDie($directory)
     {
         if (!FileHelpers::EnsureDirectoryExists($directory))
         {

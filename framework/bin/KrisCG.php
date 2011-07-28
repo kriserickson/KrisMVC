@@ -9,9 +9,12 @@
  */
 
 require dirname(__FILE__) . '/../lib/orm/KrisDB.php';
+require dirname(__FILE__) . '/../lib/orm/DebugPDO.php';
 require dirname(__FILE__) . '/../lib/helpers/FileHelpers.php';
+require dirname(__FILE__) . '/../lib/plumbing/AutoLoader.php';
 require dirname(__FILE__) . '/Args.php';
 require dirname(__FILE__) . '/CodeGeneration.php';
+
 
 
 $args = new Args();
@@ -60,3 +63,5 @@ else
 
 
 }
+
+// createSite -l "D:\Projects\html\ammara2" -s "http://localhost/ammara2/" -h localhost -d ammara -u root -p myssirk34 -y MYSQL
