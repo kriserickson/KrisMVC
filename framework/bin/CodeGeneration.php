@@ -454,7 +454,7 @@ EOT;
     private function GetTypeFromDataType($type)
     {
         // TODO: Make this work with non-mysql types...
-        switch ($type)
+        switch (strtolower($type))
         {
             case 'varchar' : case 'char': case 'set':
                 return 'string';

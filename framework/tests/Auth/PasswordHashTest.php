@@ -52,12 +52,10 @@ class PasswordHashTest extends PHPUnit_Framework_TestCase
      */
     public function testPortable()
     {
-        $correct = 'teekay';
+        $correct = 'test12345';
         $wrong = 'test12346';
 
         $hash = $this->portable_hash->HashPassword($correct);
-        $this->assertEquals('', $hash);
-
         $this->assertTrue($this->portable_hash->CheckPassword($correct, $hash));
         $this->assertFalse($this->portable_hash->CheckPassword($wrong, $hash));
 
