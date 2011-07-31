@@ -1,0 +1,609 @@
+<?php
+/*
+ * This file is part of the KrisMvc framework.
+ *
+ * (c) Kris Erickson 
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+ 
+/**
+ * Shows scaffolding
+ *
+ * @throws Exception
+ *
+ */
+class {{ControllerName}}Controller extends DefaultController
+{
+
+    /**
+     * @var int
+     */
+    protected $_pageSize = 20;
+
+    /**
+     * @var string
+     */
+    protected $_error = '';
+
+
+    /**
+     * @param \Request $request
+     * @return \{{ControllerName}}Controller
+     *
+     */
+    function __construct($request)
+    {
+        $this->_request = $request;
+
+        $this->_view = new KrisView(KrisConfig::APP_PATH . 'views/layouts/{{ScaffoldMainLayout}}');
+        // Default the error to blank...
+        $this->_view->set('error', '');
+
+        $tables = $this->GetTables();
+
+        $this->_view->set('tables', $tables);
+        $this->_view->set('table_width', (int)(100 / count($tables)));
+
+        $this->base_href = KrisConfig::WEB_FOLDER.'/{{ControllerLocation}}/';
+        $this->_view->set('display_base_href', $this->base_href.'index/');
+
+        $this->_auth = Auth::instance();
+
+    }
+
+    /**
+     * @param string $className
+     * @internal string $sort = func_get_arg(1);
+     * @internal string $ascending = func_get_arg(2)
+     * @return null|RouteRequest
+     */
+    public function Index($className = null)
+    {
+        $res =  $this->CanView();
+        if ($res != null)
+        {
+            return $res;
+        }
+
+
+        if (!is_null($className))
+        {
+            if (strlen($this->_request->PostVar('add')))
+            {
+                $this->Add($className);
+                return null;
+            }
+
+            $class = $this->GenerateClass($className);
+
+            $fields = $class->GetDisplayAndDatabaseFields();
+
+             // Get sort and sort order
+            $ascending = true;
+            if (func_num_args() > 1)
+            {
+                $sort = func_get_arg(1);
+                if (func_num_args() > 2)
+                {
+                    $ascending = func_get_arg(2) == 'asc';
+                }
+            }
+            else
+            {
+                if ($this->_request->IsPosted('sort_field'))
+                {
+                    $sort =    $this->_request->PostVar('sort_field');
+                    $ascending = $this->_request->PostVar('sort_order') == 'asc';
+                }
+                else
+                {
+                    $sort = $class->SortField ? $class->SortField : key($fields);
+                }
+            }
+            $this->_view->set('error', $this->GetHtmlError());
+            $this->_view->set('display_name', $class->DisplayName);
+            $this->_view->set('body', $this->GetIndexView($class, $ascending, $sort, $fields));
+        }
+        else
+        {
+            $this->_view->set('display_name', 'Choose Table To Edit');
+            $this->_view->set('body', '');
+        }
+
+        $this->_view->dump();
+        return null;
+    }
+
+
+
+    /**
+     * @param string $className
+     * @param int $id
+     * @return null|RouteRequest
+     */
+    public function View($className, $id)
+    {
+        $res =  $this->CanView();
+        if ($res != null)
+        {
+            return $res;
+        }
+
+        if ($this->_request->IsPosted('changeButton'))
+        {
+            $this->Change($className, $id);
+        }
+        else if ($this->_request->IsPosted('cancelButton'))
+        {
+            $this->Index($className);
+        }
+        else
+        {
+            $class = $this->GenerateClass($className);
+            $class->retrieve($id);
+
+            $data = array('display_name' => $class->DisplayName, 'fields' => $class->GetDisplayAndDatabaseFields(), 'class' => $class,
+                'form_href' => $this->base_href.'view/'.$className.'/'.$id,
+                 'changeDeleteButton' => HtmlHelpers::CreateButton('changeButton', 'Change'));
+
+            $this->_view->set('error', $this->GetHtmlError());
+            $this->_view->set('display_name', 'View '.$class->DisplayName);
+            $this->_view->set('body', $this->_view->fetch(KrisConfig::APP_PATH . 'views/{{ViewLocation}}/{{ViewView}}', $data, false));
+
+            $this->_view->dump();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $className
+     * @param int $id
+     * @return null|RouteRequest
+     */
+    public function Delete($className, $id)
+    {
+        $res =  $this->CanView();
+        if ($res != null)
+        {
+            return $res;
+        }
+
+        $class = $this->GenerateClass($className);
+        $class->retrieve($id);
+
+        if ($this->_request->IsPosted('deleteButton'))
+        {
+            if (!$class->delete())
+            {
+                $this->AddError('Failed to delete '.$className);
+            }
+            $this->Index($className);
+        }
+        else if ($this->_request->IsPosted('cancelButton'))
+        {
+            $this->Index($className);
+        }
+        else
+        {
+
+            $data = array('display_name' => 'Delete '.$class->DisplayName, 'fields' => $class->GetDisplayAndDatabaseFields(), 'class' => $class,
+                'form_href' => $this->base_href.'delete/'.$className.'/'.$id,
+                 'changeDeleteButton' => HtmlHelpers::CreateButton('deleteButton', 'Delete'));
+
+            $this->_view->set('error', $this->GetHtmlError());
+            $this->_view->set('display_name', 'View '.$class->DisplayName);
+            $this->_view->set('body', $this->_view->fetch(KrisConfig::APP_PATH . 'views/{{ViewLocation}}/{{ViewView}}', $data, false));
+
+            $this->_view->dump();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $className
+     * @param $id
+     * @return null|RouteRequest
+     */
+    public function Change($className, $id)
+    {
+        $res =  $this->CanView();
+        if ($res != null)
+        {
+            return $res;
+        }
+
+        if ($this->_request->IsPosted('cancelButton'))
+        {
+            // Show the tables index...
+            $this->Index($className);
+            return null;
+        }
+
+        $class = $this->GenerateClass($className);
+        $class->retrieve($id);
+
+        // Save button clicked...
+        if ($this->_request->IsPosted('saveButton') || $this->_request->IsPosted('applyButton'))
+        {
+            // If we save successfully we show the index, otherwise show the edit page again...
+            // Apply is the same as save, but stays on the edit page...
+            if ($this->saveClass($class) && $this->_request->IsPosted('saveButton'))
+            {
+                $this->Index($className);
+                return null;
+            }
+        }
+
+        // The enctype is the form type, if it is an upload it has to be multipart/form-data, otherwise it should be application/x-www-form-urlencoded
+        $data = array('display_name' => 'Edit '.$class->DisplayName, 'fields' => $class->GetDisplayAndDatabaseFields(), 'class' => $class,
+            'display_href' => $this->base_href.'index/'.$className, 'change_href' => $this->base_href.'change/'.$className.'/'.$id,
+            'enctype' => $this->GetEncType($class), 'show_apply' => true);
+
+        $this->_view->set('error', $this->GetHtmlError());
+        $this->_view->set('display_name', 'Edit '.$class->DisplayName);
+        $this->_view->set('body', $this->_view->fetch(KrisConfig::APP_PATH . 'views/{{ViewLocation}}/{{EditView}}', $data, false));
+
+        $this->_view->dump();
+
+        return null;
+    }
+
+    /**
+     * @param $className
+     * @return null|RouteRequest
+     */
+    public function Add($className)
+    {
+        $res =  $this->CanView();
+        if ($res != null)
+        {
+            return $res;
+        }
+
+        $class = $this->GenerateClass($className);
+
+        if ($this->_request->IsPosted('saveButton'))
+        {
+            $this->GetUpdatedFields($class);
+            $class->create();
+            $this->Index($className);
+            return null;
+        }
+
+        $data = array('display_name' => 'Add '.$class->DisplayName, 'fields' => $class->GetDisplayAndDatabaseFields(), 'class' => $class,
+            'display_href' => $this->base_href.'index/'.$className, 'change_href' => $this->base_href.'add/'.$className,
+            'enctype' => $this->GetEncType($class), 'show_apply' => false);
+
+        $this->_view->set('display_name', 'Add '.$class->DisplayName);
+        $this->_view->set('body', $this->_view->fetch(KrisConfig::APP_PATH . 'views/{{ViewLocation}}/{{EditView}}', $data, false));
+
+        $this->_view->dump();
+
+        return null;
+    }
+
+
+    /**
+     * @throws Exception
+     * @param string $className
+     * @return null|KrisCrudModel
+     */
+    private function GenerateClass($className)
+    { // Dynamically create the class...
+        if (class_exists($className))
+        {
+            // Make sure it is valid and has a proper model...
+            $class = new $className();
+            if (!is_subclass_of($class, 'KrisCrudModel'))
+            {
+                throw new Exception('Invalid crud class: ' . get_class($class));
+            }
+            return $class;
+        }
+        else
+        {
+            throw new Exception('Invalid class: ' . $className);
+        }
+
+
+    }
+
+    /**
+     * Gets a list of all the possible tables that there are models for...
+     *
+     * @return array
+     */
+    private function GetTables()
+    {
+        $tables = array();
+
+        // Get a list of all the crud tables...
+        $dir = dir(KrisConfig::APP_PATH . '/models/crud');
+
+        while (false !== ($entry = $dir->read()))
+        {
+            $pathInfo = pathinfo($entry);
+            $filename = $pathInfo['filename'];
+            if ($pathInfo['extension'] == 'php' && substr($filename, -4) == 'View')
+            {
+                // Convert the filename like SomeTableView.php into "Some Table"
+                $tableName = substr($filename, 0, -4);
+                $tables[$filename] = $tableName[0] . preg_replace('/[A-Z]/', ' $0', substr($tableName, 1));
+            }
+        }
+        return $tables;
+    }
+
+    /**
+     * SetupIndexView - Sets up the Index View
+     *
+     * @throws Exception
+     * @param KrisCrudModel $class
+     * @param bool $ascending
+     * @param string $sort
+     * @param array $fields
+     * @return string
+     */
+    private function GetIndexView($class, $ascending, $sort, $fields)
+    {
+        // Get search, where and bindings from the post variables...
+        list($bindings, $where, $search, $searchValues) = $this->getSearchFromPostVars($fields);
+
+        // Get total records from the table...
+        $totalRecords = $class->totalRecords($where, $bindings, true);
+
+        $numPages = ceil($totalRecords / $this->_pageSize);
+
+        //  Get the current paging location from the post vars.
+        $page = $this->getPageFromPostVars($numPages);
+
+        $className = get_class($class);
+
+        // Set variables in the view...
+        $data = array('display_table' => true ,'display_name' => $class->DisplayName ,'columns' => $fields ,
+            'sorted' => array(),'number_of_pages' => $numPages ,'total_records' => $totalRecords,'current_page' => $page,
+            'sort_ascending' => $ascending ,'search' => $search, 'display_href' => $this->base_href.'index/'.$className,
+            'view_href' => $this->base_href.'view/'.$className, 'change_href' => $this->base_href.'change/'.$className,
+            'delete_href' => $this->base_href.'delete/'.$className, 'search_values' => $searchValues,
+            'sort_field' => $sort, 'sort_order' => $ascending ? 'asc' : 'dec',
+            'models'=> $class->retrieveMultiple($where, $bindings, true, $this->_pageSize, $page * $this->_pageSize, $sort, $ascending));
+
+        return $this->_view->fetch(KrisConfig::APP_PATH . 'views/{{ViewLocation}}/{{IndexView}}', $data, false);
+            
+    }
+
+    /**
+     * Gets the search from Post Vars...
+     *
+     * @param $fields
+     * @return array
+     */
+    protected function getSearchFromPostVars($fields)
+    {
+        $bindings = array();
+        $where = array();
+        $searchValues = array();
+
+        if ($this->_request->IsPosted('search'))
+        {
+            $search = true;
+        }
+        else
+        {
+
+            foreach (array_keys($fields) as $field_id)
+            {
+                $search_field = 'search_' . $field_id;
+                if (strlen($this->_request->PostVar($search_field)) > 0)
+                {
+                    $bindings[] = $searchValues[$field_id] = $this->_request->PostVar($search_field);
+                    $where[] = $field_id;
+                }
+            }
+            $search = count($searchValues) > 0;
+        }
+
+        return array($bindings, $where, $search, $searchValues);
+
+    }
+
+    /**
+     * Gets the current page from the post vars..
+     *
+     * @param int $numPages
+     * @return int
+     */
+    protected function getPageFromPostVars($numPages)
+    {
+        $page = $this->_request->PostVar('current_page', 0);
+
+        if ($this->_request->IsPosted('next_page'))
+        {
+            $page++;
+        }
+        else if ($this->_request->IsPosted('first_page'))
+        {
+            $page = 0;
+        }
+        else if ($this->_request->IsPosted('prev_page'))
+        {
+            $page--;
+        }
+        else if ($this->_request->IsPosted('last_page'))
+        {
+            $page = $numPages - 1;
+        }
+        else if ($this->_request->IsPosted('goto'))
+        {
+            $page = $this->_request->PostVar('goto');
+
+        }
+        return $page;
+    }
+
+    /**
+     * @param $class KrisCrudModel
+     * @return bool
+     */
+    private function saveClass($class)
+    {
+        if ($class->HasUploads())
+        {
+            $uploads = $class->GetUploads();
+            foreach ($uploads as $upload)
+            {
+                $uploadFile = $upload['name'];
+
+                if (isset($_FILES[$uploadFile]) && is_uploaded_file($_FILES[$uploadFile]['tmp_name']) && isset($upload['directory']))
+                {
+                    $oldFilename = $class->get($uploadFile);
+                    $newFilename = uniqid('img').'.'.strtolower(pathinfo($_FILES[$uploadFile]['name'], PATHINFO_EXTENSION));
+                    if (isset($upload['width']))
+                    {
+                        if (!isset($upload['height']))
+                        {
+                            $upload['height'] = $upload['width'];
+                        }
+                        $newImage = new ImageResizer($_FILES[$uploadFile]['tmp_name']);
+                        $newImage->resizeToOptimal($upload['width'], $upload['height']);
+                        $update = $newImage->save($this->GetUploadPath($upload['directory'], $newFilename));
+                    }
+                    else
+                    {
+                        $update = move_uploaded_file($_FILES[$uploadFile]['tmp_name'], $newFilename);
+
+                    }
+
+                    if ($update)
+                    {
+                        if (strlen($oldFilename) > 0)
+                        {
+                            unlink($this->GetUploadPath($upload['directory'], $oldFilename));
+                        }
+                        $this->_request->SetPostVar($uploadFile, $newFilename);
+                    }
+                }
+                else
+                {
+                    if (!isset($upload['directory']))
+                    {
+                        $this->AddError('Upload directory not set for Field'.$uploadFile.' yet it is an upload or image type');
+                    }
+                    else
+                    {
+                        switch ($_FILES[$uploadFile]['error'])
+                        {
+                            case UPLOAD_ERR_CANT_WRITE : $this->AddError('Upload error: Can\t write the temporary file to disk.');
+                                break;
+                            case UPLOAD_ERR_FORM_SIZE : $this->AddError('Upload error: Uploaded file is larger than '.NumberHelpers::BytesToHuman($this->_request->PostVar('MAX_FILE_SIZE')).
+                                    ' please upload a smaller file');
+                                break;
+                            case UPLOAD_ERR_INI_SIZE : $this->AddError('Upload error:  Uploaded file is larger than '.NumberHelpers::BytesToHuman(ini_get('upload_max_filesize')).
+                                    ' please upload a smaller file');
+                                break;
+                            case UPLOAD_ERR_NO_FILE :
+                                // No uploaded file is not an error...
+                                break;
+                            case UPLOAD_ERR_NO_TMP_DIR : $this->AddError('Upload error: The temp directory is not or is incorrectly set/');
+                                break;
+                            case UPLOAD_ERR_PARTIAL : $this->AddError('Upload error: The file was only partially uploaded.');
+                                break;
+                            case UPLOAD_ERR_EXTENSION : default: $this->AddError('Upload error: Extension error..');
+                                break;
+
+                        }
+
+                    }
+                }
+            }
+        }
+
+        $updatedFields = $this->GetUpdatedFields($class);
+
+        if (count($updatedFields) > 0)
+        {
+            $class->UpdateSelectedFields($updatedFields);
+        }
+
+        return !$this->HasError();
+
+    }
+
+    /**
+     * @param $class KrisCrudModel
+     * @return array
+     */
+    private function GetUpdatedFields($class)
+    {
+        $fields = $class->GetDatabaseFields();
+        $updatedFields = array();
+        foreach ($fields as $field)
+        {
+            if ($this->_request->IsPosted($field))
+            {
+                $postedVar = $this->_request->PostVar($field);
+                $error = $class->ValidateField($field, $postedVar);
+                if (strlen($error) > 0)
+                {
+                    $this->AddError($error);
+                }
+                else
+                {
+                    if ($class->get($field) != $postedVar)
+                    {
+                        $class->set($field, $postedVar);
+                        $updatedFields[$field] = $postedVar;
+                    }
+                }
+            }
+        }
+        return $updatedFields;
+    }
+
+    /**
+     * @param string $directory
+     * @param string $filename
+     * @return string
+     */
+    private function GetUploadPath($directory, $filename)
+    {
+        return KrisConfig::BASE_DIR.str_replace('/', DIRECTORY_SEPARATOR, $directory).DIRECTORY_SEPARATOR.$filename;
+
+    }
+
+    /**
+     * @return null|RouteRequest
+     */
+    protected function CanView()
+    {
+        if (!$this->_auth->IsLoggedIn())
+        {
+            $this->_request->SetPostVar('destination_url', $this->_request->Route());
+            return new RouteRequest(KrisConfig::AUTH_CONTROLLER, KrisConfig::DEFAULT_ACTION, array());
+        }
+        $user = $this->_auth->User();
+        if (!$user->HasAclOrGreater(Auth::ACL_EDIT))
+        {
+            return new RouteRequest(KrisConfig::DEFAULT_CONTROLLER, KrisConfig::DEFAULT_ACTION, array());
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    /**
+     * @param KrisCrudModel $class
+     * @return string
+     */
+    private function GetEncType($class)
+    {
+         return $class->HasUploads() ? 'multipart/form-data' : 'application/x-www-form-urlencoded';
+    }
+
+
+}
