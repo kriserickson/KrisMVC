@@ -88,10 +88,15 @@ class KrisCG extends KrisDB
         {
             $site = 'http://'.$site;
         }
-        $fp = fopen($site, 'r');
+        $fp = @fopen($site, 'r');
         if ($fp === false)
         {
-            die('Could not access http://'.$site.'  Pleae make the site accessible before starting...');
+            $site .= '/';
+            $fp = @fopen($site   , 'r');
+            if ($fp === false)
+            {
+                die('Could not access '.$site.'  Pleae make the site accessible before starting...');
+            }
         }
         fclose($fp);
 
