@@ -57,14 +57,14 @@ class KrisCG extends KrisDB
 
         if (!file_exists($configLocation))
         {
-            die('Config file does not exist');
+            die('Config file does not exist at '.$configLocation);
         }
 
         require_once($configLocation);
 
         if (!class_exists('KrisConfig'))
         {
-            die('Config file not located at '.$configLocation);
+            die('File located at '.$configLocation.' not a valid config file');
         }
         $this->SetupDirectories();
     }
@@ -115,10 +115,10 @@ class KrisCG extends KrisDB
 
         $this->CreateDirectoryOrDie($this->_siteLocation.DIRECTORY_SEPARATOR.'config');
 
-        $configContents = file_get_contents(dirname(__FILE__).'/assets/KrisConfig.php');
+        $configContents = file_get_contents(__DIR__.'/assets/KrisConfig.php');
         $configContents = str_replace(array('@@FRAMEWORK_DIR@@', '@@WEB_FOLDER@@', '@@SITE_LOCATION@@', '@@DB_HOST@@', '@@DB_DATABASE@@',
             '@@DB_USER@@', '@@DB_PASSWORD@@', 'KrisConfig::DB_TYPE_MYSQL'),
-            array(dirname(dirname(__FILE__)), $webFolder, $this->_siteLocation, $host, $database, $user, $password, 'KrisConfig::DB_TYPE_'.$type),
+            array(dirname(__DIR__), $webFolder, $this->_siteLocation, $host, $database, $user, $password, 'KrisConfig::DB_TYPE_'.$type),
             $configContents);
 
         file_put_contents($configLocation, $configContents);
@@ -126,15 +126,14 @@ class KrisCG extends KrisDB
         $this->IncludeConfigFile();
 
         // Create the rest of the directories..
-        $this->CreateDirectoryOrDie($this->_applicationDirectory);
-        $this->CreateDirectoryOrDie($this->_applicationDirectory.'/controllers/main');
-        $this->CreateDirectoryOrDie($this->_applicationDirectory.'/library');
-        $this->CreateDirectoryOrDie($this->_applicationDirectory.'/views/layouts');
-        $this->CreateDirectoryOrDie($this->_applicationDirectory.'/views/main');
-        $this->CreateDirectoryOrDie($this->_baseModelDirectory);
-        $this->CreateDirectoryOrDie($this->_siteLocation.'/css');
-        $this->CreateDirectoryOrDie($this->_siteLocation.'/images');
-        $this->CreateDirectoryOrDie($this->_siteLocation.'/js');
+        $requiredDirectories = array($this->_applicationDirectory, $this->_applicationDirectory.'/controllers/main', $this->_applicationDirectory.'/library',
+            $this->_applicationDirectory.'/views/layouts', $this->_applicationDirectory.'/views/main', $this->_baseModelDirectory, $this->_siteLocation.'/css',
+            $this->_siteLocation.'/images', $this->_siteLocation.'/js');
+
+        foreach ($requiredDirectories as $requiredDirectory)
+        {
+            $this->CreateDirectoryOrDie($requiredDirectory);
+        }
 
         // Create the blocking htaccess files...
         $htaccessDeny = 'deny from all';
@@ -142,15 +141,15 @@ class KrisCG extends KrisDB
         file_put_contents($this->_applicationDirectory.'/.htaccess', $htaccessDeny);
 
         // Create the index file and .htaccess
-        $htaccessContents = file_get_contents(dirname(__FILE__).'/assets/.htaccess');
+        $htaccessContents = file_get_contents(__DIR__.'/assets/.htaccess');
         $htaccessContents = str_replace('@@WEB_FOLDER@@', $webFolder, $htaccessContents);
         file_put_contents($this->_siteLocation.'/.htaccess', $htaccessContents);
 
-        copy(dirname(__FILE__).'/assets/index.php', $this->_siteLocation.'/index.php');
-        copy(dirname(__FILE__).'/assets/MainController.php', $this->_applicationDirectory.'/controllers/main/MainController.php');
-        copy(dirname(__FILE__).'/assets/layout.php', $this->_applicationDirectory.'/views/layouts/layout.php');
-        copy(dirname(__FILE__).'/assets/MainView.php', $this->_applicationDirectory.'/views/main/MainView.php');
-        copy(dirname(__FILE__).'/assets/style.css', $this->_siteLocation.'/css/style.css');
+        copy(__DIR__.'/assets/index.php', $this->_siteLocation.'/index.php');
+        copy(__DIR__.'/assets/MainController.php', $this->_applicationDirectory.'/controllers/main/MainController.php');
+        copy(__DIR__.'/assets/layout.php', $this->_applicationDirectory.'/views/layouts/layout.php');
+        copy(__DIR__.'/assets/MainView.php', $this->_applicationDirectory.'/views/main/MainView.php');
+        copy(__DIR__.'/assets/style.css', $this->_siteLocation.'/css/style.css');
 
         echo 'Site created at '.$this->_siteLocation.PHP_EOL;
 
@@ -297,43 +296,13 @@ class KrisCG extends KrisDB
     private function GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields,
         $fakeFields, $primaryKey, $fieldTypes)
     {
-        $output = <<<EOT
-<?php
-/**
- * Generated Code, do not edit, edit the file ${filename} in {$this->_baseModelDirectory}
- */
 
-/**
-${properties}
- */
-class ${className}Model extends KrisCrudModel
-{
-    ${foreignKeyString}
-    ${fakeFields}
+        $m = new Mustache();
+        $output = $m->render(file_get_contents(__DIR__.'/assets/ModelGenerated.tpl'), array('BaseModelDirectory' => $this->_baseModelDirectory,
+                'tableName' => $tableName, 'className' => $className, 'filename' => $filename, 'properties' => $properties, 'foreignKeyString' => $foreignKeyString,
+                'initializeFields' => $initializeFields, 'fakeFields' => $fakeFields, 'primaryKey' => $primaryKey, 'fieldTypes' => $fieldTypes));
 
-    protected \$_fieldTypes = array(${fieldTypes});
-
-    public \$DisplayName = '${className}';
-
-    /**
-     * Constructor.
-     */
-    function __construct()
-    {
-        parent::__construct('${primaryKey}', '${tableName}');
-        ${initializeFields}
-    }
-}
-?>
-EOT;
-        $filePath = $this->_generatedDirectory . DIRECTORY_SEPARATOR . $className . 'Model' . '.php';
-        if (file_exists($filePath))
-        {
-            unlink($filePath);
-        }
-        $fp = fopen($filePath, 'w');
-        fwrite($fp, $output);
-        fclose($fp);
+        file_put_contents($this->_generatedDirectory . DIRECTORY_SEPARATOR . $className . 'Model' . '.php', $output);
     }
 
     /**
@@ -344,28 +313,9 @@ EOT;
      */
     private function GenerateDerivedClass($filename, $safeClassName, $className)
     {
-        $output = <<<EOT
-<?php
-/**
- * ${filename}
- *
- * Extend the class here, this file will not be overwritten.
- */
-
-/**
- * Constructor.
- */
-class ${safeClassName} extends ${className}Model
-{
-
-}
-
-?>
-EOT;
-
-        $fp = fopen($this->_crudDirectory . DIRECTORY_SEPARATOR . $filename, 'w');
-        fwrite($fp, $output);
-        fclose($fp);
+        $m = new Mustache();
+        $output = $m->render(file_get_contents(__DIR__.'/assets/ModelCrud.tpl'), array('filename' => $filename, 'safeClassName' => $safeClassName, 'className' => $className));
+        file_put_contents($this->_crudDirectory . DIRECTORY_SEPARATOR . $filename, $output);
     }
 
     /**

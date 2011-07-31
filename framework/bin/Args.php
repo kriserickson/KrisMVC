@@ -99,7 +99,7 @@ class Args
      *
      * @return string
      */
-    public function command()
+    public function Command()
     {
         return $this->_command;
     }
