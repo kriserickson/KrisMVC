@@ -95,15 +95,33 @@ class KrisController implements Controller
      */
     protected function ParseRequest($controller, $action, $params)
     {
+        $this->_request = new Request($controller, $action, $params);
+
+        if ($this->GetControllerRequest($controller, $action, $error, $function, $controllerObj))
+        {
+            $res = call_user_func_array(array($controllerObj, $function), $params);
+            if (!is_null($res) && get_class($res) == 'RouteRequest')
+            {
+                /** @var $res RouteRequest */
+                $this->ParseRequest($res->Controller, $res->Action, $res->Params);
+            }
+        }
+        else
+        {
+            $this->RequestNotFound($error);
+        }
+
+    }
+
+    protected function GetControllerRequest($controller, $action, &$error, &$function, &$controllerObj)
+    {
         $controllerClass = ucfirst($controller) . 'Controller';
 
         $controllerFile = $this->_controllerPath . $controller . '/' . $controllerClass . '.php';
 
-        $this->_request = new Request($controller, $action, $params);
-
         if (!preg_match('#^[a-z0-9_-]+$#i', $controller) || !file_exists($controllerFile))
         {
-            $this->RequestNotFound('Controller file not found: ' . $controllerFile);
+            $error = 'Controller file not found: ' . $controllerFile;
         }
         else
         {
@@ -111,9 +129,9 @@ class KrisController implements Controller
             $function = ucfirst($action);
 
 
-            if (!preg_match('#^\w[a-z0-9_-]*$#i', $function))
+            if (!preg_match('/^\w[a-z0-9_-]*$/i', $function))
             {
-                $this->RequestNotFound('Invalid function name: ' . $function);
+                $error = 'Invalid function name: ' . $function;
             }
             else
             {
@@ -122,30 +140,26 @@ class KrisController implements Controller
 
                 if (!class_exists($controllerClass))
                 {
-                    $this->RequestNotFound('Controller class (' . $controllerClass . ') not found');
+                    $error = 'Controller class (' . $controllerClass . ') not found';
                 }
                 else
                 {
 
-                    $controller = new $controllerClass($this->_request);
+                    $controllerObj = new $controllerClass($this->_request);
 
-                    if (!method_exists($controller, $function))
+                    if (!method_exists($controllerObj, $function))
                     {
-                        $this->RequestNotFound('Function not found: ' . $function . ' in controller: ' . $controllerClass);
+                        $error = 'Function not found: ' . $function . ' in controller: ' . $controllerClass;
                     }
                     else
                     {
-                        $res = call_user_func_array(array($controller, $function), $params);
-                        if (!is_null($res) && get_class($res) == 'RouteRequest')
-                        {
-                            /** @var $res RouteRequest */
-                            $this->ParseRequest($res->Controller, $res->Action, $res->Params);
-                        }
+                        return true;
                     }
                 }
             }
         }
 
+        return false;
     }
 
     /**
@@ -154,26 +168,23 @@ class KrisController implements Controller
      * @param string $msg
      * @return void
      */
-    protected function RequestNotFound($msg = '')
+    protected function RequestNotFound($msg)
     {
         $displayedError = false;
 
-        if (!is_null(KrisConfig::$Error404Handler))
+        if (!is_null(KrisConfig::$Error404Handler) && is_array(KrisConfig::$Error404Handler) && count(KrisConfig::$Error404Handler) > 1)
         {
-            if (!is_array(KrisConfig::$Error404Handler))
+            if ($this->GetControllerRequest(KrisConfig::$Error404Handler['controller'], KrisConfig::$Error404Handler['action'], $error, $function, $controllerObj))
             {
-                if (function_exists(KrisConfig::$Error404Handler))
-                {
-                    call_user_func(KrisConfig::$Error404Handler, $msg);
-                    $displayedError = true;
-                }
-                else
-                {
-                    
-                    KrisConfig::LogError('Unable to call Error404Handler, function ' . KrisConfig::$Error404Handler . ' does not exist');
-                }
+                call_user_func_array(array($controllerObj, $function), array($msg));
+                $displayedError = true;
+            }
+            else
+            {
+                KrisConfig::LogError('Unable to call Error404Handler, function ' . KrisConfig::$Error404Handler . ' does not exist');
             }
         }
+
 
 
         if (!$displayedError)

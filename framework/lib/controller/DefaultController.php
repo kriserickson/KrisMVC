@@ -25,6 +25,11 @@ abstract class DefaultController
      */
     protected $_auth;
 
+    /**
+     * @var Request
+     */
+    protected $_request;
+
 
     /**
      * @return null|RouteRequest
