@@ -110,6 +110,15 @@ class KrisView
         require($this->_file);
     }
 
+    /**
+     * @param array $vars
+     * @return string
+     */
+    public function contents($vars = array())
+    {
+        return $this->fetch($this->_file, $vars, true);
+    }
+
 }
 
  

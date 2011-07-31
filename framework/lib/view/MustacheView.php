@@ -8,7 +8,7 @@
  * with this source code in the file LICENSE.
  */
 
-require_once 'Moustache.php';
+require_once 'Mustache.php';
 
 /**
  * View Class that uses Moustache Templating engine instead of PHP.
@@ -28,8 +28,6 @@ class MustacheView extends KrisView
             $vars = array_merge($this->_vars, $vars);
         }
 
-        extract($vars);
-
         if (strlen($file) == 0)
         {
             $file = $this->_file;
@@ -47,14 +45,23 @@ class MustacheView extends KrisView
      */
     public function dump($vars = null)
     {
+        echo $this->contents($vars);
+    }
+
+    /**
+     * @param array|null $vars
+     * @return string
+     */
+    public function contents($vars = null)
+    {
         if (is_array($vars))
         {
             $this->_vars = array_merge($this->_vars, $vars);
         }
 
         $m = new Mustache();
-        echo $m->render(file_get_contents($this->_file, true), $this->_vars);
 
+        return $m->render(file_get_contents($this->_file, true), $this->_vars);
     }
 
 
