@@ -350,7 +350,20 @@ class KrisCG extends KrisDB
         copy($assetDir.$editView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$editView);
         copy($assetDir.$indexView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$indexView);
 
+        // TODO: Add the ability to add different css's 
+        copy(__DIR__.'/assets/scaffold.css', $this->_siteLocation.'/css/scaffold.css');
+        $this->CreateDirectoryOrDie($this->_siteLocation.'/images/scaffold');
 
+
+        $imageSource = __DIR__ . '/assets/scaffold';
+        $d = dir($imageSource);
+        while($res = $d->read())
+        {
+            if ($res != '.' && $res != '..')
+            {
+                copy($imageSource, $this->_siteLocation.'/images/scaffold/'.$res);
+            }
+        }
     }
 
     /**

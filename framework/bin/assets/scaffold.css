@@ -1,0 +1,68 @@
+body {
+    color: #000000;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+}
+
+hr.horizontalRule {
+    border: 0 solid;
+    padding: 0;
+    margin: 0;
+    border-top-width: 1px;
+    height: 1px;
+}
+
+table.displayTable {
+    border: #004d9c 1px solid;
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+}
+
+table.navigationTable {
+    border: #004d9c 0 solid;
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+}
+
+td.crudButtonsEven, td.crudButtonsOdd {
+    white-space: nowrap;
+}
+
+th.rowHeader {
+    border: #004d9c 1px solid;
+    padding: 4px;
+    background: #add8e6;
+}
+
+td.displayField, td.valueField, td.filterColumn, td.displayCellEven, td.crudButtonsEven, td.crudButtonsOdd {
+    border: #004d9c 1px solid;
+    padding: 3px;
+}
+
+td.navigationButtons {
+    text-align: left;
+}
+
+td.pageStatus {
+    text-align: right;
+}
+
+div.error {
+    font-size: 16px;
+    color: red;
+    font-weight: bold;
+    border: 2px solid #A00;
+    background-color: aliceBlue;
+    margin-bottom: 10px;
+    padding: 5px;
+    text-align: center;
+}
+
+div.logout
+{
+    text-align: right;
+    margin-bottom: 20px;
+}
+
