@@ -208,7 +208,7 @@ abstract class KrisModel extends KrisDB
         $dbh = $this->getDatabaseHandle();
         if (is_scalar($bindings))
         {
-            $bindings = $bindings ? array($bindings) : array();
+            $bindings = count($where) > 0 ? array($bindings) : array();
         }
         $sql = 'SELECT ' . $this->generateWhat($what) . ' FROM ' . $this->_tableName;
 

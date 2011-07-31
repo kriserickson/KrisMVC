@@ -56,6 +56,11 @@ class KrisCrudModel extends KrisModel
     protected $_fieldData = array();
 
     /**
+     * @var bool - Whether or not to show the primary key...  Override in the child class..
+     */
+    protected $_showPrimaryKey = false;
+
+    /**
      * @var string - The name of the table, can be overridden in View.
      */
     public $DisplayName;
@@ -240,7 +245,7 @@ class KrisCrudModel extends KrisModel
         $index = 0;
         foreach (array_keys($this->_recordSet) as $field)
         {
-            if (!$this->isForeignKeyField($field) && $this->convertClassKeyToDBKey($field) != $this->_primaryKeyName)
+            if (!$this->isForeignKeyField($field) && ($this->_showPrimaryKey || $this->convertClassKeyToDBKey($field) != $this->_primaryKeyName))
             {
                 if (isset($this->_fieldSortOrder[$field]))
                 {
