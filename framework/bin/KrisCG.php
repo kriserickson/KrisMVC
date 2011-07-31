@@ -26,7 +26,15 @@ if (!defined('__DIR__'))
  */
 class KrisCGCommandLineParser
 {
+    /**
+     * @var \Args
+     */
     private $_args;
+
+    /**
+     * @var \KrisCG
+     */
+    private $_cg;
 
     /**
      * This actually does everything...  Parses the command line or gets values from stdin...
@@ -42,14 +50,18 @@ class KrisCGCommandLineParser
             $location = $this->GetLocation();
             if ($location)
             {
-                $cg = new KrisCG($location);
-                if ($this->_args->Command() == 'createTable')
+                $this->_cg = new KrisCG($location);
+                if ($this->_args->Command() == 'create-table' || $this->_args->Command() == 'table')
                 {
-                    $success = $this->CreateTable($cg);
+                    $success = $this->CreateTable();
                 }
-                else if ($this->_args->Command() == 'createSite')
+                else if ($this->_args->Command() == 'create-site' || $this->_args->Command() == 'site')
                 {
-                    $success = $this->CreateSite($cg);
+                    $success = $this->CreateSite();
+                }
+                else if ($this->_args->Command() == 'create-scaffold' || $this->_args->Command() == 'scaffold')
+                {
+                    $success = $this->CreateScaffold();
                 }
 
             }
@@ -62,17 +74,16 @@ class KrisCGCommandLineParser
 
 
     /**
-     * @param KrisCG $cg
      * @return bool
      */
-    private function CreateSite($cg)
+    private function CreateSite()
     {
         $site = $this->_args->flag(array('s', 'site'), '');
         $host = $this->_args->flag(array('h', 'host'), '');
         $database = $this->_args->flag(array('d', 'database'), '');
         $user = $this->_args->flag(array('u', 'user'), '');
         $password = $this->_args->flag(array('p', 'password'), '');
-        $databaseType = $this->_args->flag(array('y', 'type'), '');
+        $databaseType = $this->_args->flag(array('y', 'type'), 'MYSQL');
         
         if ($this->IsCli())
         {
@@ -92,57 +103,101 @@ class KrisCGCommandLineParser
             {
                 $user = $this->GetInput('Database User');
             }
-            if (strlen($host) > 0 && strlen($user) == 0)
+            if (strlen($host) > 0 && strlen($password) == 0)
             {
                 $password = $this->GetInput('Database User Password');
             }
+
         }
         else
         {
             if (strlen($site) == 0)
             {
-                echo 'You must set a site...'.PHP_EOL;
+                echo 'You must set a site.'.PHP_EOL;
                 return false;
             }
-            if (strlen($host) == 0)
+            if (strlen($host) == 0 && !$this->_args->flag(array('n', 'no-database')))
             {
+                echo 'You must set a host or set no-database.'.PHP_EOL;
+                return false;
+            }
+            if (strlen($database) == 0 && !$this->_args->flag(array('n', 'no-database')))
+            {
+                echo 'You must set a database or set no-database.'.PHP_EOL;
+                return false;
+            }
 
-            }
-            if (strlen($databaseType) == 0)
-            {
-                $databaseType = 'MYSQL';
-            }
         }
 
-        $cg->CreateSite($site, $host, $database, $user, $password, $databaseType);
+        $this->_cg->CreateSite($site, $host, $database, $user, $password, $databaseType);
         return true;
     }
 
     /**
-     * @param KrisCG $cg
      * @return bool
      */
-    private function CreateTable($cg)
+    private function CreateTable()
     {
-        if (!$this->_args->flag(array('t', 'table')))
+        $table = $this->_args->flag(array('t', 'table', ''));
+        if ($this->IsCli())
         {
-
-            if ($this->IsCli())
+            if (strlen($table) == 0)
             {
-                $table = $this->GetInput('Please Enter Table Name');
+                $table = $this->GetInput('Please Enter Table Name', '', true);
             }
-            else
+        }
+        else
+        {
+            if (strlen($table) == 0)
             {
                 echo 'Error, cannot create table because no table was specified';
                 return false;
             }
         }
-        else
+
+        $this->_cg->IncludeConfigFile();
+        $this->_cg->GenerateModel($table);
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    private function CreateScaffold()
+    {
+        $controllerLocation = $this->_args->flag(array('c', 'scaffold-location'), 'scaffold');
+        $controllerName = $this->_args->flag(array('n', 'scaffold-name'), 'Scaffold');
+        $scaffoldMainLayout = $this->_args->flag(array('s', 'scaffold-view'), 'scaffold.php');
+        $viewLocation = $this->_args->flag(array('o', 'view-location'), 'scaffold');
+
+        // Currently on the KrisView PHP type is supported...
+        $viewType = $this->_args->flag(array('t', 'view-type'), 'KrisView');
+        $viewView = $this->_args->flag(array('v', 'view'), 'ViewView.php');
+        $editView = $this->_args->flag(array('e', 'edit'), 'EditView.php');
+        $indexView = $this->_args->flag(array('i', 'index'), 'IndexView.php');
+
+        if (false) //$this->IsCli())
         {
-            $table = $this->_args->flag(array('t', 'table'));
+            if (strlen($this->_args->flag(array('l', 'scaffold-location'))) == 0)
+            {
+                $controllerLocation = $this->GetInput('Controller Location (in app/controllers)', $controllerLocation);
+            }
+            if (strlen($this->_args->flag(array('n', 'scaffold-name'))) == 0)
+            {
+                $controllerLocation = $this->GetInput('Controller Class Name', $controllerName);
+            }
+            if (strlen($this->_args->flag(array('s', 'scaffold-view'))) == 0)
+            {
+                $controllerLocation = $this->GetInput('Scaffold Layout Name', $scaffoldMainLayout);
+            }
+            if (strlen($this->_args->flag(array('o', 'view-location'))) == 0)
+            {
+                $controllerLocation = $this->GetInput('Scaffold Layout Locations (in app/views)', $viewLocation);
+            }
         }
-        $cg->IncludeConfigFile();
-        $cg->GenerateModel($table);
+
+        $this->_cg->IncludeConfigFile();
+        $this->_cg->CreateScaffold($controllerLocation, $controllerName, $scaffoldMainLayout, $viewType, $viewLocation, $viewView, $editView, $indexView);
         return true;
     }
 
@@ -210,18 +265,31 @@ class KrisCGCommandLineParser
     {
         echo 'Usage KrisCG ' . PHP_EOL .
                 '   Commands:       Options ' . PHP_EOL . PHP_EOL .
-                '   createTable     -t --table          Adds a model to the project of the table specified' . PHP_EOL . PHP_EOL .
-                '   createSite                          Creates a new site' . PHP_EOL .
+                '   createTable or table                Adds a model to the project of the table specified' . PHP_EOL .
+                '                   -t --table              The table to create ' . PHP_EOL . PHP_EOL .
+                '   createSite or site                  Creates a new site' . PHP_EOL .
                 '                   -s --site           The base url of the site.  For example if you site is http://localhost/test ' . PHP_EOL .
-                '                   -h --host           The database host (ip, name), or the file location for SQLite' . PHP_EOL .
-                '                   -d --database       The database name (not required for SQLite)' . PHP_EOL .
-                '                   -u --user           The database user' . PHP_EOL .
-                '                   -p --password       The database password' . PHP_EOL .
-                '                   -y --type           The database type (MYSQL, MSSQL, SQLITE, POSTGRESQL (default to MYSQL)' . PHP_EOL. PHP_EOL.
+                '                   -n --no-database        If you do not want a database add this flag, otherwise an error will be generated'.PHP_EOL.
+                '                   -h --host               The database host (ip, name), or the file location for SQLite' . PHP_EOL .
+                '                   -d --database           The database name (not required for SQLite)' . PHP_EOL .
+                '                   -u --user               The database user' . PHP_EOL .
+                '                   -p --password           The database password' . PHP_EOL .
+                '                   -y --type               The database type (MYSQL, MSSQL, SQLITE, POSTGRESQL (default to MYSQL)' . PHP_EOL. PHP_EOL.
+                '  createScaffold scaffold              Create the crud scaffolding'. PHP_EOL.
+                '                   -l --scaffold-location  The in apps/controller of the scaffold (defaults to "scaffold")'. PHP_EOL.
+                '                   -n --scaffold-name      The name of the scaffold controller (defaults to "Scaffold")'. PHP_EOL.
+                '                   -s --scaffold-view      The main scaffold layout template (defaults to "scaffold.php")'. PHP_EOL.
+                '                   -o --view-location      The location in the views of scaffold view (defaults to "scaffold")'. PHP_EOL.
+                '                   -t --view-type          The View Type (currently only "KrisView" is supported)'. PHP_EOL.
+                '                   -v --view               The template for View (defaults to "ViewView.php")'. PHP_EOL.
+                '                   -e --edit               The template for Edit (defaults to "EditView.php")'. PHP_EOL.
+                '                   -i --index              The template for Index (defaults to "IndexView.php")'. PHP_EOL. PHP_EOL.
                 '   Options available for all commands:' . PHP_EOL .
-                        '                   -l --location       Location of the site' . PHP_EOL . PHP_EOL;
+                '                   -l --location       Location of the site' . PHP_EOL . PHP_EOL;
 
     }
+
+
 
 
 }

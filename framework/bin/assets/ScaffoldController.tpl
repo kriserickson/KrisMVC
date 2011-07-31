@@ -26,6 +26,7 @@ class {{ControllerName}}Controller extends DefaultController
      * @var string
      */
     protected $_error = '';
+    protected $_usesAuth = false;
 
 
     /**
@@ -40,16 +41,22 @@ class {{ControllerName}}Controller extends DefaultController
         $this->_view = new KrisView(KrisConfig::APP_PATH . 'views/layouts/{{ScaffoldMainLayout}}');
         // Default the error to blank...
         $this->_view->set('error', '');
+        $this->base_href = KrisConfig::WEB_FOLDER.'/scaffold/';
 
         $tables = $this->GetTables();
-
+        if (count($tables) == 0)
+        {
+            $tables = array('' => 'Currently No Tables To Edit');
+        }
         $this->_view->set('tables', $tables);
         $this->_view->set('table_width', (int)(100 / count($tables)));
-
-        $this->base_href = KrisConfig::WEB_FOLDER.'/{{ControllerLocation}}/';
+        $this->_view->set('uses_auth', $this->_usesAuth);
         $this->_view->set('display_base_href', $this->base_href.'index/');
 
-        $this->_auth = Auth::instance();
+        if ($this->_usesAuth)
+        {
+        	$this->_auth = Auth::instance();
+        }
 
     }
 
@@ -68,7 +75,7 @@ class {{ControllerName}}Controller extends DefaultController
         }
 
 
-        if (!is_null($className))
+        if (!is_null($className) && strlen($className) > 0)
         {
             if (strlen($this->_request->PostVar('add')))
             {
@@ -322,19 +329,23 @@ class {{ControllerName}}Controller extends DefaultController
         $tables = array();
 
         // Get a list of all the crud tables...
-        $dir = dir(KrisConfig::APP_PATH . '/models/crud');
-
-        while (false !== ($entry = $dir->read()))
+        $crudDirectory = KrisConfig::APP_PATH . '/models/crud';
+        if (is_dir($crudDirectory))
         {
-            $pathInfo = pathinfo($entry);
-            $filename = $pathInfo['filename'];
-            if ($pathInfo['extension'] == 'php' && substr($filename, -4) == 'View')
-            {
-                // Convert the filename like SomeTableView.php into "Some Table"
-                $tableName = substr($filename, 0, -4);
-                $tables[$filename] = $tableName[0] . preg_replace('/[A-Z]/', ' $0', substr($tableName, 1));
-            }
-        }
+            $dir = dir($crudDirectory);
+
+	        while (false !== ($entry = $dir->read()))
+	        {
+	            $pathInfo = pathinfo($entry);
+	            $filename = $pathInfo['filename'];
+	            if ($pathInfo['extension'] == 'php' && substr($filename, -4) == 'View')
+	            {
+	                // Convert the filename like SomeTableView.php into "Some Table"
+	                $tableName = substr($filename, 0, -4);
+	                $tables[$filename] = $tableName[0] . preg_replace('/[A-Z]/', ' $0', substr($tableName, 1));
+	            }
+	        }
+		}
         return $tables;
     }
 
@@ -580,20 +591,20 @@ class {{ControllerName}}Controller extends DefaultController
      */
     protected function CanView()
     {
-        if (!$this->_auth->IsLoggedIn())
+        if ($this->_usesAuth)
         {
-            $this->_request->SetPostVar('destination_url', $this->_request->Route());
-            return new RouteRequest(KrisConfig::AUTH_CONTROLLER, KrisConfig::DEFAULT_ACTION, array());
+	        if (!$this->_auth->IsLoggedIn())
+	        {
+	            $this->_request->SetPostVar('destination_url', $this->_request->Route());
+	            return new RouteRequest(KrisConfig::AUTH_CONTROLLER, KrisConfig::DEFAULT_ACTION, array());
+	        }
+	        $user = $this->_auth->User();
+	        if (!$user->HasAclOrGreater(Auth::ACL_EDIT))
+	        {
+	            return new RouteRequest(KrisConfig::DEFAULT_CONTROLLER, KrisConfig::DEFAULT_ACTION, array());
+        	}
         }
-        $user = $this->_auth->User();
-        if (!$user->HasAclOrGreater(Auth::ACL_EDIT))
-        {
-            return new RouteRequest(KrisConfig::DEFAULT_CONTROLLER, KrisConfig::DEFAULT_ACTION, array());
-        }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     /**

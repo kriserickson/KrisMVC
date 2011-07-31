@@ -319,6 +319,41 @@ class KrisCG extends KrisDB
     }
 
     /**
+     * @param string $controllerLocation
+     * @param string $controllerName
+     * @param string $scaffoldMainLayout
+     * @param string $viewType
+     * @param string $viewLocation
+     * @param string $viewView
+     * @param string $editView
+     * @param string $indexView
+     * @return void
+     */
+    public function CreateScaffold($controllerLocation, $controllerName, $scaffoldMainLayout, $viewType, $viewLocation, $viewView, $editView, $indexView)
+    {
+        $m = new Mustache();
+        $controllerDirectory = $this->_applicationDirectory . 'controllers/' . $controllerLocation;
+        $this->CreateDirectoryOrDie($controllerDirectory);
+
+        $assetDir = __DIR__.'/assets/';
+
+        $output = $m->render(file_get_contents($assetDir.'ScaffoldController.tpl'), array('ControllerLocation' => $controllerLocation,
+                'ControllerName' => $controllerName, 'ScaffoldMainLayout' => $scaffoldMainLayout, 'ViewType' => $viewType, 'ViewLocation' => $viewLocation,
+                'ViewView' => $viewView, 'EditView' => $editView, 'IndexView' => $indexView));
+        file_put_contents($controllerDirectory.DIRECTORY_SEPARATOR.ucfirst($controllerLocation).'Controller.php', $output);
+
+        copy($assetDir.$scaffoldMainLayout, $this->_applicationDirectory.'/views/layouts/'.$scaffoldMainLayout);
+        
+        $this->CreateDirectoryOrDie($this->_applicationDirectory.'/views/'.$viewLocation);
+
+        copy($assetDir.$viewView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$viewView);
+        copy($assetDir.$editView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$editView);
+        copy($assetDir.$indexView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$indexView);
+
+
+    }
+
+    /**
      * @param $table
      * @return array
      */
@@ -466,6 +501,8 @@ class KrisCG extends KrisDB
             die('Failed to create directory: '.$directory);
         }
     }
+
+
 
 
 }

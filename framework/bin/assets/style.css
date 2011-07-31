@@ -3,8 +3,8 @@
     font-size: 24px;
     font-family: Arial,serif;
     font-weight: bold;
-    color: #000;
+    color: #fff;
     background-color: #a00;
-    border: 2px solid;
+    border: 2px solid #f00;
     text-align: center;
 }
