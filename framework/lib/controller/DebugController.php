@@ -15,7 +15,8 @@ class DebugController extends KrisController
     public function Route($controllerPath)
     {
         $this->_controllerPath = $controllerPath;
-        $route =  RouteRequest::CreateFromUri($_SERVER['REQUEST_URI']);
+
+        $route =  RouteRequest::CreateFromUri($this->GetRequestUri());
 
         if ($route->Controller == 'KrisMVCDebug')
         {

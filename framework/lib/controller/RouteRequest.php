@@ -72,10 +72,7 @@ class RouteRequest
      */
     public static function CreateFromUri($requestUri)
     {
-        if (strlen(KrisConfig::WEB_FOLDER) == 0 || strpos($requestUri, KrisConfig::WEB_FOLDER) === 0)
-        {
-            $requestUri = substr($requestUri, strlen(KrisConfig::WEB_FOLDER . '/'));
-        }
+
         $route = new RouteRequest();
         $route->Controller = KrisConfig::DEFAULT_CONTROLLER;
         $route->Action = KrisConfig::DEFAULT_ACTION;

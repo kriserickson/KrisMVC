@@ -12,10 +12,18 @@ interface Controller
 {
     /**
      * @abstract
-     * @param $controllerPath
+     * @param string $controllerPath
      * @return void
      */
     function Route($controllerPath);
+
+    /**
+     * @abstract
+     * @param string $originalUrl
+     * @param string $reroutedUrl
+     * @return void
+     */
+    function ReRoute($originalUrl, $reroutedUrl);
 }
 
 /**
@@ -41,14 +49,42 @@ class KrisController implements Controller
     protected $_request;
 
     /**
+     * @var
+     */
+    protected  $_reroute = array();
+
+    /**
      * @param string $controllerPath
      * @return void
      */
     public function Route($controllerPath)
     {
         $this->_controllerPath = $controllerPath;
-        $route =  RouteRequest::CreateFromUri($_SERVER['REQUEST_URI']);
+        $route =  RouteRequest::CreateFromUri($this->GetRequestUri());
         $this->ParseRequest($route->Controller, $route->Action, $route->Params);
+    }
+
+    protected function GetRequestUri()
+    {
+        $requestUri = $_SERVER['REQUEST_URI'];
+        if (strlen(KrisConfig::WEB_FOLDER) == 0 || strpos($requestUri, KrisConfig::WEB_FOLDER) === 0)
+        {
+            $requestUri = substr($requestUri, strlen(KrisConfig::WEB_FOLDER . '/'));
+        }
+        foreach ($this->_reroute as $originalRoute => $reRoute)
+        {
+            if (preg_match('/^'.str_replace('/','\\/',$originalRoute).'$/', $requestUri))
+            {
+                $requestUri = preg_replace('/'.str_replace('/','\\/',$originalRoute).'/', $reRoute, $requestUri);
+                break;
+            }
+        }
+        return $requestUri;
+    }
+
+    public function ReRoute($originalUrl, $reroutedUrl)
+    {
+        $this->_reroute[$originalUrl] = $reroutedUrl;
     }
 
     /**

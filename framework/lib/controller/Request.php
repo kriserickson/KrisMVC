@@ -261,6 +261,13 @@ class Request
         header('Content-Disposition: attachment; filename="' . $filename . '"');
     }
 
+    /**
+     * @return string
+     */
+    public function Route()
+    {
+        return $this->_controller.'/'.$this->_action.(count($this->_params) > 0 ? '/'.implode('/', $this->_params) : '');
+    }
 
 
 }
