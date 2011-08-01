@@ -84,7 +84,13 @@ class DebugPDO
      */
 	public function exec ($statement)
     {
-        return $this->_pdo->exec($statement);
+        $startTime = microtime(true);
+        $ret = $this->_pdo->exec($statement);
+        $endTime = microtime(true);
+
+        $this->AddLog('pdo::exec', $statement, $endTime - $startTime);
+
+        return $ret;
     }
 
     /**
@@ -93,7 +99,14 @@ class DebugPDO
      */
     public function query ($statement)
     {
-        return $this->_pdo->query($statement);
+        $startTime = microtime(true);
+
+        $ret = $this->_pdo->query($statement);
+        $endTime = microtime(true);
+
+        $this->AddLog('pdo::query', $statement, $endTime - $startTime);
+
+        return $ret;
     }
 
     /**
@@ -233,7 +246,13 @@ class DebugPDOStatement
      */
 	public function bindParam ($parameter, &$variable, $dataType = null, $length = null, $driverOptions = null)
     {
-        return $this->_statement->bindParam($parameter, $variable, $dataType, $length, $driverOptions);
+        $startTime = microtime(true);
+        $ret = $this->_statement->bindParam($parameter, $variable, $dataType, $length, $driverOptions);
+        $endTime = microtime(true);
+
+        $this->_debugPdo->AddToLog($endTime - $startTime);
+
+        return $ret;
     }
 
     /**
@@ -246,7 +265,13 @@ class DebugPDOStatement
      */
 	public function bindColumn ($column, &$param, $type = null, $maxLength = null, $driverData = null)
     {
-        return $this->_statement->bindColumn($column, $param, $type, $maxLength, $driverData);
+        $startTime = microtime(true);
+        $ret = $this->_statement->bindColumn($column, $param, $type, $maxLength, $driverData);
+        $endTime = microtime(true);
+
+        $this->_debugPdo->AddToLog($endTime - $startTime);
+
+        return $ret;
     }
 
     /**
@@ -257,7 +282,13 @@ class DebugPDOStatement
      */
 	public function bindValue ($parameter, $value, $data_type = null)
     {
-        return $this->_statement->bindValue($parameter, $value, $data_type);
+        $startTime = microtime(true);
+        $ret = $this->_statement->bindValue($parameter, $value, $data_type);
+        $endTime = microtime(true);
+
+        $this->_debugPdo->AddToLog($endTime - $startTime);
+
+        return $ret;
     }
 
     /**
@@ -265,7 +296,13 @@ class DebugPDOStatement
      */
     public function rowCount ()
     {
-        return $this->_statement->rowCount();
+        $startTime = microtime(true);
+        $ret = $this->_statement->rowCount();
+        $endTime = microtime(true);
+
+        $this->_debugPdo->AddToLog($endTime - $startTime);
+
+        return $ret;
     }
 
 
@@ -301,7 +338,13 @@ class DebugPDOStatement
      */
 	public function fetchObject ($class_name = null, array $ctor_args = null)
     {
-        return $this->_statement->fetchObject($class_name, $ctor_args);
+        $startTime = microtime(true);
+        $ret = $this->_statement->fetchObject($class_name, $ctor_args);
+        $endTime = microtime(true);
+
+        $this->_debugPdo->AddToLog($endTime - $startTime);
+
+        return $ret;
     }
 
     /**
@@ -371,7 +414,13 @@ class DebugPDOStatement
      */
 	public function nextRowset ()
     {
-        return $this->_statement->nextRowset();
+        $startTime = microtime(true);
+        $ret = $this->_statement->nextRowset();
+        $endTime = microtime(true);
+
+        $this->_debugPdo->AddToLog($endTime - $startTime);
+
+        return $ret;
     }
 
     /**

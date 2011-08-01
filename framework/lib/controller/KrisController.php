@@ -69,7 +69,12 @@ class KrisController implements Controller
         $requestUri = $_SERVER['REQUEST_URI'];
         if (strlen(KrisConfig::WEB_FOLDER) == 0 || strpos($requestUri, KrisConfig::WEB_FOLDER) === 0)
         {
-            $requestUri = substr($requestUri, strlen(KrisConfig::WEB_FOLDER . '/'));
+            $webFolder = KrisConfig::WEB_FOLDER;
+            if (substr($webFolder,-1) != '/')
+            {
+                $webFolder .= '/';
+            }
+            $requestUri = substr($requestUri, strlen($webFolder));
         }
         foreach ($this->_reroute as $originalRoute => $reRoute)
         {
@@ -97,7 +102,7 @@ class KrisController implements Controller
     {
         $this->_request = new Request($controller, $action, $params);
 
-        if ($this->GetControllerRequest($controller, $action, $error, $function, $controllerObj))
+        if ($this->GetControllerRequest($controller, $action, $error, $controllerObj, $function))
         {
             $res = call_user_func_array(array($controllerObj, $function), $params);
             if (!is_null($res) && get_class($res) == 'RouteRequest')
@@ -113,7 +118,15 @@ class KrisController implements Controller
 
     }
 
-    protected function GetControllerRequest($controller, $action, &$error, &$function, &$controllerObj)
+    /**
+     * @param $controller
+     * @param $action
+     * @param $error
+     * @param $function
+     * @param $controllerObj
+     * @return bool
+     */
+    protected function GetControllerRequest($controller, $action, &$error, &$controllerObj, &$function)
     {
         $controllerClass = ucfirst($controller) . 'Controller';
 
@@ -174,7 +187,7 @@ class KrisController implements Controller
 
         if (!is_null(KrisConfig::$Error404Handler) && is_array(KrisConfig::$Error404Handler) && count(KrisConfig::$Error404Handler) > 1)
         {
-            if ($this->GetControllerRequest(KrisConfig::$Error404Handler['controller'], KrisConfig::$Error404Handler['action'], $error, $function, $controllerObj))
+            if ($this->GetControllerRequest(KrisConfig::$Error404Handler['controller'], KrisConfig::$Error404Handler['action'], $error, $controllerObj, $function))
             {
                 call_user_func_array(array($controllerObj, $function), array($msg));
                 $displayedError = true;

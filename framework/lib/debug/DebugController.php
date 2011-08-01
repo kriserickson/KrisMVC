@@ -36,61 +36,77 @@ class DebugController extends KrisController
             $content = ob_get_clean();
             $elapsedTime = ($endTime - $startTime) * 1000;
 
-            $jsVars = '';
-
-            // Get Database Log
-            $db = AutoLoader::$Container->get('PDO');
-            /** @var $db DebugPDO */
-            $databaseQueryCount = count($db->DatabaseLog);
-            $dbTime = 0;
-            if ($databaseQueryCount > 0)
-            {
-                $jsVars .= 'dbLog = [';
-                for ($i = 0; $i < $databaseQueryCount; $i++)
-                {
-                   $dbLogItem = $db->DatabaseLog[$i];
-                   $jsVars .=  ($i > 0 ? ',' : '').'{ func: "'.$dbLogItem['function'].'", query: "'.$dbLogItem['query'].'", milliseconds: '.number_format($dbLogItem['microseconds'] * 1000, 2).'}';
-                   $dbTime += $dbLogItem['microseconds'];
-                }
-                $jsVars .= '];'.PHP_EOL;
-            }
-            $dbTime *= 1000;
-
-            // Get Memory Log
-            $peakUsage = memory_get_peak_usage(true);
-            $currentUsage = memory_get_usage(true);
-            $memory = NumberHelpers::BytesToHuman($peakUsage);
-            $currentMemory = NumberHelpers::BytesToHuman($currentUsage);
-
-            $jsVars .= "memoryLog = '<h2>Memory Info</h2><b>Peak Memory Usage: </b><code>$memory ($peakUsage Bytes)</code><br/>".
-                    "<b>Current Usage: </b><code>$currentMemory ($currentUsage Bytes)</code><br/>';".PHP_EOL;
-
-            // Get Time Log
-            $jsVars .= "timeLog = '<h2>Time Info</h2><b>Time To Create Page: </b><code>".number_format($elapsedTime,4)." milliseconds</code><br/>".
-                    "<b>Database Query Time: </b><code>".number_format($dbTime,4)." milliseconds</code><br/>".
-                    "<b>Processing Time: </b><code>".number_format($elapsedTime - $dbTime, 2)." milliseconds</code><br/>';".PHP_EOL;
-
-            $jsVars .= "debugLog = '".str_replace(PHP_EOL, '', nl2br(str_replace("'", "\\'", str_replace('\\', '\\\\', $log->GetErrorLog()))))."';".PHP_EOL;
-
-            $debugPrefix = KrisConfig::WEB_FOLDER.'/KrisMVCDebug/';
-
-            $webBar = '<div id="krisMvcDebugDataHolder"><div id="krisMvcDebugData"></div></div>'.
-                '<div id="krisMvcWebBarButton"><span class="showbar"><a href="#">show bar</a></span></div>'.
-                '<div id="krisMvcWebBar"><div class="leftside"><ul id="debugConfig">'.
-                '<li class="debugList" id="config"><img title="View Configuration" src="'.$debugPrefix.'plugin.png">Config</li>'.
-                '<li class="debugList" id="logs"><img title="View Logs" src="'.$debugPrefix.'page_white_text.png">Logs</li>'.
-                '<li class="debugList" id="database"><img title="Database Logs" src="'.$debugPrefix.'database.png">Database: '.$databaseQueryCount.'</li>'.
-                '<li class="debugList" id="time"><img title="Time Elapsed" src="'.$debugPrefix.'clock_play.png">Time: '. (int)($elapsedTime) .'ms</li>'.
-                '<li class="debugList" id="memory"><img title="Peak Memory" src="'.$debugPrefix.'chart_curve.png">Memory: '.$memory.'</li></ul></div>'.
-                '<div class="rightside"><span class="downarr"><a href="#"></a></span></div></div>'.
-                '<link rel="stylesheet" href="'.$debugPrefix.'debug.css" type="text/css" media="screen" />'.
-                '<script type="text/javascript" src="'.$debugPrefix.'debug.js"></script>'.
-                '<script type="text/javascript">'.$jsVars.'</script>';
-
-            echo str_replace('</body>', $webBar.'</body>', $content);
-
+            echo str_replace('</body>', $this->GetWebBar($elapsedTime, $log) . '</body>', $content);
         }
 
+    }
+
+    /**
+     * @param int $elapsedTime
+     * @param DebugLog $log
+     * @return string
+     */
+    public function GetWebBar($elapsedTime, $log)
+    {
+        $jsVars = '';
+        $dbVars = '';
+
+        // Get Database Log
+        $db = AutoLoader::$Container->get('PDO');
+        /** @var $db DebugPDO */
+        $databaseQueryCount = count($db->DatabaseLog);
+        $dbTime = 0;
+        if ($databaseQueryCount > 0)
+        {
+            for ($i = 0; $i < $databaseQueryCount; $i++)
+            {
+                $dbLogItem = $db->DatabaseLog[$i];
+                $dbVars .= ($i > 0 ? ','
+                        : '') . '{ func: "' . $dbLogItem['function'] . '", query: "' . $dbLogItem['query'] . '", milliseconds: ' . number_format($dbLogItem['microseconds'] * 1000, 2) . '}';
+                $dbTime += $dbLogItem['microseconds'];
+            }
+        }
+        $dbTime *= 1000;
+
+        // Get Memory Log
+        $peakUsage = memory_get_peak_usage(true);
+        $currentUsage = memory_get_usage(true);
+        $memory = NumberHelpers::BytesToHuman($peakUsage);
+        $currentMemory = NumberHelpers::BytesToHuman($currentUsage);
+
+        $jsVars .= 'dbLog = [' . $this->CleanJSVar($dbVars) . '];' . PHP_EOL;
+        $jsVars .= "memoryLog = '<h2>Memory Info</h2><b>Peak Memory Usage: </b><code>$memory ($peakUsage Bytes)</code><br/>" .
+                "<b>Current Usage: </b><code>$currentMemory ($currentUsage Bytes)</code><br/>';" . PHP_EOL;
+
+        // Get Time Log
+        $jsVars .= "timeLog = '<h2>Time Info</h2><b>Time To Create Page: </b><code>" . number_format($elapsedTime, 4) . " milliseconds</code><br/>" .
+                "<b>Database Query Time: </b><code>" . number_format($dbTime, 4) . " milliseconds</code><br/>" .
+                "<b>Processing Time: </b><code>" . number_format($elapsedTime - $dbTime, 2) . " milliseconds</code><br/>';" . PHP_EOL;
+
+        $jsVars .= "debugLog = '" . $this->CleanJSVar($log->GetErrorLog()) . "';" . PHP_EOL;
+
+        $debugPrefix = KrisConfig::WEB_FOLDER . '/KrisMVCDebug/';
+
+        $webBar = '<div id="krisMvcDebugDataHolder"><div id="krisMvcDebugData"></div></div>' .
+                '<div id="krisMvcWebBarButton"><span class="showbar"><a href="#">show bar</a></span></div>' .
+                '<div id="krisMvcWebBar"><div class="leftside"><ul id="debugConfig">' .
+                '<li class="debugList" id="version"><strong>KrisMVC</strong> Version: ' . KRIS_MVC_VERSION . '</li>' .
+                '<li class="debugList" id="config"><img title="View Configuration" src="' . $debugPrefix . 'plugin.png">Config</li>' .
+                '<li class="debugList" id="logs"><img title="View Logs" src="' . $debugPrefix . 'page_white_text.png">Logs</li>' .
+                '<li class="debugList" id="database"><img title="Database Logs" src="' . $debugPrefix . 'database.png">Database: ' . $databaseQueryCount . '</li>' .
+                '<li class="debugList" id="time"><img title="Time Elapsed" src="' . $debugPrefix . 'clock_play.png">Time: ' . (int)($elapsedTime) . 'ms</li>' .
+                '<li class="debugList" id="memory"><img title="Peak Memory" src="' . $debugPrefix . 'chart_curve.png">Memory: ' . $memory . '</li></ul></div>' .
+                '<div class="rightside"><span class="downarr"><a href="#"></a></span></div></div>' .
+                '<link rel="stylesheet" href="' . $debugPrefix . 'debug.css" type="text/css" media="screen" />' .
+                '<script type="text/javascript" src="' . $debugPrefix . 'debug.js"></script>' .
+                '<script type="text/javascript">' . $jsVars . '</script>';
+
+        return $webBar;
+    }
+
+    private function CleanJSVar($debugLog)
+    {
+        return str_replace(PHP_EOL, '', nl2br(str_replace("'", "\\'", str_replace('\\', '\\\\', $debugLog))));
     }
 
     /**

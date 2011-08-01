@@ -9,23 +9,23 @@
 /**
  * Exceptions that are raised if the container can't fulfil a dependency during creation.
  */
-class bucket_CreationException extends Exception
+class BucketCreationException extends Exception
 {
 }
 
 /**
  * Internally used by `bucket_Container` to hold instances.
  */
-class bucket_Scope
+class BucketScope
 {
     protected $top;
     protected $instances = array();
     protected $implementations = array();
 
     /**
-     * @param bucket_Scope|null $top
+     * @param BucketScope|null $top
      */
-    function __construct(bucket_Scope $top = null)
+    function __construct(BucketScope $top = null)
     {
         $this->top = $top;
     }
@@ -82,14 +82,14 @@ class bucket_Scope
 /**
  * The main container class.
  */
-class bucket_Container
+class BucketContainer
 {
     protected $factory;
     protected $scope;
 
     /**
      * @param null|array $factory
-     * @param null|bucket_Scope $scope
+     * @param null|BucketScope $scope
      */
     function __construct($factory = null, $scope = null)
     {
@@ -105,12 +105,12 @@ class bucket_Container
         {
             $this->factory = $factory ? $factory : new StdClass();
         }
-        $this->scope = new bucket_Scope($scope);
+        $this->scope = new BucketScope($scope);
     }
 
     /**
      * Clones the container, with a new sub-scope.
-     * @return \bucket_Container
+     * @return \BucketContainer
      */
     function makeChildContainer()
     {
@@ -186,7 +186,7 @@ class bucket_Container
     {
         if (!class_exists($classname))
         {
-            throw new bucket_CreationException("Undefined class $classname");
+            throw new BucketCreationException("Undefined class $classname");
         }
 
         $classname = strtolower($classname);
@@ -210,7 +210,7 @@ class bucket_Container
                     }
                 }
             }
-            throw new bucket_CreationException("No implementation registered for '$classname'. Possible candidates are: " . implode(', ', $candidates));
+            throw new BucketCreationException("No implementation registered for '$classname'. Possible candidates are: " . implode(', ', $candidates));
         }
         $dependencies = array();
         /** @var $ctor ReflectionMethod */
@@ -225,7 +225,7 @@ class bucket_Container
                     $param_klass = $parameter->getClass();
                     if (!$param_klass)
                     {
-                        throw new bucket_CreationException("Can't auto-assign parameter '" . $parameter->getName() . "' for '" . $klass->getName() . "'");
+                        throw new BucketCreationException("Can't auto-assign parameter '" . $parameter->getName() . "' for '" . $klass->getName() . "'");
                     }
                     $dependencies[] = $this->get($param_klass->getName());
                 }

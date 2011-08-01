@@ -9,6 +9,7 @@
  */
 
 // These are the bare bones files required to run the application...
+define('KRIS_MVC_VERSION', "0.8");
 
 /** @noinspection PhpIncludeInspection */
 require KrisConfig::FRAMEWORK_DIR.'/lib/controller/KrisController.php';
@@ -69,7 +70,7 @@ else
 $factory = array('PDO' => create_function('$container', '$dsn = "mysql:host=".KrisConfig::DB_HOST.";dbname=".KrisConfig::DB_DATABASE;'.PHP_EOL.
     'return new '.$databaseClass.'($dsn, KrisConfig::DB_USER, KrisConfig::DB_PASSWORD);'));
 
-AutoLoader::$Container = new bucket_Container($factory);
+AutoLoader::$Container = new BucketContainer($factory);
 foreach ($classes as $interface => $useClass)
 {
     AutoLoader::$Container->registerImplementation($interface, $useClass);

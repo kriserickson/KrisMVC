@@ -14,7 +14,7 @@ div#krisMvcWebBar, div#krisMvcWebBarButton,  div#krisMvcDebugDataHolder
     border-left: 1px solid #eee;
     border-right: 1px solid #eee;
     color: #000000;
-    font:14px/18px Arial, Helvetica, sans-serif;
+    font:12px/16px Arial, Helvetica, sans-serif;
     padding:  0;
     display: none;
 }
@@ -85,10 +85,11 @@ span.showbar a {
 
 ul#debugConfig li {
     display: inline-block;
-    margin: 10px 10px 10px 10px;
+    margin: 12px 10px 10px 10px;
     border-right: 1px solid;
     padding-right: 10px;
     font-weight: bold;
+    vertical-align: top;
     cursor: pointer;
 }
 
@@ -100,6 +101,13 @@ ul#debugConfig li:last-child
 {
     border-right: 0;
     padding-right: 0;
+}
+
+ul#debugConfig li#version
+{
+    font-size: 10px;
+    font-weight: bold;
+    cursor: default;
 }
 
 
@@ -118,4 +126,7 @@ span.downarr a {
     padding: 25px 0 0 10px;
     background: url(../images/downarrow.png) no-repeat 5px 7px;
 }
+
+
+
 

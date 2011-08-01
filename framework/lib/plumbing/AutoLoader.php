@@ -16,7 +16,7 @@ class AutoLoader
     private static $ClassLoader = array();
 
     /**
-     * @var bucket_Container
+     * @var BucketContainer
      */
     public static $Container;
 
