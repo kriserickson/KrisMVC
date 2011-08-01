@@ -13,7 +13,7 @@ class Auth_AllTests extends PHPUnit_Framework_TestSuite
 	{
 		$suite = new self();
 
-		$suite->addTestFile(dirname(__FILE__) . '/PasswordHashTest.php');
+		$suite->addTestFile(__DIR__ . '/PasswordHashTest.php');
 
 		return $suite;
 	}

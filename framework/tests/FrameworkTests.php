@@ -1,20 +1,32 @@
 <?php
 
-require dirname(__FILE__) . '/../../config/KrisConfig.php';
+if (!defined('__DIR__'))
+{
+    define('__DIR__', dirname(__FILE__));
+}
 
-require dirname(__FILE__) . '/../../framework/lib/auth/PasswordHash.php';
-require dirname(__FILE__) . '/../../framework/lib/controller/KrisController.php';
-require dirname(__FILE__) . '/../../framework/lib/orm/KrisDB.php';
-require dirname(__FILE__) . '/../../framework/lib/orm/KrisModel.php';
-require dirname(__FILE__) . '/../../framework/lib/orm/KrisCrudModel.php';
-require dirname(__FILE__) . '/../../framework/lib/orm/KrisDBView.php';
-require dirname(__FILE__) . '/../../framework/lib/view/KrisView.php';
+require __DIR__ . '/../../config/KrisConfig.php';
+require __DIR__ . '/../../framework/lib/auth/PasswordHash.php';
+require __DIR__ . '/../../framework/lib/controller/KrisController.php';
+require __DIR__ . '/../../framework/lib/controller/RouteRequest.php';
+require __DIR__ . '/../../framework/lib/controller/Request.php';
+require __DIR__ . '/../../framework/lib/orm/KrisDB.php';
+require __DIR__ . '/../../framework/lib/orm/KrisModel.php';
+require __DIR__ . '/../../framework/lib/orm/KrisCrudModel.php';
+require __DIR__ . '/../../framework/lib/orm/KrisDBView.php';
+require __DIR__ . '/../../framework/lib/plumbing/BucketContainer.php';
+require __DIR__ . '/../../framework/lib/view/KrisView.php';
+require __DIR__ . '/../../framework/lib/view/Mustache.php';
+require __DIR__ . '/../../framework/lib/helpers/HtmlHelpers.php';
 
 
 require 'Auth/AllTests.php';
 require 'Controller/AllTests.php';
+require 'Helpers/AllTests.php';
 require 'Orm/AllTests.php';
+require 'Plumbing/AllTests.php';
 require 'View/AllTests.php';
+
 
 
 /**
@@ -34,7 +46,9 @@ class AllUnitTests extends PHPUnit_Framework_TestSuite
 		$suite = new self();
         $suite->addTestSuite('Auth_AllTests');
         $suite->addTestSuite('Controller_AllTests');
+        $suite->addTestSuite('Helpers_AllTests');
 		$suite->addTestSuite('Orm_AllTests');
+        $suite->addTestSuite('Plumbing_AllTests');
         $suite->addTestSuite('View_AllTests');
 
 		return $suite;

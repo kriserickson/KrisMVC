@@ -13,10 +13,10 @@ class Orm_AllTests extends PHPUnit_Framework_TestSuite
 	{
 		$suite = new self();
 
-		$suite->addTestFile(dirname(__FILE__) . '/KrisDBTest.php');
-        $suite->addTestFile(dirname(__FILE__) . '/KrisDBViewTest.php');
-        $suite->addTestFile(dirname(__FILE__) . '/KrisModelTest.php');
-        $suite->addTestFile(dirname(__FILE__) . '/KrisCrudModelTest.php');
+		$suite->addTestFile(__DIR__ . '/KrisDBTest.php');
+        $suite->addTestFile(__DIR__ . '/KrisDBViewTest.php');
+        $suite->addTestFile(__DIR__ . '/KrisModelTest.php');
+        $suite->addTestFile(__DIR__ . '/KrisCrudModelTest.php');
 
 		return $suite;
 	}

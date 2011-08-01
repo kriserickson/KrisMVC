@@ -1,7 +1,7 @@
 <?php
 
 
-require(dirname(__FILE__). '/ClassCategoryTest.php');
+require(__DIR__. '/ClassCategoryTest.php');
 
 /**
  * Test class for KrisDBView.

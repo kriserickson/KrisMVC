@@ -13,7 +13,8 @@ class View_AllTests extends PHPUnit_Framework_TestSuite
 	{
 		$suite = new self();
 
-		$suite->addTestFile(dirname(__FILE__) . '/KrisViewTest.php');
+		$suite->addTestFile(__DIR__ . '/KrisViewTest.php');
+        $suite->addTestFile(__DIR__ . '/MustacheTest.php');
 
 		return $suite;
 	}

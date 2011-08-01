@@ -19,7 +19,22 @@ class KrisControllerTest extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new KrisController(KrisConfig::APP_PATH . 'controllers/', KrisConfig::WEB_FOLDER, 'main', 'index');
+        $this->object = $this->getMock('KrisController', array('GetControllerRequest'));
+        $this->object->expects($this->once())->method('GetControllerRequest')->will($this->returnCallback(function ($controller, $action, &$error, &$class, &$func)
+            {
+                if ($controller != 'main')
+                {
+                    throw new InvalidArgumentException('Invalid controller '.$controller);
+                }
+                if ($action != 'index')
+                {
+                    throw new InvalidArgumentException('Invalid action '.$action);
+                }
+                $func = 'Index';
+                $class = new TestControllerClass();
+                return true;
+            }));
+
     }
 
     /**
@@ -29,5 +44,46 @@ class KrisControllerTest extends PHPUnit_Framework_TestCase
     protected function tearDown()
     {
     }
+
+
+    /**
+     * @test
+     */
+    public function testRoute()
+    {
+        $_SERVER['REQUEST_URI'] = '/main/index';
+        $this->object->Route('');
+    }
+
+    /**
+     * @test
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidAction()
+    {
+        $_SERVER['REQUEST_URI'] = '/main/foo';
+        $this->object->Route('');
+    }
+
+    /**
+     * @test
+     */
+    public function testReRoute()
+    {
+        // Remove the following lines when you implement this test.
+        $_SERVER['REQUEST_URI'] = '/main/index';
+        $this->object->ReRoute('/main.php', '/main/index');
+        $this->object->Route('');
+
+    }
 }
+
+class TestControllerClass
+{
+    public function Index()
+    {
+        return null;
+    }
+}
+
 ?>

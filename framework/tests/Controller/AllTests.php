@@ -13,7 +13,7 @@ class Controller_AllTests extends PHPUnit_Framework_TestSuite
 	{
 		$suite = new self();
 
-		$suite->addTestFile(dirname(__FILE__) . '/KrisControllerTest.php');
+		$suite->addTestFile(__DIR__ . '/KrisControllerTest.php');
 
 		return $suite;
 	}
