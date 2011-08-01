@@ -76,50 +76,51 @@ class KrisCG extends KrisDB
      * @param string $database
      * @param string $user
      * @param string $password
-     * @param string $type
-     *
-     * @internal param string $siteName
+     * @param string $databaseType     *
+     * @param string $viewType
+     * @param string $siteName
      * @return void
      */
-    public function CreateSite($site, $host, $database, $user, $password, $type)
+    public function CreateSite($site, $host, $database, $user, $password, $databaseType, $viewType, $siteName)
     {
 
-        if (strtolower(substr($site,0,7)) != 'http://')
-        {
-            $site = 'http://'.$site;
-        }
-        $fp = @fopen($site, 'r');
-        if ($fp === false)
-        {
-            $site .= '/';
-            $fp = @fopen($site   , 'r');
-            if ($fp === false)
-            {
-                die('Could not access '.$site.'  Pleae make the site accessible before starting...');
-            }
-        }
-        fclose($fp);
-
+        $site = $this->EnsureSiteExists($site);
         $webFolder = '/'.basename($site);
 
         $configLocation = $this->_siteLocation . '/config/KrisConfig.php';
         if (file_exists($configLocation))
         {
-            die('Cannot create a site where one already exists');
+            throw new Exception('Cannot create a site where one already exists');
         }
 
-        if (!in_array($type, array('MYSQL', 'MSSQL', 'SQLITE', 'POSTGRESQL')))
+        if (!in_array($databaseType, array('MYSQL', 'MSSQL', 'SQLITE', 'POSTGRESQL')))
         {
-            die('Database type ('.$type.') invalid, must be be one of MYSQL, MSSQL, SQLITE, POSTGRESQL');
+            throw new Exception('Database type ('.$databaseType.') invalid, must be be one of MYSQL, MSSQL, SQLITE, POSTGRESQL');
+        }
+
+        $viewTypeLower = strtolower($viewType);
+        if ($viewTypeLower == 'kris' || $viewTypeLower == 'krisview')
+        {
+            $templateExtension = 'php';
+            $templateType = 'KrisView';
+        }
+        else if ($viewTypeLower == 'mustache' || $viewTypeLower == 'mustacheview')
+        {
+            $templateExtension = 'tpl';
+            $templateType = 'MustacheView';
+        }
+        else
+        {
+            throw new Exception('Unsupported template type: '.$viewType);
         }
 
         $this->CreateDirectoryOrDie($this->_siteLocation.DIRECTORY_SEPARATOR.'config');
 
-        $configContents = file_get_contents(__DIR__.'/assets/KrisConfig.php');
-        $configContents = str_replace(array('@@FRAMEWORK_DIR@@', '@@WEB_FOLDER@@', '@@SITE_LOCATION@@', '@@DB_HOST@@', '@@DB_DATABASE@@',
-            '@@DB_USER@@', '@@DB_PASSWORD@@', 'KrisConfig::DB_TYPE_MYSQL'),
-            array(dirname(__DIR__), $webFolder, $this->_siteLocation, $host, $database, $user, $password, 'KrisConfig::DB_TYPE_'.$type),
-            $configContents);
+        $m = new Mustache();
+        $configContents = $m->render(file_get_contents(__DIR__.'/assets/CodeTemplates/KrisConfig.template'),
+            array('framework_dir' => dirname(__DIR__), 'web_folder' => $webFolder, 'site_location' => $this->_siteLocation,
+                'db_host' => $host, 'db_database' => $database, 'db_user' => $user, 'db_password' => $password,
+                'db_type' => 'KrisConfig::DB_TYPE_'.$databaseType));
 
         file_put_contents($configLocation, $configContents);
 
@@ -146,13 +147,43 @@ class KrisCG extends KrisDB
         file_put_contents($this->_siteLocation.'/.htaccess', $htaccessContents);
 
         copy(__DIR__.'/assets/index.php', $this->_siteLocation.'/index.php');
-        copy(__DIR__.'/assets/MainController.php', $this->_applicationDirectory.'/controllers/main/MainController.php');
-        copy(__DIR__.'/assets/layout.php', $this->_applicationDirectory.'/views/layouts/layout.php');
-        copy(__DIR__.'/assets/MainView.php', $this->_applicationDirectory.'/views/main/MainView.php');
-        copy(__DIR__.'/assets/style.css', $this->_siteLocation.'/css/style.css');
+
+        $mainControllerContents = $m->render(file_get_contents(__DIR__.'/assets/CodeTemplates/MainController.template'),
+            array('layout_template' => 'layout.'.$templateExtension, 'main_template' => 'MainView.'.$templateExtension,
+                'sitename' => $siteName, 'template_type' => $templateType));
+        file_put_contents($this->_applicationDirectory.'/controllers/main/MainController.php', $mainControllerContents);
+
+        copy(__DIR__.'/assets/DefaultView'.$templateType.'/layout.'.$templateExtension, $this->_applicationDirectory.'/views/layouts/layout.'.$templateExtension);
+        copy(__DIR__.'/assets/DefaultView'.$templateType.'/MainView.'.$templateExtension, $this->_applicationDirectory.'/views/main/MainView.'.$templateExtension);
+        copy(__DIR__.'/assets/css/style.css', $this->_siteLocation.'/css/style.css');
 
         echo 'Site created at '.$this->_siteLocation.PHP_EOL;
 
+    }
+
+    /**
+     * @throws Exception
+     * @param string $site
+     * @return string
+     */
+    public function EnsureSiteExists($site)
+    {
+        if (strtolower(substr($site, 0, 7)) != 'http://')
+        {
+            $site = 'http://' . $site;
+        }
+        $fp = @fopen($site, 'r');
+        if ($fp === false)
+        {
+            $site .= '/';
+            $fp = @fopen($site, 'r');
+            if ($fp === false)
+            {
+                throw new Exception('Could not access ' . $site . '  Please make the site accessible before starting...');
+            }
+        }
+        fclose($fp);
+        return $site;
     }
 
 
@@ -176,7 +207,7 @@ class KrisCG extends KrisDB
 
         if (!$this->TableExists($tableName))
         {
-            die('ERROR: Table '.$tableName.' does not exist');
+            throw new Exception('ERROR: Table '.$tableName.' does not exist');
         }
 
         $columnNames = $this->GetColumnMetadata($tableName);
@@ -298,7 +329,7 @@ class KrisCG extends KrisDB
     {
 
         $m = new Mustache();
-        $output = $m->render(file_get_contents(__DIR__.'/assets/ModelGenerated.tpl'), array('BaseModelDirectory' => $this->_baseModelDirectory,
+        $output = $m->render(file_get_contents(__DIR__.'/CodeTemplates/assets/ModelGenerated.template'), array('BaseModelDirectory' => $this->_baseModelDirectory,
                 'tableName' => $tableName, 'className' => $className, 'filename' => $filename, 'properties' => $properties, 'foreignKeyString' => $foreignKeyString,
                 'initializeFields' => $initializeFields, 'fakeFields' => $fakeFields, 'primaryKey' => $primaryKey, 'fieldTypes' => $fieldTypes));
 
@@ -314,48 +345,68 @@ class KrisCG extends KrisDB
     private function GenerateDerivedClass($filename, $safeClassName, $className)
     {
         $m = new Mustache();
-        $output = $m->render(file_get_contents(__DIR__.'/assets/ModelCrud.tpl'), array('filename' => $filename, 'safeClassName' => $safeClassName, 'className' => $className));
+        $output = $m->render(file_get_contents(__DIR__.'/assets/CodeTemplates/ModelCrud.template'), array('filename' => $filename, 'safeClassName' => $safeClassName, 'className' => $className));
         file_put_contents($this->_crudDirectory . DIRECTORY_SEPARATOR . $filename, $output);
     }
 
     /**
      * @param string $controllerLocation
      * @param string $controllerName
-     * @param string $scaffoldMainLayout
      * @param string $viewType
      * @param string $viewLocation
-     * @param string $viewView
-     * @param string $editView
-     * @param string $indexView
      * @return void
      */
-    public function CreateScaffold($controllerLocation, $controllerName, $scaffoldMainLayout, $viewType, $viewLocation, $viewView, $editView, $indexView)
+    public function CreateScaffold($controllerLocation, $controllerName, $viewType, $viewLocation)
     {
         $m = new Mustache();
         $controllerDirectory = $this->_applicationDirectory . 'controllers/' . $controllerLocation;
-        $this->CreateDirectoryOrDie($controllerDirectory);
 
         $assetDir = __DIR__.'/assets/';
 
-        $output = $m->render(file_get_contents($assetDir.'ScaffoldController.tpl'), array('ControllerLocation' => $controllerLocation,
-                'ControllerName' => $controllerName, 'ScaffoldMainLayout' => $scaffoldMainLayout, 'ViewType' => $viewType, 'ViewLocation' => $viewLocation,
+        if ($viewType == 'KrisView')
+        {
+            $viewView = 'ViewView.php';
+            $editView = 'EditView.php';
+            $indexView = 'ViewView.php';
+            $scaffoldMainLayout = 'Scaffold.php';
+            $viewFolder = 'ScaffoldViewKrisView';
+        }
+        else if ($viewType == 'Mustache' || $viewType == 'MustacheView')
+        {
+            $viewView = 'ViewView.tpl';
+            $editView = 'EditView.tpl';
+            $indexView = 'ViewView.tpl';
+            $scaffoldMainLayout = 'Scaffold.tpl';
+            $viewFolder = 'ScaffoldViewMustache';
+        }
+        else
+        {
+            throw new InvalidArgumentException('View type: '.$viewType.' is not supported');
+        }
+
+        $templateDir = $assetDir.'/'.$viewFolder;
+
+        $this->CreateDirectoryOrDie($controllerDirectory);
+
+        $output = $m->render(file_get_contents($assetDir.'CodeTemplates/ScaffoldController.template'), array('ControllerLocation' => $controllerLocation,
+                'ControllerName' => $controllerName, 'ScaffoldMainLayout' => $scaffoldMainLayout, 'ViewLocation' => $viewLocation,
                 'ViewView' => $viewView, 'EditView' => $editView, 'IndexView' => $indexView));
         file_put_contents($controllerDirectory.DIRECTORY_SEPARATOR.ucfirst($controllerLocation).'Controller.php', $output);
 
-        copy($assetDir.$scaffoldMainLayout, $this->_applicationDirectory.'/views/layouts/'.$scaffoldMainLayout);
+        copy($templateDir.$scaffoldMainLayout, $this->_applicationDirectory.'/views/layouts/'.$scaffoldMainLayout);
         
         $this->CreateDirectoryOrDie($this->_applicationDirectory.'/views/'.$viewLocation);
 
-        copy($assetDir.$viewView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$viewView);
-        copy($assetDir.$editView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$editView);
-        copy($assetDir.$indexView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$indexView);
+        copy($templateDir.$viewView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$viewView);
+        copy($templateDir.$editView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$editView);
+        copy($templateDir.$indexView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$indexView);
 
         // TODO: Add the ability to add different css's 
-        copy(__DIR__.'/assets/scaffold.css', $this->_siteLocation.'/css/scaffold.css');
+        copy(__DIR__.'/assets/css/scaffold.css', $this->_siteLocation.'/css/scaffold.css');
         $this->CreateDirectoryOrDie($this->_siteLocation.'/images/scaffold');
 
 
-        $imageSource = __DIR__ . '/assets/scaffold';
+        $imageSource = __DIR__ . '/assets/ScaffoldImages';
         $d = dir($imageSource);
         while($res = $d->read())
         {
@@ -511,7 +562,7 @@ class KrisCG extends KrisDB
     {
         if (!FileHelpers::EnsureDirectoryExists($directory))
         {
-            die('Failed to create directory: '.$directory);
+            throw new Exception('Failed to create directory: '.$directory);
         }
     }
 

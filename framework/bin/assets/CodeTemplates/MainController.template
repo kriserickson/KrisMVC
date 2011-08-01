@@ -1,0 +1,31 @@
+<?php
+
+/**
+ *
+ */
+class MainController extends DefaultController
+{
+    const DEFAULT_TITLE = '{{sitename}}';
+
+    /**
+     * Constructor
+     */
+    function __construct()
+    {
+        $this->_view = new {{template_type}}(KrisConfig::APP_PATH . 'views/layouts/{{layout_template}}');
+    }
+
+
+    /**
+     * Default action
+     * @return void
+     */
+    public function Index()
+    {
+        $data = array('body' => $this->_view->fetch(KrisConfig::APP_PATH . 'views/main/{{main_template}}', array('content' => 'Hello World!'), false),
+            'title' => self::DEFAULT_TITLE, 'web_folder' => KrisConfig::WEB_FOLDER);
+        $this->_view->dump($data);
+    }
+
+
+}
