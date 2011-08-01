@@ -14,6 +14,7 @@ class DebugController extends KrisController
      */
     public function Route($controllerPath)
     {
+
         $this->_controllerPath = $controllerPath;
 
         $route =  RouteRequest::CreateFromUri($this->GetRequestUri());
@@ -24,6 +25,10 @@ class DebugController extends KrisController
         }
         else
         {
+            /** @var $log DebugLog */
+            $log = AutoLoader::$Container->get('Log');
+            $log->Debug('Controller path: '.$controllerPath.' Controller: '.$route->Controller.' Action: '.$route->Action.' Params: ('.implode(',', $route->Params).')');
+
             $startTime = microtime(true);
             ob_start();
             $this->ParseRequest($route->Controller, $route->Action, $route->Params);
@@ -34,7 +39,7 @@ class DebugController extends KrisController
             $jsVars = '';
 
             // Get Database Log
-            $db = AutoLoader::GetDatabaseHandle();
+            $db = AutoLoader::$Container->get('PDO');
             /** @var $db DebugPDO */
             $databaseQueryCount = count($db->DatabaseLog);
             $dbTime = 0;
@@ -47,7 +52,7 @@ class DebugController extends KrisController
                    $jsVars .=  ($i > 0 ? ',' : '').'{ func: "'.$dbLogItem['function'].'", query: "'.$dbLogItem['query'].'", milliseconds: '.number_format($dbLogItem['microseconds'] * 1000, 2).'}';
                    $dbTime += $dbLogItem['microseconds'];
                 }
-                $jsVars .= '];';
+                $jsVars .= '];'.PHP_EOL;
             }
             $dbTime *= 1000;
 
@@ -56,13 +61,16 @@ class DebugController extends KrisController
             $currentUsage = memory_get_usage(true);
             $memory = NumberHelpers::BytesToHuman($peakUsage);
             $currentMemory = NumberHelpers::BytesToHuman($currentUsage);
+
             $jsVars .= "memoryLog = '<h2>Memory Info</h2><b>Peak Memory Usage: </b><code>$memory ($peakUsage Bytes)</code><br/>".
-                    "<b>Current Usage: </b><code>$currentMemory ($currentUsage Bytes)</code><br/>';";
+                    "<b>Current Usage: </b><code>$currentMemory ($currentUsage Bytes)</code><br/>';".PHP_EOL;
 
             // Get Time Log
             $jsVars .= "timeLog = '<h2>Time Info</h2><b>Time To Create Page: </b><code>".number_format($elapsedTime,4)." milliseconds</code><br/>".
                     "<b>Database Query Time: </b><code>".number_format($dbTime,4)." milliseconds</code><br/>".
-                    "<b>Processing Time: </b><code>".number_format($elapsedTime - $dbTime, 2)." milliseconds</code><br/>';";
+                    "<b>Processing Time: </b><code>".number_format($elapsedTime - $dbTime, 2)." milliseconds</code><br/>';".PHP_EOL;
+
+            $jsVars .= "debugLog = '".str_replace(PHP_EOL, '', nl2br(str_replace("'", "\\'", str_replace('\\', '\\\\', $log->GetErrorLog()))))."';".PHP_EOL;
 
             $debugPrefix = KrisConfig::WEB_FOLDER.'/KrisMVCDebug/';
 
@@ -95,15 +103,15 @@ class DebugController extends KrisController
         {
             case 'debug.js':
                 header('Content-type: application/javascript');
-                readfile(KrisConfig::FRAMEWORK_DIR.'/lib/debug/debug.js');
+                readfile(KrisConfig::FRAMEWORK_DIR.'/lib/debug/js/debug.js');
                 break;
             case 'debug.css' :
                 header('Content-type: text/css');
-                readfile(KrisConfig::FRAMEWORK_DIR.'/lib/debug/debug.css');
+                readfile(KrisConfig::FRAMEWORK_DIR.'/lib/debug/css/debug.css');
                 break;
             default:
                 header('Content-type: image/png');
-                readfile(KrisConfig::FRAMEWORK_DIR.'/lib/debug/'.$asset);
+                readfile(KrisConfig::FRAMEWORK_DIR.'/lib/debug/images/'.$asset);
 
         }
     }

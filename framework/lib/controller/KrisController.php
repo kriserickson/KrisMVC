@@ -181,7 +181,9 @@ class KrisController implements Controller
             }
             else
             {
-                KrisConfig::LogError('Unable to call Error404Handler, function ' . KrisConfig::$Error404Handler . ' does not exist');
+                /** @var $log Log */
+                $log = AutoLoader::$Container->get('Log');
+                $log->Error('Unable to call Error404Handler, function ' . KrisConfig::$Error404Handler . ' does not exist');
             }
         }
 

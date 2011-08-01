@@ -108,7 +108,7 @@ abstract class KrisDB
     {
         if (is_null($this->_dbh))
         {
-            $this->_dbh = AutoLoader::GetDatabaseHandle();
+            $this->_dbh = AutoLoader::$Container->get('PDO');
         }
         return $this->_dbh;
     }

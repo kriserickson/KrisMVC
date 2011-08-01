@@ -65,40 +65,8 @@ class AutoLoader
     }
 
 
-    /**
-     * @var PDO
-     */
-    private static $DB_CONNECTION;
 
-    /**
-     * Used by KrisDB and it's child classes to get a database connection.  Edit the DB_* static variables to configure
-     *
-     * @static
-     * @return PDO
-     */
-    public static function GetDatabaseHandle()
-    {
-        if (is_null(self::$DB_CONNECTION))
-        {
-            try
-            {
-                $dsn = 'mysql:host='.KrisConfig::DB_HOST.';dbname='.KrisConfig::DB_DATABASE;
-                if (KrisConfig::DEBUG)
-                {
-                    self::$DB_CONNECTION = new DebugPDO($dsn, KrisConfig::DB_USER, KrisConfig::DB_PASSWORD);
-                }
-                else
-                {
-                    self::$DB_CONNECTION = new PDO($dsn, KrisConfig::DB_USER, KrisConfig::DB_PASSWORD);
-                }
-            }
-            catch (PDOException $e)
-            {
-                die('Connection failed: ' . $e->getMessage());
-            }
-        }
-        return self::$DB_CONNECTION;
-    }
+
 
 }
 

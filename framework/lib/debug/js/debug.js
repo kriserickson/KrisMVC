@@ -37,6 +37,7 @@
                         /** @namespace dbLog */
                         /** @namespace timeLog */
                         /** @namespace memoryLog */
+                        /** @namespace debugLog */
                         case 'database' :
                                 text += '<h2>Database Log</h2><ol>';
                                 for (var i = 0; i < dbLog.length; i++)
@@ -50,7 +51,7 @@
                             break;
                         case 'memory' : text = memoryLog;
                             break;
-                        case 'logs' : text = '<h2>Log Info</h2>Not yet implemented...';
+                        case 'logs' : text = debugLog;
                             break;
                         case 'config' : text = '<h2>Config Info</h2>Not yet implemented...';
                             break;

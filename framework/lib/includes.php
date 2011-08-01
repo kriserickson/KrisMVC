@@ -19,11 +19,13 @@ require KrisConfig::FRAMEWORK_DIR.'/lib/plumbing/BucketContainer.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/plumbing/AutoLoader.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/view/KrisView.php';
 
+
 // This will be loaded as needed...
 AutoLoader::AddClass('KrisDB', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisDB.php', true);
 AutoLoader::AddClass('KrisModel', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisModel.php', true);
 AutoLoader::AddClass('KrisDBView', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisDBView.php', true);
 AutoLoader::AddClass('KrisCrudModel', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisCrudModel.php', true);
+AutoLoader::AddClass('KrisLog', KrisConfig::FRAMEWORK_DIR.'/lib/log/Log.php', true);
 
 // Authentication
 AutoLoader::AddClass('Auth', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Auth.php', true);
@@ -37,7 +39,6 @@ AutoLoader::AddClass('HtmlHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/Html
 AutoLoader::AddClass('ImageResizer', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/ImageResizer.php', true);
 AutoLoader::AddClass('NumberHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/NumberHelpers.php', true);
 
-AutoLoader::$Container = new bucket_Container();
 
 
 //===============================================
@@ -48,18 +49,31 @@ if (KrisConfig::DEBUG)
     // Setup debug
     ini_set('display_errors', 'On');
     error_reporting(E_ALL);
-    AutoLoader::AddClass('DebugController', KrisConfig::FRAMEWORK_DIR.'/lib/controller/DebugController.php', true);
-    AutoLoader::AddClass('DebugPDO', KrisConfig::FRAMEWORK_DIR.'/lib/orm/DebugPDO.php', true);
-    AutoLoader::$Container->registerImplementation('Controller', 'DebugController');
+    AutoLoader::AddClass('DebugController', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugController.php', true);
+    AutoLoader::AddClass('DebugPDO', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugPDO.php', true);
+    AutoLoader::AddClass('Log', KrisConfig::FRAMEWORK_DIR.'/lib/log/Log.php', true);
+    AutoLoader::AddClass('DebugLog', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugLog.php', true);
 
+    $classes = array('Controller' => 'DebugController', 'Log' => 'DebugLog');
+    $databaseClass = 'DebugPDO';
 }
 else
 {
     ini_set('display_errors', 'Off');
     error_reporting(E_ERROR);
-    AutoLoader::$Container->registerImplementation('Controller', 'KrisController');
+    $classes = array('Log' => 'KrisLog');
+    $databaseClass = 'PDO';
 }
 
+// Eventually this will improve with 5.3 and better lambda functions and closures...
+$factory = array('PDO' => create_function('$container', '$dsn = "mysql:host=".KrisConfig::DB_HOST.";dbname=".KrisConfig::DB_DATABASE;'.PHP_EOL.
+    'return new '.$databaseClass.'($dsn, KrisConfig::DB_USER, KrisConfig::DB_PASSWORD);'));
+
+AutoLoader::$Container = new bucket_Container($factory);
+foreach ($classes as $interface => $useClass)
+{
+    AutoLoader::$Container->registerImplementation($interface, $useClass);
+}
 
 
 

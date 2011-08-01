@@ -98,8 +98,7 @@ class bucket_Container
             $this->factory = new StdClass();
             foreach ($factory as $classname => $callback)
             {
-                $this->factory->
-                {'new_' . strtolower($classname)} = $callback;
+                $this->factory->{'new_' . strtolower($classname)} = $callback;
             }
         }
         else
@@ -123,7 +122,7 @@ class bucket_Container
      * @param $classname
      * @return null
      */
-    function get($classname)
+    public function get($classname)
     {
         $classname = $this->scope->getImplementation($classname);
         $name = strtolower($classname);
@@ -139,22 +138,16 @@ class bucket_Container
      * @param string $classname
      * @return object
      */
-    function create($classname)
+    public function create($classname)
     {
         $classname = $this->scope->getImplementation($classname);
-        if (isset($this->factory->
-        {'new_' . strtolower($classname)})
-        )
+        if (isset($this->factory->{'new_' . strtolower($classname)}))
         {
-            return call_user_func($this->factory->
-                {'new_' . strtolower($classname)}, $this);
+            return call_user_func($this->factory->{'new_' . strtolower($classname)}, $this);
         }
         if (is_callable(array($this->factory, 'new_' . $classname)))
         {
-            return $this->factory->
-            {
-            'new_' . $classname
-            }($this);
+            return $this->factory->{'new_' . $classname}($this);
         }
         return $this->createThroughReflection($classname);
     }
@@ -164,7 +157,7 @@ class bucket_Container
      * @param string $interface
      * @param object $use_class
      */
-    function registerImplementation($interface, $use_class)
+    public function registerImplementation($interface, $use_class)
     {
         $this->scope->setImplementation(strtolower($interface), $use_class);
     }
