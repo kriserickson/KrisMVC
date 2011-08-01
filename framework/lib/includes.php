@@ -40,6 +40,8 @@ AutoLoader::AddClass('HtmlHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/Html
 AutoLoader::AddClass('ImageResizer', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/ImageResizer.php', true);
 AutoLoader::AddClass('NumberHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/NumberHelpers.php', true);
 
+// Alternate Views
+AutoLoader::AddClass('MustacheView', KrisConfig::FRAMEWORK_DIR.'/lib/view/MustacheView.php', true);
 
 
 //===============================================
