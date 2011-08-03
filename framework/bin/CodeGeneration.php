@@ -66,6 +66,12 @@ class KrisCG extends KrisDB
         {
             die('File located at '.$configLocation.' not a valid config file');
         }
+
+        $factory = array('PDO' => create_function('$container', '$dsn = "mysql:host=".KrisConfig::DB_HOST.";dbname=".KrisConfig::DB_DATABASE;'.PHP_EOL.
+            'return new PDO($dsn, KrisConfig::DB_USER, KrisConfig::DB_PASSWORD);'));
+
+        AutoLoader::$Container = new BucketContainer($factory);
+
         $this->SetupDirectories();
     }
 
@@ -329,11 +335,12 @@ class KrisCG extends KrisDB
     {
 
         $m = new Mustache();
-        $output = $m->render(file_get_contents(__DIR__.'/CodeTemplates/assets/ModelGenerated.template'), array('BaseModelDirectory' => $this->_baseModelDirectory,
-                'tableName' => $tableName, 'className' => $className, 'filename' => $filename, 'properties' => $properties, 'foreignKeyString' => $foreignKeyString,
-                'initializeFields' => $initializeFields, 'fakeFields' => $fakeFields, 'primaryKey' => $primaryKey, 'fieldTypes' => $fieldTypes));
+        $output = $m->render(file_get_contents($this->BuildPath($this->BuildPath($this->BuildPath(__DIR__, 'assets'), 'CodeTemplates'), 'ModelGenerated.template')),
+            array('BaseModelDirectory' => $this->_baseModelDirectory, 'tableName' => $tableName, 'className' => $className, 'filename' => $filename,
+            'properties' => $properties, 'foreignKeyString' => $foreignKeyString, 'initializeFields' => $initializeFields, 'fakeFields' => $fakeFields,
+            'primaryKey' => $primaryKey, 'fieldTypes' => $fieldTypes));
 
-        file_put_contents($this->_generatedDirectory . DIRECTORY_SEPARATOR . $className . 'Model' . '.php', $output);
+        file_put_contents($this->BuildPath($this->_generatedDirectory, $className . 'Model' . '.php'), $output);
     }
 
     /**
@@ -359,60 +366,68 @@ class KrisCG extends KrisDB
     public function CreateScaffold($controllerLocation, $controllerName, $viewType, $viewLocation)
     {
         $m = new Mustache();
-        $controllerDirectory = $this->_applicationDirectory . 'controllers/' . $controllerLocation;
 
-        $assetDir = __DIR__.'/assets/';
+        $controllerDirectory = $this->BuildPath($this->BuildPath($this->_applicationDirectory,'controllers'), $controllerLocation);
 
-        if ($viewType == 'KrisView')
+        $assetDir = $this->BuildPath(__DIR__, 'assets');
+
+        if ($viewType == 'KrisView' || $viewType == 'Kris')
         {
             $viewView = 'ViewView.php';
             $editView = 'EditView.php';
-            $indexView = 'ViewView.php';
+            $indexView = 'IndexView.php';
             $scaffoldMainLayout = 'Scaffold.php';
             $viewFolder = 'ScaffoldViewKrisView';
+            $viewType = 'KrisView';
         }
         else if ($viewType == 'Mustache' || $viewType == 'MustacheView')
         {
             $viewView = 'ViewView.tpl';
             $editView = 'EditView.tpl';
-            $indexView = 'ViewView.tpl';
+            $indexView = 'IndexView.tpl';
             $scaffoldMainLayout = 'Scaffold.tpl';
-            $viewFolder = 'ScaffoldViewMustache';
+            $viewFolder = 'ScaffoldViewMustacheView';
+            $viewType = 'MustacheView';
         }
         else
         {
             throw new InvalidArgumentException('View type: '.$viewType.' is not supported');
         }
 
-        $templateDir = $assetDir.'/'.$viewFolder;
+        $templateDir = $this->BuildPath($assetDir, $viewFolder);
 
         $this->CreateDirectoryOrDie($controllerDirectory);
 
-        $output = $m->render(file_get_contents($assetDir.'CodeTemplates/ScaffoldController.template'), array('ControllerLocation' => $controllerLocation,
-                'ControllerName' => $controllerName, 'ScaffoldMainLayout' => $scaffoldMainLayout, 'ViewLocation' => $viewLocation,
-                'ViewView' => $viewView, 'EditView' => $editView, 'IndexView' => $indexView));
-        file_put_contents($controllerDirectory.DIRECTORY_SEPARATOR.ucfirst($controllerLocation).'Controller.php', $output);
+        $output = $m->render(file_get_contents($this->BuildPath($this->BuildPath($assetDir,'CodeTemplates') ,'ScaffoldController.template')),
+            array('ControllerLocation' => $controllerLocation, 'ControllerName' => $controllerName, 'ScaffoldMainLayout' => $scaffoldMainLayout,
+                'ViewLocation' => $viewLocation, 'ViewView' => $viewView, 'EditView' => $editView, 'IndexView' => $indexView, 'ViewType' => $viewType));
 
-        copy($templateDir.$scaffoldMainLayout, $this->_applicationDirectory.'/views/layouts/'.$scaffoldMainLayout);
+        file_put_contents($this->BuildPath($controllerDirectory, ucfirst($controllerLocation).'Controller.php'), $output);
+
+        copy($this->BuildPath($templateDir,$scaffoldMainLayout), $this->BuildPath($this->BuildPath($this->BuildPath($this->_applicationDirectory, 'views'), 'layouts'), $scaffoldMainLayout));
         
-        $this->CreateDirectoryOrDie($this->_applicationDirectory.'/views/'.$viewLocation);
+        $this->CreateDirectoryOrDie($this->BuildPath($this->BuildPath($this->_applicationDirectory, 'views'), $viewLocation));
 
-        copy($templateDir.$viewView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$viewView);
-        copy($templateDir.$editView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$editView);
-        copy($templateDir.$indexView, $this->_applicationDirectory.'/views/'.$viewLocation.'/'.$indexView);
+        copy($this->BuildPath($templateDir, $viewView), $this->BuildPath($this->BuildPath($this->BuildPath($this->_applicationDirectory, 'views') , $viewLocation), $viewView));
+        copy($this->BuildPath($templateDir, $editView), $this->BuildPath($this->BuildPath($this->BuildPath($this->_applicationDirectory, 'views'), $viewLocation), $editView));
+        copy($this->BuildPath($templateDir, $indexView), $this->BuildPath($this->BuildPath($this->BuildPath($this->_applicationDirectory, 'views'), $viewLocation), $indexView));
 
         // TODO: Add the ability to add different css's 
-        copy(__DIR__.'/assets/css/scaffold.css', $this->_siteLocation.'/css/scaffold.css');
-        $this->CreateDirectoryOrDie($this->_siteLocation.'/images/scaffold');
+        copy($this->BuildPath($this->BuildPath($assetDir, 'css'), 'scaffold.css'), $this->BuildPath($this->BuildPath($this->_siteLocation, 'css'), 'scaffold.css'));
+        $this->CreateDirectoryOrDie($this->BuildPath($this->BuildPath($this->_siteLocation, 'images'), 'scaffold'));
 
 
-        $imageSource = __DIR__ . '/assets/ScaffoldImages';
+        $imageSource = $this->BuildPath($assetDir, 'ScaffoldImages');
         $d = dir($imageSource);
+
+        $scaffoldImagesDir = $this->BuildPath($this->BuildPath($this->_siteLocation, 'images'), 'scaffold');
+        $this->CreateDirectoryOrDie($scaffoldImagesDir);
+
         while($res = $d->read())
         {
             if ($res != '.' && $res != '..')
             {
-                copy($imageSource, $this->_siteLocation.'/images/scaffold/'.$res);
+                copy($this->BuildPath($imageSource, $res), $this->BuildPath($scaffoldImagesDir, $res));
             }
         }
     }
@@ -566,7 +581,21 @@ class KrisCG extends KrisDB
         }
     }
 
-
+    /**
+     * Returns a path combined
+     *
+     * @param string $path1
+     * @param string $path2
+     * @return string
+     */
+    private function BuildPath($path1, $path2)
+    {
+        if (substr($path1,-1) != '/' && substr($path1,-1) != '\\')
+        {
+            $path1 .= DIRECTORY_SEPARATOR;
+        }
+        return $path1.$path2;
+    }
 
 
 }

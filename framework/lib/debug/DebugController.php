@@ -88,8 +88,8 @@ class DebugController extends KrisController
         $debugPrefix = KrisConfig::WEB_FOLDER . '/KrisMVCDebug/';
 
         $webBar = '<div id="krisMvcDebugDataHolder"><div id="krisMvcDebugData"></div></div>' .
-                '<div id="krisMvcWebBarButton"><span class="showbar"><a href="#">show bar</a></span></div>' .
-                '<div id="krisMvcWebBar"><div class="leftside"><ul id="debugConfig">' .
+                '<div id="krisMvcWebBarButton" style="display:none"><span class="showbar"><a href="#">show bar</a></span></div>' .
+                '<div id="krisMvcWebBar" style="display:none"><div class="leftside"><ul id="debugConfig">' .
                 '<li class="debugList" id="version"><strong>KrisMVC</strong> Version: ' . KRIS_MVC_VERSION . '</li>' .
                 '<li class="debugList" id="config"><img title="View Configuration" src="' . $debugPrefix . 'plugin.png">Config</li>' .
                 '<li class="debugList" id="logs"><img title="View Logs" src="' . $debugPrefix . 'page_white_text.png">Logs</li>' .

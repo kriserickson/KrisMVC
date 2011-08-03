@@ -38,7 +38,7 @@ class {{ControllerName}}Controller extends DefaultController
     {
         $this->_request = $request;
 
-        $this->_view = new KrisView(KrisConfig::APP_PATH . 'views/layouts/{{ScaffoldMainLayout}}');
+        $this->_view = new {{ViewType}}(KrisConfig::APP_PATH . 'views/layouts/{{ScaffoldMainLayout}}');
         // Default the error to blank...
         $this->_view->set('error', '');
         $this->base_href = KrisConfig::WEB_FOLDER.'/scaffold/';
@@ -46,9 +46,10 @@ class {{ControllerName}}Controller extends DefaultController
         $tables = $this->GetTables();
         if (count($tables) == 0)
         {
-            $tables = array('' => 'Currently No Tables To Edit');
+            $tables = array('link' => '', 'name' => 'Currently No Tables To Edit');
         }
         $this->_view->set('tables', $tables);
+        $this->_view->set('web_folder', KrisConfig::WEB_FOLDER);
         $this->_view->set('table_width', (int)(100 / count($tables)));
         $this->_view->set('uses_auth', $this->_usesAuth);
         $this->_view->set('display_base_href', $this->base_href.'index/');
@@ -342,7 +343,7 @@ class {{ControllerName}}Controller extends DefaultController
 	            {
 	                // Convert the filename like SomeTableView.php into "Some Table"
 	                $tableName = substr($filename, 0, -4);
-	                $tables[$filename] = $tableName[0] . preg_replace('/[A-Z]/', ' $0', substr($tableName, 1));
+	                $tables[] = array('link' => $filename, 'name'  => $tableName[0] . preg_replace('/[A-Z]/', ' $0', substr($tableName, 1)));
 	            }
 	        }
 		}
@@ -374,14 +375,40 @@ class {{ControllerName}}Controller extends DefaultController
 
         $className = get_class($class);
 
+        $columns = array();
+        foreach ($fields as $columnId => $columnName)
+        {
+            $columns[] = array('column_id' => $columnId, 'column_name' => $columnName, 'sort' => $columnId == $sort ? ($ascending ?  'dec' : 'asc') : 'asc',
+                'sort_display' => $columnId == $sort ? ($ascending == 'asc' ? '&dArr;' : '&uArr;') : '',
+                'search_value' => isset($searchValues[$columnId]) ? $searchValues[$columnId] : '');
+        }
+
+        $models = array();
+        foreach ($class->retrieveMultiple($where, $bindings, true, $this->_pageSize, $page * $this->_pageSize, $sort, $ascending) as $row)
+        {
+            /** @var $row KrisCrudModel */
+            $model = array('primary_key' => $row->PrimaryKey(), 'column_values' => array());
+            foreach (array_keys($fields) as $columnName)
+            {
+                 $model['column_values'][] = array('column_value' => $row->GetDisplayValue($columnName));
+            }
+            $models[] = $model;
+        }
+
+        $pages = array();
+        for ($index = 0; $index < $numPages; $index++)
+        {
+            $pages[] = array('page' => $index, 'display_page' => $index + 1, 'page_selected' => $index == $page);
+        }
+
         // Set variables in the view...
-        $data = array('display_table' => true ,'display_name' => $class->DisplayName ,'columns' => $fields ,
+        $data = array('display_table' => true ,'display_name' => $class->DisplayName ,'columns' => $columns,
             'sorted' => array(),'number_of_pages' => $numPages ,'total_records' => $totalRecords,'current_page' => $page,
             'sort_ascending' => $ascending ,'search' => $search, 'display_href' => $this->base_href.'index/'.$className,
             'view_href' => $this->base_href.'view/'.$className, 'change_href' => $this->base_href.'change/'.$className,
-            'delete_href' => $this->base_href.'delete/'.$className, 'search_values' => $searchValues,
-            'sort_field' => $sort, 'sort_order' => $ascending ? 'asc' : 'dec',
-            'models'=> $class->retrieveMultiple($where, $bindings, true, $this->_pageSize, $page * $this->_pageSize, $sort, $ascending));
+            'delete_href' => $this->base_href.'delete/'.$className, 'display_page' => $page + 1,
+            'prev_page_disabled' => $page == 0, 'next_page_disabled' => $page >= ($numPages - 1), 'pages' => $pages,
+            'sort_order' => $ascending ? 'asc' : 'dec', 'web_folder' => KrisConfig::WEB_FOLDER, 'models'=> $models);
 
         return $this->_view->fetch(KrisConfig::APP_PATH . 'views/{{ViewLocation}}/{{IndexView}}', $data, false);
             

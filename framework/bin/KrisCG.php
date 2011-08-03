@@ -12,6 +12,7 @@ require dirname(__FILE__) . '/../lib/orm/KrisDB.php';
 require dirname(__FILE__) . '/../lib/debug/DebugPDO.php';
 require dirname(__FILE__) . '/../lib/helpers/FileHelpers.php';
 require dirname(__FILE__) . '/../lib/plumbing/AutoLoader.php';
+require dirname(__FILE__) . '/../lib/plumbing/BucketContainer.php';
 require dirname(__FILE__) . '/../lib/view/Mustache.php';
 require dirname(__FILE__) . '/Args.php';
 require dirname(__FILE__) . '/CodeGeneration.php';
@@ -58,18 +59,13 @@ class KrisCGCommandLineParser
                     {
                         $success = $this->CreateTable();
                     }
-                    else {
-                        if ($this->_args->Command() == 'create-site' || $this->_args->Command() == 'site')
-                        {
-                            $success = $this->CreateSite();
-                        }
-                        else
-                        {
-                            if ($this->_args->Command() == 'create-scaffold' || $this->_args->Command() == 'scaffold')
-                            {
-                                $success = $this->CreateScaffold();
-                            }
-                        }
+                    else  if ($this->_args->Command() == 'create-site' || $this->_args->Command() == 'site')
+                    {
+                        $success = $this->CreateSite();
+                    }
+                    else if ($this->_args->Command() == 'create-scaffold' || $this->_args->Command() == 'scaffold')
+                    {
+                        $success = $this->CreateScaffold();
                     }
                 }
                 catch (Exception $ex)
@@ -199,9 +195,9 @@ class KrisCGCommandLineParser
         $viewLocation = $this->_args->flag(array('o', 'view-location'), 'scaffold');
 
         // Currently on the KrisView PHP type is supported...
-        $viewType = $this->_args->flag(array('t', 'view-type'), 'KrisView');
+        $viewType = $this->_args->flag(array('t', 'view-type'), 'Mustache');
 
-        if (false) //$this->IsCli())
+        if ($this->IsCli())
         {
             if (strlen($this->_args->flag(array('l', 'scaffold-location'))) == 0)
             {
@@ -290,10 +286,10 @@ class KrisCGCommandLineParser
     {
         echo 'Usage KrisCG ' . PHP_EOL .
                 '   Commands:       Options ' . PHP_EOL . PHP_EOL .
-                '   createTable or table                Adds a model to the project of the table specified' . PHP_EOL .
+                '   create-table or table               Adds a model to the project of the table specified' . PHP_EOL .
                 '                   -t --table              The table to create ' . PHP_EOL . PHP_EOL .
-                '   createSite or site                  Creates a new site' . PHP_EOL .
-                '                   -s --site           The base url of the site.  For example if you site is http://localhost/test ' . PHP_EOL .
+                '   create-site or site                 Creates a new site' . PHP_EOL .
+                '                   -s --site               The base url of the site.  For example if you site is http://localhost/test ' . PHP_EOL .
                 '                   -n --no-database        If you do not want a database add this flag, otherwise an error will be generated' . PHP_EOL .
                 '                   -h --host               The database host (ip, name), or the file location for SQLite' . PHP_EOL .
                 '                   -d --database           The database name (not required for SQLite)' . PHP_EOL .
@@ -302,7 +298,7 @@ class KrisCGCommandLineParser
                 '                   -y --database-type      The database type (MYSQL, MSSQL, SQLITE, POSTGRESQL (default to MYSQL)' . PHP_EOL .
                 '                   -a --site-name          The name of the site' . PHP_EOL .
                 '                   -v --view-type          The view engine (Mustache or KrisView)' . PHP_EOL . PHP_EOL .
-                '  createScaffold scaffold              Create the crud scaffolding' . PHP_EOL .
+                '  create-scaffold scaffold             Create the crud scaffolding' . PHP_EOL .
                 '                   -l --scaffold-location  The in apps/controller of the scaffold (defaults to "scaffold")' . PHP_EOL .
                 '                   -n --scaffold-name      The name of the scaffold controller (defaults to "Scaffold")' . PHP_EOL .
                 '                   -s --scaffold-view      The main scaffold layout template (defaults to "scaffold.php")' . PHP_EOL .
@@ -311,7 +307,7 @@ class KrisCGCommandLineParser
                 '                   -v --view               The template for View (defaults to "ViewView.php")' . PHP_EOL .
                 '                   -e --edit               The template for Edit (defaults to "EditView.php")' . PHP_EOL .
                 '                   -i --index              The template for Index (defaults to "IndexView.php")' . PHP_EOL . PHP_EOL .
-                '   Options available for all commands:' . PHP_EOL .
+                '  Options available for all commands:' . PHP_EOL .
                 '                   -l --location       Location of the site' . PHP_EOL . PHP_EOL;
 
     }

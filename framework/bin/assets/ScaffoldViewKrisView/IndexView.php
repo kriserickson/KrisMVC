@@ -38,9 +38,10 @@
                 <?php endif; ?>
             </th>
 
-            <?php foreach ($columns as $columnId => $columnName): ?>
-            <th class="rowHeader"><a class="sortLink" href="<?= $display_href ?>/<?= $columnId ?>/<?=  $columnId == $sort_field ? ($sort_ascending ?  'dec' : 'asc') : 'asc' ?>">
-                <?= $columnName ?> <?= $columnId == $sort_field ? ($sort_order == 'asc' ? '&dArr;' : '&uArr;') : '' ?></a></th>
+            <?php foreach ($columns as $column): ?>
+            <th class="rowHeader"><a class="sortLink" href="<?= $display_href ?>/<?= $column['column_id'] ?>/<?= $column['sort'] ?>">
+                <?= $column['column_name'] ?> <?= $column['sort_display'] ?></a>
+            </th>
             <?php endforeach; ?>
         </tr>
 
@@ -48,14 +49,12 @@
         <tr>
             <td class="filterColumn" colspan="1">
                 <input type="submit" id="query" name="query" value="Query"/></td>
-            <?php foreach (array_keys($columns) as $columnId): ?>
+            <?php foreach (array_keys($columns) as $column): ?>
             <td class="filterColumn">
-                <label for="search_<?= $columnId; ?>"></label>
-                <input class="searchInput" value="<?= isset($search_values[$columnId]) ? $search_values[$columnId] : '' ?>" type="text" id="search_<?= $columnId; ?>" name="search_<?= $columnId; ?>" size="12" maxlength="45" />
+                <label for="search_<?= $column['column_id']; ?>"></label>
+                <input class="searchInput" value="<?= $column['search_value'] ?>" type="text" id="search_<?= $column['column_id'] ?>" name="search_<?= $column['column_id'] ?>" size="12" maxlength="45" />
             </td>
             <?php endforeach; ?>
-
-
         </tr>
         <?php endif; ?>
 
@@ -63,15 +62,15 @@
         <tr class="displayRowEven">
             <td class="crudButtonsEven">
                 <a href="<?= $view_href ?>/<?= $model->PrimaryKey() ?>"><img
-                        src="<?= KrisConfig::WEB_FOLDER ?>/images/scaffold/view_button.png"
+                        src="<?= $web_folder ?>/images/scaffold/view_button.png"
                         height="16" width="16" border="0" alt="View"
                         title="View"/></a>&nbsp;
                 <a href="<?= $change_href ?>/<?= $model->PrimaryKey() ?>"><img
-                        src="<?= KrisConfig::WEB_FOLDER ?>/images/scaffold/change_button.png"
+                        src="<?= $web_folder ?>/images/scaffold/change_button.png"
                         height="16" width="16" border="0" alt="Change"
                         title="Change"/></a>&nbsp;
                 <a href="<?= $delete_href ?>/<?= $model->PrimaryKey() ?>"><img
-                        src="<?= KrisConfig::WEB_FOLDER ?>/images/scaffold/delete_button.png"
+                        src="<?= $web_folder ?>/images/scaffold/delete_button.png"
                         height="16" width="16" border="0" alt="Delete"
                         title="Delete"/></a>
             </td>
