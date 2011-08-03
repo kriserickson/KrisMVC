@@ -14,8 +14,7 @@
             </th>
 
             {{#columns}}
-            <th class="rowHeader"><a class="sortLink" href="{{display_href}}/{{columnId}}/{{sort}}">
-                {{columnName}} {{sortDisplay}}</a>
+            <th class="rowHeader"><a class="sortLink" href="{{display_href}}/{{column_id}}/{{sort}}">{{column_name}} {{{sort_display}}}</a>
             </th>
             {{/columns}}
         </tr>
@@ -24,12 +23,12 @@
         <tr>
             <td class="filterColumn" colspan="1">
                 <input type="submit" id="query" name="query" value="Query"/></td>
-            {{#column_ids}}
+            {{#columns}}
             <td class="filterColumn">
                 <label for="search_{{column_id}}"></label>
                 <input class="searchInput" value="{{search_value}}" type="text" id="search_{{column_id}}" name="search_{{column_id}}" size="12" maxlength="45" />
             </td>
-            {{/column_ids}}
+            {{/columns}}
 
 
         </tr>
@@ -52,20 +51,20 @@
     <table summary="navigation" class="navigationTable">
         <tr class="navigationRole">
             <td class="navigationButtons">
-                <input type="submit" name="first_page" value="<<"{{prev_page_disabled}}/>
-                <input type="submit" name="prev_page" value="<"{{prev_page_disabled}}/>
+                <input type="submit" name="first_page" value="<<"{{#prev_page_disabled}} disabled="disabled"{{/prev_page_disabled}}/>
+                <input type="submit" name="prev_page" value="<"{{#prev_page_disabled}} disabled="disabled"{{/prev_page_disabled}}/>
                 <input type="submit" name="add" value="Add"/>
-                <input type="submit" name="next_page" value=">"{{next_page_disabled}}/>
-                <input type="submit" name="last_page" value=">>"{{next_page_disabled}}/>
+                <input type="submit" name="next_page" value=">"{{#next_page_disabled}} disabled="disabled"{{/next_page_disabled}}/>
+                <input type="submit" name="last_page" value=">>"{{#next_page_disabled}} disabled="disabled"{{/next_page_disabled}}/>
                 <label for="goto">Go to</label>
                 <select name="goto" id="goto" onchange="return this.form.submit();">
-                    {{pages}}
-                    <option value="{{page}}"{{page_selected}}>>{{page}}</option>
+                    {{#pages}}
+                    <option value="{{page}}"{{#page_selected}}selected="selected"{{/page_selected}}>{{display_page}}</option>
                     {{/pages}}
                 </select>
             </td>
             <td class="pageStatus">
-                Page:&nbsp;{{current_page}}&nbsp;of&nbsp;{{number_of_pages}}&nbsp;
+                Page:&nbsp;{{display_page}}&nbsp;of&nbsp;{{number_of_pages}}&nbsp;
                 Records:&nbsp;{{total_records}}
             </td>
         </tr>

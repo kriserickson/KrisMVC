@@ -13,10 +13,11 @@
 <table width="100%">
     <tr>
         {{#tables}}
-        <td width="{{table_width}}>%"><a href="{{display_base_href}}{{link}}">{{name}}></a></td>
+        <td width="{{table_width}}>%"><a href="{{display_base_href}}{{link}}">{{name}}</a></td>
         {{/tables}}
     </tr>
 </table>
+
 
 <h3>{{display_name}}</h3>
 
