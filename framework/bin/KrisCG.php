@@ -154,7 +154,14 @@ class KrisCGCommandLineParser
 
         }
 
-        $this->_cg->CreateSite($site, $host, $database, $user, $password, $databaseType, $viewType, $siteName);
+        try
+        {
+            $this->_cg->CreateSite($site, $host, $database, $user, $password, $databaseType, $viewType, $siteName);
+        }
+        catch (Exception $ex)
+        {
+            echo 'Error Creating Site: '.$ex->getMessage();
+        }
         return true;
     }
 
@@ -181,7 +188,14 @@ class KrisCGCommandLineParser
         }
 
         $this->_cg->IncludeConfigFile();
-        $this->_cg->GenerateModel($table);
+        try
+        {
+            $this->_cg->GenerateModel($table);
+        }
+        catch (Exception $ex)
+        {
+            echo 'Error Creating Table: '.$ex->getMessage();
+        }
         return true;
     }
 
@@ -205,20 +219,28 @@ class KrisCGCommandLineParser
             }
             if (strlen($this->_args->flag(array('n', 'scaffold-name'))) == 0)
             {
-                $controllerLocation = $this->GetInput('Controller Class Name', $controllerName);
+                $controllerName = $this->GetInput('Controller Class Name', $controllerName);
             }
             if (strlen($this->_args->flag(array('t', 'view-type'))) == 0)
             {
-                $controllerLocation = $this->GetInput('View Type', $viewType);
+                $viewType = $this->GetInput('View Type', $viewType);
             }
             if (strlen($this->_args->flag(array('o', 'view-location'))) == 0)
             {
-                $controllerLocation = $this->GetInput('Scaffold Layout Locations (in app/views)', $viewLocation);
+                $viewLocation = $this->GetInput('Scaffold Layout Locations (in app/views)', $viewLocation);
             }
         }
 
+
         $this->_cg->IncludeConfigFile();
-        $this->_cg->CreateScaffold($controllerLocation, $controllerName, $viewType, $viewLocation);
+        try
+        {
+            $this->_cg->CreateScaffold($controllerLocation, $controllerName, $viewType, $viewLocation);
+        }
+        catch (Exception $ex)
+        {
+            echo 'Error Creating Scaffold: '.$ex->getMessage();
+        }
         return true;
     }
 

@@ -213,7 +213,7 @@ class KrisCG extends KrisDB
 
         if (!$this->TableExists($tableName))
         {
-            throw new Exception('ERROR: Table '.$tableName.' does not exist');
+            throw new Exception('Table '.$tableName.' does not exist');
         }
 
         $columnNames = $this->GetColumnMetadata($tableName);
@@ -393,6 +393,7 @@ class KrisCG extends KrisDB
         {
             throw new InvalidArgumentException('View type: '.$viewType.' is not supported');
         }
+
 
         $templateDir = $this->BuildPath($assetDir, $viewFolder);
 
