@@ -12,7 +12,7 @@ class MainController extends DefaultController
      * @param $request
      * @return \MainController
      */
-    function __construct()
+    function __construct($request)
     {
         $this->_view = new {{template_type}}(KrisConfig::APP_PATH . 'views/layouts/{{layout_template}}');
         $this->_auth = Auth::instance();

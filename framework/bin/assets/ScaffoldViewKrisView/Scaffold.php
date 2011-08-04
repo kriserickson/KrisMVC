@@ -25,8 +25,8 @@
 
 <table width="100%">
     <tr>
-        <?php foreach ($tables as $link => $name): ?>
-        <td width="<?= $table_width ?>%"><a href="<?= $display_base_href.$link ?>"><?= $name ?></a></td>
+        <?php foreach ($tables as $table): ?>
+        <td width="<?= $table_width ?>%"><a href="<?= $display_base_href.$table['link'] ?>"><?= $table['name'] ?></a></td>
         <?php endforeach; ?>
     </tr>
 </table>

@@ -18,6 +18,7 @@
 /** @var $search_values array */
 /** @var $sort_field string */
 /** @var $sort_order string */
+/** @var $web_folder string */
 
 // Types used in the view...
 /** @var $model KrisCrudModel */
@@ -61,21 +62,12 @@
         <?php foreach ($models as $model): ?>
         <tr class="displayRowEven">
             <td class="crudButtonsEven">
-                <a href="<?= $view_href ?>/<?= $model->PrimaryKey() ?>"><img
-                        src="<?= $web_folder ?>/images/scaffold/view_button.png"
-                        height="16" width="16" border="0" alt="View"
-                        title="View"/></a>&nbsp;
-                <a href="<?= $change_href ?>/<?= $model->PrimaryKey() ?>"><img
-                        src="<?= $web_folder ?>/images/scaffold/change_button.png"
-                        height="16" width="16" border="0" alt="Change"
-                        title="Change"/></a>&nbsp;
-                <a href="<?= $delete_href ?>/<?= $model->PrimaryKey() ?>"><img
-                        src="<?= $web_folder ?>/images/scaffold/delete_button.png"
-                        height="16" width="16" border="0" alt="Delete"
-                        title="Delete"/></a>
+                <a href="<?= $view_href ?>/<?= $model['primary_key'] ?>"><img src="<?= $web_folder ?>/images/scaffold/view_button.png" height="16" width="16" border="0" alt="View" title="View"/></a>&nbsp;
+                <a href="<?= $change_href ?>/<?= $model['primary_key'] ?>"><img src="<?= $web_folder ?>/images/scaffold/change_button.png" height="16" width="16" border="0" alt="Change" title="Change"/></a>&nbsp;
+                <a href="<?= $delete_href ?>/<?= $model['primary_key'] ?>"><img src="<?= $web_folder ?>/images/scaffold/delete_button.png" height="16" width="16" border="0" alt="Delete" title="Delete"/></a>
             </td>
-            <?php foreach (array_keys($columns) as $columnName): ?>
-            <td class="displayCellEven"><?= $model->GetDisplayValue($columnName); ?></td>
+            <?php foreach ($model['column_values'] as $column): ?>
+            <td class="displayCellEven"><?= $column['column_value']; ?></td>
             <?php endforeach; ?>
         </tr>
         <?php endforeach; ?>

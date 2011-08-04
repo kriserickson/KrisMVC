@@ -408,7 +408,7 @@ class {{ControllerName}}Controller extends DefaultController
             'view_href' => $this->base_href.'view/'.$className, 'change_href' => $this->base_href.'change/'.$className,
             'delete_href' => $this->base_href.'delete/'.$className, 'display_page' => $page + 1,
             'prev_page_disabled' => $page == 0, 'next_page_disabled' => $page >= ($numPages - 1), 'pages' => $pages,
-            'sort_order' => $ascending ? 'asc' : 'dec', 'web_folder' => KrisConfig::WEB_FOLDER, 'models'=> $models);
+            'sort_field' => $sort, 'sort_order' => $ascending ? 'asc' : 'dec', 'web_folder' => KrisConfig::WEB_FOLDER, 'models'=> $models);
 
         return $this->_view->fetch(KrisConfig::APP_PATH . 'views/{{ViewLocation}}/{{IndexView}}', $data, false);
             
