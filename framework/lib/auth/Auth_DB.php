@@ -35,46 +35,71 @@ class Auth_DB extends Auth
      * @param string $password
      * @return bool
      */
-    public function Login($loginName, $password)
+    public function LoginWithEmail($email, $password)
     {
-        $ret = $this->_db->Retrieve('LoginName', $loginName);
+        $ret = $this->_db->Retrieve('Email', $email);
         if ($ret)
         {
-            // One hour
-            if (time() - strtotime($ret->Get('LastLogin')) > 3600)
-            {
-                $ret->Set('FailedLoginCount', 0);
-            }
-
-            if ($ret->Get('FailedLoginCount') > 5)
-            {
-                $this->_error = self::ERROR_TOO_MANY_INVALID_LOGINS;
-            }
-            else
-            {
-                $passwordHash = new PasswordHash(8, true);
-                if ($passwordHash->CheckPassword($password, $ret->Get('PasswordHash')))
-                {
-                    $this->_user = new User($ret->Get('UserId'), $ret->Get('DisplayName'), $ret->Get('Email'), $ret->Get('Data'), $ret->Get('Acl'));
-                    $ret->Set('FailedLoginCount', 0);
-                    $ret->Set('Ip', $_SERVER['REMOTE_ADDR']);
-                    $ret->Update();
-                    $this->LoginUserToSession();
-                    return true;
-                }
-                else
-                {
-                    $this->_error = self::ERROR_INVALID_PASSWORD;
-                    $ret->Set('FailedLoginCount', $ret->Get('FailedLoginCount') + 1);
-                    $ret->Set('Ip', $_SERVER['REMOTE_ADDR']);
-                }
-            }
+            return $this->LoginWithRecord($ret, $password);
         }
         else
         {
             $this->_error = self::ERROR_INVALID_LOGIN;
         }
 
+        return false;
+    }
+
+    /**
+     * @param string $loginName
+     * @param string $password
+     * @return bool
+     */
+    public function Login($loginName, $password)
+    {
+        $ret = $this->_db->Retrieve('LoginName', $loginName);
+        if ($ret)
+        {
+            return $this->LoginWithRecord($ret, $password);
+        }
+        else
+        {
+            $this->_error = self::ERROR_INVALID_LOGIN;
+        }
+
+        return false;
+    }
+
+    public function LoginWithRecord($ret, $password)
+    { // One hour
+        if (time() - strtotime($ret->Get('LastLogin')) > 3600)
+        {
+            $ret->Set('FailedLoginCount', 0);
+        }
+
+        if ($ret->Get('FailedLoginCount') > 5)
+        {
+            $this->_error = self::ERROR_TOO_MANY_INVALID_LOGINS;
+        }
+        else
+        {
+            $passwordHash = new PasswordHash(8, true);
+            if ($passwordHash->CheckPassword($password, $ret->Get('PasswordHash')))
+            {
+                $this->_user = new User($ret->Get('UserId'), $ret->Get('DisplayName'), $ret->Get('Email'), $ret->Get('Data'), $ret->Get('Acl'));
+                $ret->Set('FailedLoginCount', 0);
+                $ret->Set('Ip', $_SERVER['REMOTE_ADDR']);
+                $ret->Update();
+                $this->LoginUserToSession();
+                return true;
+            }
+            else
+            {
+                $this->_error = self::ERROR_INVALID_PASSWORD;
+                $ret->Set('FailedLoginCount', $ret->Get('FailedLoginCount') + 1);
+                $ret->Set('Ip', $_SERVER['REMOTE_ADDR']);
+            }
+        }
         return false;
     }
 

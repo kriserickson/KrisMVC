@@ -50,6 +50,11 @@ class KrisCrudModel extends KrisModel
     protected $_javascriptEditLibraries = array();
 
     /**
+     * @var array - Add any javascript libraries to this array in the derived class...
+     */
+    protected $_cssEditStyles = array();
+
+    /**
      *
      * @var array - Any data associated with a field, for example images have their upload directory here...
      */
@@ -283,6 +288,10 @@ class KrisCrudModel extends KrisModel
             {
                 $value = isset($this->_fieldData[$fixedKey][$value]) ? $this->_fieldData[$fixedKey][$value] : '';
             }
+            else if ($this->_fieldTypes[$fixedKey] == 'date')
+            {
+                $value = date('Y-m-d', strtotime($value));
+            }
         }
         return $value;
     }
@@ -320,7 +329,9 @@ class KrisCrudModel extends KrisModel
                     $this->AddJavascript('Edit', 'Image', $key);
                     return HtmlHelpers::CreateImage('img'.$key, $value, $this->GetFieldData($fixedKey, 'directory'), $this->GetClass('Edit', 'Image')).
                         HtmlHelpers::CreateFileInput($key, $key, $this->GetClass('Edit', 'FileInput'), $this->GetFieldData($fixedKey, 'max_size', 1000000));
-
+                case 'date':
+                    $this->AddJavascript('Edit', 'Date', $key);
+                    return HtmlHelpers::CreateInput($key, date('Y-m-d', strtotime($value)), '', $this->GetClass('Edit', 'Date'), $this->_fieldTypes[$fixedKey]);
                 // TODO: upload, datetime, integer, etc...
                 default:
                     $this->AddJavascript('Edit', 'Input', $key);
@@ -352,16 +363,22 @@ class KrisCrudModel extends KrisModel
     public function GetJavascript($view)
     {
         $libraries = array();
+        $styles = array();
         
         if ($view == 'edit')
         {
             $libraries = $this->_javascriptEditLibraries;
+            $styles = $this->_cssEditStyles;
         }
 
         $js = '';
         foreach ($libraries as $library)
         {
             $js .= '<script type="text/javascript" src="'.$library.'"></script>'.PHP_EOL;
+        }
+        foreach ($styles as $style)
+        {
+            $js .= '<link href="'.$style.'" rel="stylesheet" type="text/css"/>';
         }
 
         $js_script = array_filter($this->_javascript);
@@ -511,7 +528,7 @@ class KrisCrudModel extends KrisModel
         $property = ucfirst($action) . ucfirst($type) . 'Class';
         if (property_exists($this, $property))
         {
-            return $this[$property];
+            return $this->$property;
         }
         else
         {

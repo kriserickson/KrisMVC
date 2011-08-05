@@ -93,6 +93,17 @@ class Auth
     }
 
     /**
+     * @throws Exception
+     * @param $email
+     * @param $password
+     * @return void
+     */
+    public function LoginWithEmail($email, $password)
+    {
+        throw new Exception('LoginWithEmail not implemented in '.get_class($this));
+    }
+
+    /**
      * @param string $loginName
      * @param string $password
      * @return bool

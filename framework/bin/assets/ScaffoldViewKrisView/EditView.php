@@ -10,7 +10,7 @@
 /** @var $enctype string */
 /** @var $show_apply bool */
 ?>
-<link href="<?= KrisConfig::WEB_FOLDER ?>/css/jquery.wysiwyg.css" rel="stylesheet" type="text/css" />
+<link href="<?= $web_folder ?>/css/jquery.wysiwyg.css" rel="stylesheet" type="text/css" />
 
 <form id="displayForm" method="post" action="<?= $change_href ?>" enctype="<?= $enctype ?>">
 

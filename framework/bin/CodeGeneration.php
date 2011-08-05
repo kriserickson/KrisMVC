@@ -155,11 +155,11 @@ class KrisCG extends KrisDB
         copy(__DIR__.'/assets/index.php', $this->_siteLocation.'/index.php');
 
         $mainControllerContents = $m->render(file_get_contents(__DIR__.'/assets/CodeTemplates/MainController.template'),
-            array('layout_template' => 'layout.'.$templateExtension, 'main_template' => 'MainView.'.$templateExtension,
+            array('layout_template' => 'Layout.'.$templateExtension, 'main_template' => 'MainView.'.$templateExtension,
                 'sitename' => $siteName, 'template_type' => $templateType));
         file_put_contents($this->_applicationDirectory.'/controllers/main/MainController.php', $mainControllerContents);
 
-        copy(__DIR__.'/assets/DefaultView'.$templateType.'/layout.'.$templateExtension, $this->_applicationDirectory.'/views/layouts/layout.'.$templateExtension);
+        copy(__DIR__.'/assets/DefaultView'.$templateType.'/Layout.'.$templateExtension, $this->_applicationDirectory.'/views/layouts/Layout.'.$templateExtension);
         copy(__DIR__.'/assets/DefaultView'.$templateType.'/MainView.'.$templateExtension, $this->_applicationDirectory.'/views/main/MainView.'.$templateExtension);
         copy(__DIR__.'/assets/css/style.css', $this->_siteLocation.'/css/style.css');
 

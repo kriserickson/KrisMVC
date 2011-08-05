@@ -42,7 +42,7 @@ AutoLoader::AddClass('NumberHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/Nu
 
 // Alternate Views
 AutoLoader::AddClass('MustacheView', KrisConfig::FRAMEWORK_DIR.'/lib/view/MustacheView.php', true);
-
+AutoLoader::AddClass('Log', KrisConfig::FRAMEWORK_DIR.'/lib/log/Log.php', true);
 
 //===============================================
 // Debug
@@ -54,7 +54,6 @@ if (KrisConfig::DEBUG)
     error_reporting(E_ALL);
     AutoLoader::AddClass('DebugController', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugController.php', true);
     AutoLoader::AddClass('DebugPDO', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugPDO.php', true);
-    AutoLoader::AddClass('Log', KrisConfig::FRAMEWORK_DIR.'/lib/log/Log.php', true);
     AutoLoader::AddClass('DebugLog', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugLog.php', true);
 
     $classes = array('Controller' => 'DebugController', 'Log' => 'DebugLog');
@@ -64,7 +63,7 @@ else
 {
     ini_set('display_errors', 'Off');
     error_reporting(E_ERROR);
-    $classes = array('Log' => 'KrisLog');
+    $classes = array('Controller' => 'KrisController', 'Log' => 'KrisLog');
     $databaseClass = 'PDO';
 }
 

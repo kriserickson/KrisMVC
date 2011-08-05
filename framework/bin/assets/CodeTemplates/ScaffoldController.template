@@ -249,7 +249,7 @@ class {{ControllerName}}Controller extends DefaultController
         // The enctype is the form type, if it is an upload it has to be multipart/form-data, otherwise it should be application/x-www-form-urlencoded
         $data = array('display_name' => 'Edit '.$class->DisplayName, 'fields' => $class->GetDisplayAndDatabaseFields(), 'class' => $class,
             'display_href' => $this->base_href.'index/'.$className, 'change_href' => $this->base_href.'change/'.$className.'/'.$id,
-            'enctype' => $this->GetEncType($class), 'show_apply' => true);
+            'enctype' => $this->GetEncType($class), 'show_apply' => true, 'web_folder' => KrisConfig::WEB_FOLDER);
 
         $this->_view->set('error', $this->GetHtmlError());
         $this->_view->set('display_name', 'Edit '.$class->DisplayName);
@@ -537,16 +537,15 @@ class {{ControllerName}}Controller extends DefaultController
                         {
                             case UPLOAD_ERR_CANT_WRITE : $this->AddError('Upload error: Can\t write the temporary file to disk.');
                                 break;
-                            case UPLOAD_ERR_FORM_SIZE : $this->AddError('Upload error: Uploaded file is larger than '.NumberHelpers::BytesToHuman($this->_request->PostVar('MAX_FILE_SIZE')).
+                            case UPLOAD_ERR_FORM_SIZE : $this->AddError('Upload error: Uploaded file is larger than form size: '.NumberHelpers::BytesToHuman($this->_request->PostVar('MAX_FILE_SIZE')).
                                     ' please upload a smaller file');
                                 break;
-                            case UPLOAD_ERR_INI_SIZE : $this->AddError('Upload error:  Uploaded file is larger than '.NumberHelpers::BytesToHuman(ini_get('upload_max_filesize')).
-                                    ' please upload a smaller file');
+                            case UPLOAD_ERR_INI_SIZE : $this->AddError('Upload error:  Uploaded file is larger than max php ini size '.ini_get('upload_max_filesize').' please upload a smaller file');
                                 break;
                             case UPLOAD_ERR_NO_FILE :
                                 // No uploaded file is not an error...
                                 break;
-                            case UPLOAD_ERR_NO_TMP_DIR : $this->AddError('Upload error: The temp directory is not or is incorrectly set/');
+                            case UPLOAD_ERR_NO_TMP_DIR : $this->AddError('Upload error: The temp directory is not or is incorrectly set.');
                                 break;
                             case UPLOAD_ERR_PARTIAL : $this->AddError('Upload error: The file was only partially uploaded.');
                                 break;

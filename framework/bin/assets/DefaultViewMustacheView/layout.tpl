@@ -7,7 +7,7 @@
 </head>
 <body>
 
-    <div class="mainBody">
+    <div class="heyMaItWorks">
         {{{body}}}
     </div>
 
