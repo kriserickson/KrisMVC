@@ -31,6 +31,7 @@ AutoLoader::AddClass('KrisLog', KrisConfig::FRAMEWORK_DIR.'/lib/log/Log.php', tr
 // Authentication
 AutoLoader::AddClass('Auth', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Auth.php', true);
 AutoLoader::AddClass('Auth_DB', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Auth_DB.php', true);
+AutoLoader::AddClass('PasswordCheck', KrisConfig::FRAMEWORK_DIR.'/lib/auth/PasswordCheck.php', true);
 AutoLoader::AddClass('PasswordHash', KrisConfig::FRAMEWORK_DIR.'/lib/auth/PasswordHash.php', true);
 AutoLoader::AddClass('Session', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Session.php', true);
 AutoLoader::AddClass('User', KrisConfig::FRAMEWORK_DIR.'/lib/auth/User.php', true);
@@ -44,6 +45,7 @@ AutoLoader::AddClass('NumberHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/Nu
 AutoLoader::AddClass('MustacheView', KrisConfig::FRAMEWORK_DIR.'/lib/view/MustacheView.php', true);
 AutoLoader::AddClass('Log', KrisConfig::FRAMEWORK_DIR.'/lib/log/Log.php', true);
 
+
 //===============================================
 // Debug
 //===============================================
@@ -56,12 +58,13 @@ if (KrisConfig::DEBUG)
     AutoLoader::AddClass('DebugPDO', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugPDO.php', true);
     AutoLoader::AddClass('DebugLog', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugLog.php', true);
 
+
     $classes = array('Controller' => 'DebugController', 'Log' => 'DebugLog');
     $databaseClass = 'DebugPDO';
 }
 else
 {
-    ini_set('display_errors', 'Off');
+    ini_set('display_errors', 'On');
     error_reporting(E_ERROR);
     $classes = array('Controller' => 'KrisController', 'Log' => 'KrisLog');
     $databaseClass = 'PDO';
@@ -69,7 +72,8 @@ else
 
 // Eventually this will improve with 5.3 and better lambda functions and closures...
 $factory = array('PDO' => create_function('$container', '$dsn = "mysql:host=".KrisConfig::DB_HOST.";dbname=".KrisConfig::DB_DATABASE;'.PHP_EOL.
-    'return new '.$databaseClass.'($dsn, KrisConfig::DB_USER, KrisConfig::DB_PASSWORD);'));
+    'return new '.$databaseClass.'($dsn, KrisConfig::DB_USER, KrisConfig::DB_PASSWORD);'),
+    'PasswordCheck' => create_function('', 'return new PasswordHash(8,true);'));
 
 AutoLoader::$Container = new BucketContainer($factory);
 foreach ($classes as $interface => $useClass)

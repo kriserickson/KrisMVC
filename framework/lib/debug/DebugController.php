@@ -31,10 +31,18 @@ class DebugController extends KrisController
 
             $startTime = microtime(true);
             ob_start();
-            $this->ParseRequest($route->Controller, $route->Action, $route->Params);
+            try
+            {
+                $this->ParseRequest($route->Controller, $route->Action, $route->Params);
+            }
+            catch (Exception $ex)
+            {
+                $log->Error('Uncaught exception: '.$ex->Message);
+            }
             $endTime = microtime(true);
             $content = ob_get_clean();
             $elapsedTime = ($endTime - $startTime) * 1000;
+
 
             echo str_replace('</body>', $this->GetWebBar($elapsedTime, $log) . '</body>', $content);
         }

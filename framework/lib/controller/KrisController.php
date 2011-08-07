@@ -149,7 +149,7 @@ class KrisController implements Controller
             else
             {
                 /** @noinspection PhpIncludeInspection */
-                require($controllerFile);
+                require_once($controllerFile);
 
                 if (!class_exists($controllerClass))
                 {

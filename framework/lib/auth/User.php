@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of the KrisMvc framework.
  *
  * (c) Kris Erickson 
@@ -34,6 +34,17 @@ class User
      */
     private $_acl;
 
+    /**
+     * @var boolean
+     */
+    protected $_dataChanged;
+
+    /**
+     * @var bool
+     */
+    protected $_aclChanged;
+
+
 
     /**
      * @param int $userId
@@ -41,6 +52,7 @@ class User
      * @param string $email
      * @param string $data
      * @param int $acl
+     * @param \Auth $auth
      * @return \User
      *
      */
@@ -51,6 +63,22 @@ class User
         $this->_email = $email;
         $this->_data = unserialize($data);
         $this->_acl = $acl;
+    }
+
+
+    /**
+     * Save UserData and Acl's if they are changed...
+     */
+    public function __destruct()
+    {
+        if ($this->_dataChanged)
+        {
+            Auth::instance()->SaveData();
+        }
+        if ($this->_aclChanged)
+        {
+            Auth::instance()->SaveAcl();
+        }
     }
 
     /**
@@ -78,11 +106,33 @@ class User
     }
 
     /**
+     * @throws Exception
+     * @param $name
+     * @param $value
+     * @return void
+     */
+    public function SetUserData($name, $value)
+    {
+        $this->_data[$name] = $value;
+        $this->_dataChanged = true;
+    }
+
+    /**
+     * @param string $name
+     * @return void
+     */
+    public function UnsetUserData($name)
+    {
+        unset($this->_data[$name]);
+        $this->_dataChanged = true;
+    }
+
+    /**
      * @param string $name
      * @param mixed $default
      * @return mixed
      */
-    public function GetUserData($name, $default)
+    public function GetUserData($name, $default = false)
     {
         if (isset($this->_data[$name]))
         {
@@ -92,24 +142,34 @@ class User
     }
 
     /**
-     * @param $name
-     * @param $value
+     * @param int $acl
      * @return void
      */
-    public function SetUserData($name, $value)
+    public function SetAcl($acl)
     {
-        $this->_data[$name] = $value;
-        Auth::instance()->SaveUserData($this->_userId, serialize($this->_data));
+        $this->_acl |= $acl;
+        $this->_aclChanged = true;
     }
 
     /**
      * @param int $acl
-     * @return bool
+     * @return void
+     */
+    public function RemoveAcl($acl)
+    {
+        $this->_acl | $acl;
+        $this->_aclChanged = true;
+    }
+
+    /**
+     * @param int $acl ACL_ type
+     * @return int
      */
     public function HasAcl($acl)
     {
-        return $acl & $this->_acl;
+        return $this->_acl & $acl;
     }
+
 
     /**
      * @param int $acl
@@ -118,6 +178,24 @@ class User
     public function HasAclOrGreater($acl)
     {
         return $this->_acl >= $acl;
+    }
+
+    /**
+     * @access internal
+     * @return int
+     */
+    public function GetAcl()
+    {
+        return $this->_acl;
+    }
+
+    /**
+     * @access internal
+     * @return array
+     */
+    public function GetData()
+    {
+        return $this->_data;
     }
 
 

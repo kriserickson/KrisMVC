@@ -14,12 +14,21 @@
  * @throws Exception
  *
  */
-class Auth
+abstract class Auth
 {
     // Possible auth errors
     const ERROR_INVALID_LOGIN = 1;
     const ERROR_INVALID_PASSWORD = 2;
     const ERROR_TOO_MANY_INVALID_LOGINS = 3;
+    const ERROR_PASSWORD_TOO_SHORT = 4;
+    const ERROR_PASSWORD_MUST_INCLUDE_ONE_NUMBER = 5;
+    const ERROR_PASSWORD_MUST_INCLUDE_ONE_LETTER = 6;
+    const ERROR_PASSWORD_MUST_INCLUDE_ONE_CAPITAL_LETTER = 7;
+    const ERROR_PASSWORD_MUST_INCLUDE_ONE_SYMBOL = 8;
+    const ERROR_EMAIL_ALREADY_EXISTS = 9;
+    const ERROR_LOGIN_NAME_ALREADY_EXISTS = 10;
+    const ERROR_INVALID_EMAIL = 11;
+    const ERROR_CONFIRM_PASSWORD_DOES_NOT_MATCH_PASSWORD = 12;
 
     // ACLs
     const ACL_NONE = 0;
@@ -30,6 +39,10 @@ class Auth
     const ACL_ADMIN = 16;
     const ACL_ROOT = 32;
     const ACL_DEVELOPER = 64;
+
+    // Search Types for find users...
+    const SEARCH_TYPE_USERNAME = 0;
+    const SEARCH_TYPE_EMAIL = 1;
 
     /**
      * See above constants for errors...
@@ -52,8 +65,12 @@ class Auth
     /**
      * @var \Session
      */
-    protected  $_session;
+    protected $_session;
 
+
+    /**
+     * Load the user...
+     */
     protected function __construct()
     {
         $this->_session = Session::instance();
@@ -62,6 +79,7 @@ class Auth
             $this->_user = $this->_session->Get('user');
         }
     }
+
 
 
     /**
@@ -92,47 +110,7 @@ class Auth
         return !is_null($this->_user);
     }
 
-    /**
-     * @throws Exception
-     * @param $email
-     * @param $password
-     * @return void
-     */
-    public function LoginWithEmail($email, $password)
-    {
-        throw new Exception('LoginWithEmail not implemented in '.get_class($this));
-    }
 
-    /**
-     * @param string $loginName
-     * @param string $password
-     * @return bool
-     */
-    public function Login($loginName, $password)
-    {
-        throw new Exception('Login not implemented in '.get_class($this));
-    }
-
-    /**
-     * @throws Exception
-     * @return bool
-     */
-    public function Logout()
-    {
-        throw new Exception('Logout not implemented in '.get_class($this));
-    }
-
-    /**
-     * @param string $loginName
-     * @param string $password
-     * @param string $email
-     * @param string $displayName
-     * @return bool
-     */
-    public function AddUser($loginName, $password, $email, $displayName)
-    {
-        throw new Exception('AddUser not implemented in '.get_class($this));
-    }
 
     /**
      * @return User
@@ -142,8 +120,6 @@ class Auth
         return $this->_user;
     }
 
-
-
     /**
      * @return int
      */
@@ -152,21 +128,212 @@ class Auth
         return $this->_error;
     }
 
-    protected  function LoginUserToSession()
+
+
+    /**
+     * @return void
+     */
+    protected function LoginUserToSession()
     {
         $this->_session->Set('user', $this->_user);
     }
 
     /**
+     * @param string $loginName
+     * @param string $email
+     * @param string $password
+     * @param string $confirmPassword
+     * @param string $displayName
+     * @param bool $requireLoginName
+     * @return bool
+     */
+    public function AddUser($loginName, $email, $password, $confirmPassword, $displayName, $requireLoginName)
+    {
+        if ($requireLoginName && strlen($loginName) == 0)
+        {
+            $this->_error = Auth::ERROR_INVALID_LOGIN;
+            return false;
+        }
+        else if (strlen($email) == 0 || !$this->isValidEmail($email))
+        {
+            $this->_error = Auth::ERROR_INVALID_EMAIL;
+
+            return false;
+        }
+        else if (!$this->isValidPassword($password))
+        {
+            return false;
+        }
+        else if ($password != $confirmPassword)
+        {
+            $this->_error = Auth::ERROR_CONFIRM_PASSWORD_DOES_NOT_MATCH_PASSWORD;
+            return false;
+        }
+
+        return $this->AddUserRecord($loginName, $email, $password, $displayName, $requireLoginName);
+    }
+
+    /**
+     * @param string $email
+     * @return bool
+     */
+    private function isValidEmail($email)
+    {
+       $atIndex = strrpos($email, "@");
+
+       if (is_bool($atIndex) && !$atIndex)
+       {
+          return false;
+       }
+       else
+       {
+          $domain = substr($email, $atIndex+1);
+          $username = substr($email, 0, $atIndex);
+          $localLen = strlen($username);
+          $domainLen = strlen($domain);
+          if ($localLen < 1 || $localLen > 64 || $domainLen < 1 || $domainLen > 255 || $username[0] == '.' || $username[$localLen-1] == '.'
+              || preg_match('/\\.\\./', $username) || !preg_match('/^[A-Za-z0-9\\-\\.]+$/', $domain) || preg_match('/\\.\\./', $domain))
+          {
+             // Invalid email
+             return false;
+          }
+          else if (!preg_match('/^(\\\\.|[A-Za-z0-9!#%&`_=\\/$\'*+?^{}|~.-])+$/', str_replace("\\\\","",$username)))
+          {
+             // character not valid in local part unless local part is quoted
+             if (!preg_match('/^"(\\\\"|[^"])+"$/', str_replace("\\\\","",$username)))
+             {
+                return  false;
+             }
+          }
+          if (!(checkdnsrr($domain,"MX") || checkdnsrr($domain,"A")))
+          {
+             // domain not found in DNS
+             return false;
+          }
+       }
+
+       return true;
+    }
+
+    /**
+     * @param string $password
+     * @return bool
+     */
+    private function isValidPassword($password)
+    {
+        $error = 0;
+
+        if( strlen($password) < 8 ) {
+            $error = Auth::ERROR_PASSWORD_TOO_SHORT;
+        }
+        else if( !preg_match("#[0-9]+#", $password) ) {
+            $error = Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_NUMBER;
+        }
+        else if( !preg_match("#[a-z]+#", $password) ) {
+            $error =  Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_LETTER;
+
+        }
+        else if( !preg_match("#[A-Z]+#", $password) ) {
+            $error = Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_CAPITAL_LETTER;
+
+        }
+        else if( !preg_match("#\\W+#", $password) ) {
+            $error = Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_SYMBOL;
+        }
+
+
+        if ($error != 0)
+        {
+            $this->_error = $error;
+            return false;
+        }
+
+        return true;
+
+    }
+
+
+
+    /**
      * @throws Exception
-     * @param $user_id
-     * @param $data
+     * @param $email
+     * @param $password
      * @return void
      */
-    public function SaveUserData($user_id, $data)
-    {
-        throw new Exception('SaveUserData not implemented in '.get_class($this));
-    }
+    public abstract function LoginWithEmail($email, $password);
+
+    /**
+     * @param string $loginName
+     * @param string $password
+     * @return bool
+     */
+    public abstract function Login($loginName, $password);
+
+    /**
+     * @throws Exception
+     * @return bool
+     */
+    public abstract function Logout();
+
+
+    /**
+     * @param string $loginName
+     * @param string $email
+     * @param string $password
+     * @param string $displayName
+     * @param bool $requireLoginName
+     */
+    protected abstract function AddUserRecord($loginName, $email, $password, $displayName, $requireLoginName);
+
+    /**
+     * @abstract Saves the User Data
+     * @return void
+     */
+    public abstract function SaveData();
+
+    /**
+     * @abstract
+     * @param $password
+     * @return void
+     */
+    public abstract  function SetPassword($password);
+
+
+    /**
+     * @abstract
+     * @return void
+     */
+    public abstract function SaveAcl();
+
+
+    /**
+     * @abstract
+     * @param int $startPosition
+     * @param int $pageSize
+     * @param string $orderBy
+     * @return array
+     */
+    public abstract function GetUsers($startPosition, $pageSize, $orderBy = 'Email');
+
+    /**
+     * @abstract
+     * @param int $searchType
+     * @param string $search
+     * @param int $startPosition
+     * @param int $pageSize
+     * @param string $orderBy
+     * @return array
+     */
+    public abstract function SearchUsers($searchType, $search, $startPosition, $pageSize, $orderBy = 'Email');
+
+    /**
+     * @abstract
+     * @param $searchType
+     * @param $search
+     * @return void
+     */
+    public abstract function TotalUsers($searchType, $search);
+
 
 }
 

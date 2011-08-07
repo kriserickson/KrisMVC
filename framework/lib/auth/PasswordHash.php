@@ -28,7 +28,8 @@
 /**
  * PasswordHash
  */
-class PasswordHash {
+class PasswordHash implements PasswordCheck
+{
 	private $itoa64;
 	private $iteration_count_log2;
 	private $portable_hashes;
