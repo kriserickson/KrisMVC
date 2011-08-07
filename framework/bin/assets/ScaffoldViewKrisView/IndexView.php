@@ -19,6 +19,9 @@
 /** @var $sort_field string */
 /** @var $sort_order string */
 /** @var $web_folder string */
+/** @var $display_page int */
+/** @var $prev_page_disabled bool */
+/** @var $next_page_disabled bool */
 
 // Types used in the view...
 /** @var $model KrisCrudModel */
@@ -76,14 +79,11 @@
     <table summary="navigation" class="navigationTable">
         <tr class="navigationRole">
             <td class="navigationButtons">
-                <input type="submit" name="first_page" value="<<" <?= $current_page == 0 ? 'disabled="disabled"'
-                        : '' ?>/>
-                <input type="submit" name="prev_page" value="<" <?= $current_page == 0 ? 'disabled="disabled"' : '' ?>/>
+                <input type="submit" name="first_page" value="<<" <?= $prev_page_disabled ? 'disabled="disabled"' : '' ?>/>
+                <input type="submit" name="prev_page" value="<" <?= $prev_page_disabled ? 'disabled="disabled"' : '' ?>/>
                 <input type="submit" name="add" value="Add"/>
-                <input type="submit" name="next_page" value=">" <?= $current_page >= $number_of_pages - 1
-                        ? 'disabled="disabled"' : '' ?>/>
-                <input type="submit" name="last_page" value=">>"<?= $current_page >= $number_of_pages - 1
-                        ? 'disabled="disabled"' : '' ?>/>
+                <input type="submit" name="next_page" value=">" <?= $next_page_disabled ? 'disabled="disabled"' : '' ?>/>
+                <input type="submit" name="last_page" value=">>"<?= $next_page_disabled ? 'disabled="disabled"' : '' ?>/>
                 <label for="goto">Go to</label>
                 <select name="goto" id="goto" onchange="return this.form.submit();">
                     <?php for ($i = 0; $i < $number_of_pages; $i++): ?>
@@ -93,7 +93,7 @@
                 </select>
             </td>
             <td class="pageStatus">
-                Page:&nbsp;<?= $current_page + 1 ?>&nbsp;of&nbsp;<?= $number_of_pages ?>&nbsp;
+                Page:&nbsp;<?= $display_page ?>&nbsp;of&nbsp;<?= $number_of_pages ?>&nbsp;
                 Records:&nbsp;<?= $total_records ; ?>
             </td>
         </tr>
@@ -102,8 +102,7 @@
 
 
 
-<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>-->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 <script>
     $('.searchInput').keydown(function()
     {
