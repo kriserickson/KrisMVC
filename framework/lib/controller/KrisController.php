@@ -110,7 +110,7 @@ class KrisController implements Controller
     {
         $this->_request = new Request($controller, $action, $params);
 
-        if ($this->GetControllerRequest($controller, $action, $error, $controllerObj, $function))
+        if ($this->GetControllerRequest($controller, $this->_request->Action(), $error, $controllerObj, $function))
         {
             $res = call_user_func_array(array($controllerObj, $function), $this->_request->Params());
             if (!is_null($res) && get_class($res) == 'RouteRequest')

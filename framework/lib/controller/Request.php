@@ -57,18 +57,29 @@ class Request
     {
         $this->_action = $action;
         $this->_controller = $controller;
-        if (is_array($params) && isset($params[0]) && strpos($params[0], '?') !== false)
-        {
-            $paramAndQueryString = explode('?', $params[0], 2);
-            $params[0] = $paramAndQueryString[0];
-            self::$_get = $this->ParseStr($_SERVER['QUERY_STRING']);
-        }
         $this->_params = $params;
+
+        if (is_array($params) && count($params) > 0 && strpos($params[count($params) - 1], '?') !== false)
+        {
+            $this->_params[count($params) - 1] = $this->ParseQueryVariables($params[count($params) - 1]);
+        }
+        else if ((!is_array($params) || count($params) == 0) && strpos($action, '?') !== false)
+        {
+            $this->_action = $this->ParseQueryVariables($action);
+        }
 
         if (is_null(self::$_post))
         {
             self::$_post = $_POST;
         }
+    }
+
+    private function ParseQueryVariables($var)
+    {
+        self::$_get = $this->ParseStr($_SERVER['QUERY_STRING']);
+
+        $varAndQueryString = explode('?', $var, 2);
+        return $varAndQueryString[0];
     }
 
     public function Params()
