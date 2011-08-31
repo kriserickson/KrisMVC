@@ -93,6 +93,10 @@ function __autoload($className)
         {
             $path = 'crud/';
         }
+        if (strlen($path) > 0 && !file_exists(KrisConfig::APP_PATH . 'models/'. $path . $className . '.php'))
+        {
+            $path = '';
+        }
 
         /** @noinspection PhpIncludeInspection */
         require(KrisConfig::APP_PATH . 'models/'. $path . $className . '.php');

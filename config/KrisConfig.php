@@ -33,6 +33,10 @@ class KrisConfig
 
     public static $DATABASE_TYPE = KrisConfig::DB_TYPE_MYSQL;
 
+    public static $CACHE_TYPE = KrisConfig::CACHE_TYPE_DB;
+
+    public static $CACHE_DSN = 'database=test;host=localhost;user=root;password=myssirk34;table=cache';
+
     /**
      * Database quote style enumeration.
      */
@@ -48,6 +52,10 @@ class KrisConfig
     const AUTH_TYPE_LDAP = 'LDAP';
     const AUTH_TYPE_OPEN_AUTH = 'OpenAuth';
 
+    const CACHE_TYPE_DB = 'DB';
+    const CACHE_TYPE_FILE = 'File';
+    const CACHE_TYPE_APC = 'APC';
+    const CACHE_TYPE_MEMCACHE = 'Memcache';
 
     /**
      * @var null|string|array

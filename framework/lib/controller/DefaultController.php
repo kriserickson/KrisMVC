@@ -37,6 +37,12 @@ abstract class DefaultController
     abstract function Index();
 
 
+    /**
+     * @abstract
+     * @param $request Request
+     */
+    abstract function __construct($request);
+
         /**
      * Returns an html appropriate error string...
      *

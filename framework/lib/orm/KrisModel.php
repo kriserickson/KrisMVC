@@ -25,10 +25,18 @@ abstract class KrisModel extends KrisDB
      * @param string $primaryKeyName
      * @param string $tableName
      */
-    function __construct($primaryKeyName = '', $tableName = '')
+    function __construct($primaryKeyName, $tableName)
     {
         $this->_primaryKeyName = $primaryKeyName; //Name of auto-incremented Primary Key
         $this->_tableName = $tableName; //Corresponding table in database
+    }
+
+    /**
+     * @return string
+     */
+    public function TableName()
+    {
+        return $this->_tableName;
     }
 
     /**
@@ -77,21 +85,31 @@ abstract class KrisModel extends KrisDB
     }
 
     /**
+     * @param string $query
+     * @return void
+     */
+    public function Query($query)
+    {
+        $dbh = $this->getDatabaseHandle();
+        $dbh->query($query);
+    }
+
+    /**
      * Retrieves (hopefully) one record from the table based on the primary key...
      *
-     * @param $primaryKeyValue
+     * @param $primaryKeyOrFieldName
      * @param null|array $value
      * @return bool|KrisModel
      */
-    public function Retrieve($primaryKeyValue, $value = null)
+    public function Retrieve($primaryKeyOrFieldName, $value = null)
     {
         if (is_null($value))
         {
-            return $this->bindRecordSet($this->generateStatement(null, array($this->_primaryKeyName), array($primaryKeyValue), false)->fetch(PDO::FETCH_ASSOC), $this);
+            return $this->bindRecordSet($this->generateStatement(null, array($this->_primaryKeyName), array($primaryKeyOrFieldName), false)->fetch(PDO::FETCH_ASSOC), $this);
         }
         else
         {
-            return $this->bindRecordSet($this->generateStatement(null, array($primaryKeyValue), $value, false)->fetch(PDO::FETCH_ASSOC), $this);
+            return $this->bindRecordSet($this->generateStatement(null, array($primaryKeyOrFieldName), array($value), false)->fetch(PDO::FETCH_ASSOC), $this);
         }
     }
 

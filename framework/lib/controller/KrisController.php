@@ -64,6 +64,9 @@ class KrisController implements Controller
         $this->ParseRequest($route->Controller, $route->Action, $route->Params);
     }
 
+    /**
+     * @return mixed|string
+     */
     protected function GetRequestUri()
     {
         $requestUri = $_SERVER['REQUEST_URI'];
@@ -87,6 +90,11 @@ class KrisController implements Controller
         return $requestUri;
     }
 
+    /**
+     * @param $originalUrl string | route regex
+     * @param $reroutedUrl string - reroute address
+     * @return void
+     */
     public function ReRoute($originalUrl, $reroutedUrl)
     {
         $this->_reroute[$originalUrl] = $reroutedUrl;
@@ -104,7 +112,7 @@ class KrisController implements Controller
 
         if ($this->GetControllerRequest($controller, $action, $error, $controllerObj, $function))
         {
-            $res = call_user_func_array(array($controllerObj, $function), $params);
+            $res = call_user_func_array(array($controllerObj, $function), $this->_request->Params());
             if (!is_null($res) && get_class($res) == 'RouteRequest')
             {
                 /** @var $res RouteRequest */

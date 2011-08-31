@@ -41,10 +41,16 @@ class DebugController extends KrisController
             }
             $endTime = microtime(true);
             $content = ob_get_clean();
-            $elapsedTime = ($endTime - $startTime) * 1000;
 
-
-            echo str_replace('</body>', $this->GetWebBar($elapsedTime, $log) . '</body>', $content);
+            if ($this->_request->IsHtml)
+            {
+                $elapsedTime = ($endTime - $startTime) * 1000;
+                echo str_replace('</body>', $this->GetWebBar($elapsedTime, $log) . '</body>', $content);
+            }
+            else
+            {
+                echo $content;
+            }
         }
 
     }

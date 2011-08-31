@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of the KrisMvc framework.
  *
  * (c) Kris Erickson 
@@ -7,7 +7,6 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
-
 class Request
 {
     /**
@@ -26,9 +25,20 @@ class Request
     private $_params;
 
     /**
+     * @var bool
+     * 
+     */
+    public $IsHtml = true;
+
+    /**
      * @var array
      */
-    static $_post = null;
+    static $_post = array();
+
+    /**
+     * @var array
+     */
+    static $_get = array();
 
     const CONTENT_TYPE_XML = 'text/xml';
     const CONTENT_TYPE_CSS = 'text/css';
@@ -47,11 +57,39 @@ class Request
     {
         $this->_action = $action;
         $this->_controller = $controller;
+        if (is_array($params) && isset($params[0]) && strpos($params[0], '?') !== false)
+        {
+            $paramAndQueryString = explode('?', $params[0], 2);
+            $params[0] = $paramAndQueryString[0];
+            self::$_get = $this->ParseStr($_SERVER['QUERY_STRING']);
+        }
         $this->_params = $params;
+
         if (is_null(self::$_post))
         {
             self::$_post = $_POST;
         }
+    }
+
+    public function Params()
+    {
+        return $this->_params;
+    }
+
+    private function ParseStr($queryString)
+    {
+        $res = parse_str($queryString);
+        // parse_str is returning null...
+        if (is_null($res))
+        {
+            $res = array();
+            foreach(explode('&', $queryString) as $key=>$value)
+            {
+                $data = explode('=', $value);
+                $res[$data[0]] = urldecode($data[1]);
+            }
+        }
+        return $res;
     }
 
     /**
@@ -100,6 +138,29 @@ class Request
             return get_magic_quotes_gpc() ? stripslashes(self::$_post[$key]) : self::$_post[$key];
         }
         return $default;
+    }
+
+    /**
+     * @param $key
+     * @param string $default
+     * @return string
+     */
+    public function GetVar($key, $default = '')
+    {
+        if (isset(self::$_get[$key]))
+        {
+            return get_magic_quotes_gpc() ? stripslashes(self::$_get[$key]) : self::$_get[$key];
+        }
+        return $default;
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function HasGet($key)
+    {
+        return isset(self::$_get[$key]);
     }
 
 
@@ -249,6 +310,10 @@ class Request
      */
     public function SetContentType($mimeType)
     {
+        if ($mimeType != Request::CONTENT_TYPE_HTML)
+        {
+            $this->IsHtml = false;
+        }
         header('Content-type: ' . $mimeType);
     }
 

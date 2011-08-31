@@ -66,7 +66,7 @@ class KrisView
      */
     public function add($key, $var)
     {
-        $this->_vars[$key][] = $var;
+        $this->_vars[$key] = $var;
         return $this;
     }
 
