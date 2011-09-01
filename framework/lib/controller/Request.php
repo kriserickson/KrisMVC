@@ -33,7 +33,7 @@ class Request
     /**
      * @var array
      */
-    static $_post = array();
+    static $_post = null;
 
     /**
      * @var array
