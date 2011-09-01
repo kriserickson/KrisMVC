@@ -37,7 +37,7 @@ class DebugController extends KrisController
             }
             catch (Exception $ex)
             {
-                $log->Error('Uncaught exception: '.$ex->Message);
+                $log->Error('Uncaught exception: '.$ex->getMessage());
             }
             $endTime = microtime(true);
             $content = ob_get_clean();
@@ -45,7 +45,14 @@ class DebugController extends KrisController
             if ($this->_request->IsHtml)
             {
                 $elapsedTime = ($endTime - $startTime) * 1000;
-                echo str_replace('</body>', $this->GetWebBar($elapsedTime, $log) . '</body>', $content);
+                if (strpos($content, '</body>') !== false)
+                {
+                    echo str_replace('</body>', $this->GetWebBar($elapsedTime, $log) . '</body>', $content);
+                }
+                else
+                {
+                    echo $content.$this->GetWebBar($elapsedTime, $log);
+                }
             }
             else
             {
