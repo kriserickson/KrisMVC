@@ -20,11 +20,6 @@ class KrisCrudModel extends KrisModel
     protected $_foreignKeys = array();
 
     /**
-     * @var array - List of fields that aren't in the table, but displayed based on joins of foreign keys...  $FakeFieldName => $FieldId
-     */
-    protected $_fakeFields = array();
-
-    /**
      * @var array - FieldName -> Type (string, text, int, date, bool, image, upload, etc)
      */
     protected $_fieldTypes = array();
@@ -451,15 +446,6 @@ class KrisCrudModel extends KrisModel
         return parent::convertFieldToDisplayField($field);
     }
 
-
-    /**
-     * @param string $fieldName
-     * @return bool
-     */
-    protected function isFakeField($fieldName)
-    {
-        return is_array($this->_fakeFields) && isset($this->_fakeFields[$fieldName]);
-    }
 
     /**
      * @param string $fieldName

@@ -17,10 +17,25 @@
  */
 abstract class KrisDB
 {
+    /**
+     * @var PDO
+     */
     protected $_dbh = null;
+
+    /**
+     * @var array
+     */
     protected $_recordSet = array(); // for holding all object property variables
+
+    /**
+     * @var bool
+     */
     protected $_initializedRecordSet = false;
 
+    /**
+     * @var array - List of fields that aren't in the table, but displayed based on joins of foreign keys...  $FakeFieldName => $FieldId
+     */
+    protected $_fakeFields = array();
 
     /**
      * Used to get a field from the Model/DBView
@@ -111,6 +126,15 @@ abstract class KrisDB
             $this->_dbh = AutoLoader::$Container->get('PDO');
         }
         return $this->_dbh;
+    }
+
+    /**
+     * @param string $fieldName
+     * @return bool
+     */
+    protected function isFakeField($fieldName)
+    {
+        return is_array($this->_fakeFields) && isset($this->_fakeFields[$fieldName]);
     }
 
     /**

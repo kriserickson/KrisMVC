@@ -63,12 +63,15 @@ abstract class KrisModel extends KrisDB
 
         foreach ($this->_recordSet as $key => $value)
         {
-            $dbKey = $this->convertClassKeyToDBKey($key);
-            if ($dbKey != $this->_primaryKeyName || $value)
+            if (!$this->isFakeField($key))
             {
-                $s1 .= (strlen($s1) > 0 ? ',' : ''). $this->quoteDbObject($dbKey);
-                $s2 .= (strlen($s2) > 0 ? ',' : '').'?';
-                $params[] = $value;
+                $dbKey = $this->convertClassKeyToDBKey($key);
+                if ($dbKey != $this->_primaryKeyName || $value)
+                {
+                    $s1 .= (strlen($s1) > 0 ? ',' : ''). $this->quoteDbObject($dbKey);
+                    $s2 .= (strlen($s2) > 0 ? ',' : '').'?';
+                    $params[] = $value;
+                }
             }
         }
         $stmt = $dbh->prepare('INSERT INTO ' . $this->quoteDbObject($this->_tableName) . ' (' . $s1 . ') VALUES (' . $s2 . ')');
@@ -257,11 +260,14 @@ abstract class KrisModel extends KrisDB
         $values = array();
         foreach ($fields as $key => $value)
         {
-            $dbKey = $this->convertClassKeyToDBKey($key);
-            if ($dbKey != $this->_primaryKeyName)
+            if (!$this->isFakeField($key))
             {
-                $set .= (strlen($set) > 0 ? ',' : '') . $this->quoteDbObject($dbKey) . '=?';
-                $values[] = $value;
+                $dbKey = $this->convertClassKeyToDBKey($key);
+                if ($dbKey != $this->_primaryKeyName)
+                {
+                    $set .= (strlen($set) > 0 ? ',' : '') . $this->quoteDbObject($dbKey) . '=?';
+                    $values[] = $value;
+                }
             }
         }
         $stmt = $dbh->prepare('UPDATE ' . $this->quoteDbObject($this->_tableName) . ' SET ' . $set . ' WHERE ' . $this->quoteDbObject($this->_primaryKeyName) . '=?');
