@@ -108,11 +108,13 @@ class Auth_DB extends Auth
         {
             /** @var $passwordCheck PasswordCheck */
             $passwordCheck = AutoLoader::$Container->get('PasswordCheck');
+            $record->Set('Ip', $_SERVER['REMOTE_ADDR']);
+            $record->Set('LastLogin', date('Y-m-d h:i:s'));
+
             if ($passwordCheck->CheckPassword($password, $record->Get('PasswordHash')))
             {
                 $this->_user = new User($record->Get('UserId'), $record->Get('DisplayName'), $record->Get('Email'), $record->Get('Data'), $record->Get('Acl'));
                 $record->Set('FailedLoginCount', 0);
-                $record->Set('Ip', $_SERVER['REMOTE_ADDR']);
                 $record->Update();
                 $this->LoginUserToSession();
                 return true;
@@ -121,7 +123,7 @@ class Auth_DB extends Auth
             {
                 $this->_error = self::ERROR_INVALID_PASSWORD;
                 $record->Set('FailedLoginCount', $record->Get('FailedLoginCount') + 1);
-                $record->Set('Ip', $_SERVER['REMOTE_ADDR']);
+                $record->Update();
             }
         }
         return false;
@@ -157,6 +159,7 @@ class Auth_DB extends Auth
      * @param string $email
      * @param string $displayName
      * @param bool $requireLoginName
+     * @param bool $loginUser;
      * @return bool
      */
     protected function AddUserRecord($loginName, $email, $password, $displayName, $requireLoginName)

@@ -143,11 +143,11 @@ abstract class Auth
      * @param string $email
      * @param string $password
      * @param string $confirmPassword
-     * @param string $displayName
-     * @param bool $requireLoginName
+     * @param string $displayName - Optionals
+     * @param bool $requireLoginName - Whether login name is required
      * @return bool
      */
-    public function AddUser($loginName, $email, $password, $confirmPassword, $displayName, $requireLoginName)
+    public function AddUser($loginName, $email, $password, $confirmPassword, $displayName = '', $requireLoginName = true, $loginUser = false)
     {
         if ($requireLoginName && strlen($loginName) == 0)
         {
@@ -170,7 +170,14 @@ abstract class Auth
             return false;
         }
 
-        return $this->AddUserRecord($loginName, $email, $password, $displayName, $requireLoginName);
+        $ret = $this->AddUserRecord($loginName, $email, $password, $displayName, $requireLoginName);
+
+        if ($ret && $loginUser)
+        {
+            $this->LoginWithEmail($email, $password);
+        }
+
+        return $ret;
     }
 
     /**
@@ -223,21 +230,26 @@ abstract class Auth
     {
         $error = 0;
 
-        if( strlen($password) < 8 ) {
+        if( strlen($password) < 8 )
+        {
             $error = Auth::ERROR_PASSWORD_TOO_SHORT;
         }
-        else if( !preg_match("#[0-9]+#", $password) ) {
+        else if( !preg_match("#[0-9]+#", $password) )
+        {
             $error = Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_NUMBER;
         }
-        else if( !preg_match("#[a-z]+#", $password) ) {
+        else if( !preg_match("#[a-z]+#", $password) )
+        {
             $error =  Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_LETTER;
 
         }
-        else if( !preg_match("#[A-Z]+#", $password) ) {
+        else if( !preg_match("#[A-Z]+#", $password) )
+        {
             $error = Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_CAPITAL_LETTER;
 
         }
-        else if( !preg_match("#\\W+#", $password) ) {
+        else if( !preg_match("#\\W+#", $password) )
+        {
             $error = Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_SYMBOL;
         }
 
