@@ -101,7 +101,7 @@ abstract class KrisModel extends KrisDB
      * Retrieves (hopefully) one record from the table based on the primary key...
      *
      * @param $primaryKeyOrFieldName
-     * @param null|array $value
+     * @param null|string|array $value
      * @return bool|KrisModel
      */
     public function Retrieve($primaryKeyOrFieldName, $value = null)
@@ -112,7 +112,12 @@ abstract class KrisModel extends KrisDB
         }
         else
         {
-            return $this->bindRecordSet($this->generateStatement(null, array($primaryKeyOrFieldName), array($value), false)->fetch(PDO::FETCH_ASSOC), $this);
+            if (!is_array($primaryKeyOrFieldName))
+            {
+                $primaryKeyOrFieldName = array($primaryKeyOrFieldName);
+                $value = array($value);
+            }
+            return $this->bindRecordSet($this->generateStatement(null, $primaryKeyOrFieldName, $value, false)->fetch(PDO::FETCH_ASSOC), $this);
         }
     }
 

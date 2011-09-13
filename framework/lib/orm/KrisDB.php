@@ -273,7 +273,10 @@ abstract class KrisDB
             $whatString = '';
             foreach ($what as $whereName)
             {
-                $whatString .= (strlen($whatString) > 0 ? ', ' : '') . $this->quoteDbObject($this->convertClassKeyToDBKey($whereName));
+                if (!$this->isFakeField($whereName))
+                {
+                    $whatString .= (strlen($whatString) > 0 ? ', ' : '') . $this->quoteDbObject($this->convertClassKeyToDBKey($whereName));
+                }
             }
             return $whatString;
         }

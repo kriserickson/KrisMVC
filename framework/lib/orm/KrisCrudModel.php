@@ -83,17 +83,6 @@ class KrisCrudModel extends KrisModel
     }
 
     /**
-     * Retrieves (hopefully) one record from the table based on the primary key...
-     *
-     * @param $primaryKeyValue
-     * @return bool|KrisDB
-     */
-    public function Retrieve($primaryKeyValue)
-    {
-        return $this->bindRecordSet($this->generateStatement(array($this->_primaryKeyName), array($primaryKeyValue), false)->fetch(PDO::FETCH_ASSOC), $this);
-    }
-
-    /**
      * Allows for changing of the auto-generated foreign keys...
      *
      * @param string $field - field that is to be changed...
