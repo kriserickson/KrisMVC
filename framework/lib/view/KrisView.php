@@ -17,7 +17,7 @@
 class KrisView
 {
     protected $_file = '';
-    protected $_vars = array();
+    protected $_vars = array('WEB_FOLDER' => KrisConfig::WEB_FOLDER);
 
     /**
      * @param string $file
