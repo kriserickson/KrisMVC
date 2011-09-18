@@ -229,7 +229,7 @@ abstract class KrisModel extends KrisDB
      * @param bool $orderAscending
      * @return PDOStatement
      */
-    private function generateStatement($what, $where, $bindings, $likeQuery, $count = 0, $offset = 0, $order = '', $orderAscending = true)
+    protected function generateStatement($what, $where, $bindings, $likeQuery, $count = 0, $offset = 0, $order = '', $orderAscending = true)
     {
         $dbh = $this->getDatabaseHandle();
         if (is_scalar($bindings))

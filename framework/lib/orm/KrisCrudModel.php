@@ -118,6 +118,7 @@ class KrisCrudModel extends KrisModel
     }
 
     /**
+     * @param $what
      * @param string|array $where
      * @param array $bindings
      * @param $likeQuery
@@ -127,7 +128,7 @@ class KrisCrudModel extends KrisModel
      * @param bool $orderAscending
      * @return PDOStatement
      */
-    private function generateStatement($where, $bindings, $likeQuery, $count = 0, $offset = 0, $order = '', $orderAscending = true)
+    protected function generateStatement($what, $where, $bindings, $likeQuery, $count = 0, $offset = 0, $order = '', $orderAscending = true)
     {
         $dbh = $this->getDatabaseHandle();
         if (is_scalar($bindings))
@@ -135,13 +136,7 @@ class KrisCrudModel extends KrisModel
             $bindings = $bindings ? array($bindings) : array();
         }
 
-        $tableFields = $this->GetTableFields();
-        for ($i = 0; $i < count($tableFields); $i++)
-        {
-            $tableFields[$i] = 't1.' . $this->convertClassKeyToDBKey($tableFields[$i]);
-        }
-
-        $select = 'SELECT ' . (implode(',', $tableFields));
+        $select = 'SELECT ' . $this->generateWhat($what, 't1');
         $from = ' FROM ' . $this->_tableName . ' t1';
 
         $tableIndex = 2;
@@ -191,13 +186,13 @@ class KrisCrudModel extends KrisModel
             $displayFieldSelect = ', CONCAT(';
             for ($i = 0; $i < count($displayField); $i++)
             {
-                $displayFieldSelect .= ($i > 0 ? ", ' '," : '') . $tableAlias . '.' . $displayField[$i];
+                $displayFieldSelect .= ($i > 0 ? ", ' '," : '') . $tableAlias . '.' . $this->quoteDbObject($displayField[$i]);
             }
             $displayFieldSelect .= ')';
         }
         else
         {
-            $displayFieldSelect = ', ' . $tableAlias . '.' . $displayField;
+            $displayFieldSelect = ', ' . $tableAlias . '.' . $this->quoteDbObject($displayField);
         }
 
         $displayFieldSelect .= ' AS ' . $aliasField;

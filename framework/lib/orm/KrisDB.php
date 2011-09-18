@@ -259,9 +259,10 @@ abstract class KrisDB
      * Generates which fields to select
      *
      * @param array|string $what
+     * @param string $table
      * @return string
      */
-    protected function generateWhat($what)
+    protected function generateWhat($what, $table = '')
     {
         if (is_null($what))
         {
@@ -271,11 +272,12 @@ abstract class KrisDB
         if (is_array($what))
         {
             $whatString = '';
+            $tableString = (strlen($table) > 0 ? $table.'.' : '');
             foreach ($what as $whereName)
             {
                 if (!$this->isFakeField($whereName))
                 {
-                    $whatString .= (strlen($whatString) > 0 ? ', ' : '') . $this->quoteDbObject($this->convertClassKeyToDBKey($whereName));
+                    $whatString .= (strlen($whatString) > 0 ? ', ' : '') . $tableString. $this->quoteDbObject($this->convertClassKeyToDBKey($whereName));
                 }
             }
             return $whatString;
