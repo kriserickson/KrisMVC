@@ -38,6 +38,11 @@ abstract class KrisDB
     protected $_fakeFields = array();
 
     /**
+     * @var array - Collection of foreign key data... ForeignKeyId => array('table' => '', 'field' => '', 'display' => '', 'alias' => '')
+     */
+    protected $_foreignKeys = array();
+
+    /**
      * Used to get a field from the Model/DBView
      *
      * @throws DatabaseException
@@ -277,7 +282,7 @@ abstract class KrisDB
             {
                 if (!$this->isFakeField($whereName))
                 {
-                    $whatString .= (strlen($whatString) > 0 ? ', ' : '') . $tableString. $this->quoteDbObject($this->convertClassKeyToDBKey($whereName));
+                    $whatString .= (strlen($whatString) > 0 ? ', ' : '') . $tableString.$this->quoteDbObject($this->convertClassKeyToDBKey($whereName));
                 }
             }
             return $whatString;
@@ -295,7 +300,7 @@ abstract class KrisDB
      * @param $likeQuery
      * @return string
      */
-    protected function generateWhere($where, $bindings, $likeQuery)
+    protected function generateWhere($where, $bindings, $likeQuery, $tables = array())
     {
         if (is_array($where))
         {
@@ -306,7 +311,17 @@ abstract class KrisDB
             $whereString = '';
             foreach ($where as $whereName)
             {
-                $whereString .= (strlen($whereString) > 0 ? ' AND ' : '') . $this->quoteDbObject($this->convertClassKeyToDBKey($whereName)). ($likeQuery ? ' LIKE ?' : ' = ?');
+                // If the where we are searching for is a link to another table use the link...
+                $whereField = $this->convertClassKeyToDBKey($whereName);
+                if (isset($this->_foreignKeys[$whereField]))
+                {
+                    $tableName = $tables[$this->_foreignKeys[$whereField]['table']].'.';
+                }
+                else
+                {
+                    $tableName = '';
+                }
+                $whereString .= (strlen($whereString) > 0 ? ' AND ' : '') .$tableName. $this->quoteDbObject($whereField). ($likeQuery ? ' LIKE ?' : ' = ?');
             }
             return $whereString;
         }

@@ -14,10 +14,6 @@
  */
 class KrisCrudModel extends KrisModel
 {
-    /**
-     * @var array - Collection of foreign key data... ForeignKeyId => array('table' => '', 'field' => '', 'display' => '', 'alias' => '')
-     */
-    protected $_foreignKeys = array();
 
     /**
      * @var array - FieldName -> Type (string, text, int, date, bool, image, upload, etc)
@@ -138,6 +134,7 @@ class KrisCrudModel extends KrisModel
 
         $select = 'SELECT ' . $this->generateWhat($what, 't1');
         $from = ' FROM ' . $this->_tableName . ' t1';
+        $tables = array($this->_tableName => 't1');
 
         $tableIndex = 2;
 
@@ -145,6 +142,7 @@ class KrisCrudModel extends KrisModel
         {
 
             $tableAlias = 't' . $tableIndex++;
+            $tables[$foreignFieldData['table']] = $tableAlias;
             $from .= ' INNER JOIN ' . $foreignFieldData['table'] . ' ' . $tableAlias . ' ON (t1.' . $columnName . ' = ' . $tableAlias . '.' . $foreignFieldData['field'] . ') ';
             $displayField = $foreignFieldData['display'];
             $aliasField = $foreignFieldData['alias'];
@@ -158,7 +156,7 @@ class KrisCrudModel extends KrisModel
 
         if ((is_array($where) && count($where) > 0) || (!is_array($where) && strlen($where) > 0))
         {
-            $sql .= ' WHERE ' . $this->generateWhere($where, $bindings, $likeQuery);
+            $sql .= ' WHERE ' . $this->generateWhere($where, $bindings, $likeQuery, $tables);
         }
 
         $bindings = $this->GetBindings($bindings, $likeQuery);
