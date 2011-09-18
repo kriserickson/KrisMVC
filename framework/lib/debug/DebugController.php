@@ -37,6 +37,7 @@ class DebugController extends KrisController
             }
             catch (Exception $ex)
             {
+                $trace = $ex->getTrace();
                 $log->Error('Uncaught exception: '.$ex->getMessage());
             }
             $endTime = microtime(true);
@@ -51,7 +52,7 @@ class DebugController extends KrisController
                 }
                 else
                 {
-                    echo $content.$this->GetWebBar($elapsedTime, $log);
+                    echo '<html><body>'.$content.$this->GetWebBar($elapsedTime, $log).'</body></html>';
                 }
             }
             else
