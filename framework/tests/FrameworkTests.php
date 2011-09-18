@@ -6,6 +6,7 @@ if (!defined('__DIR__'))
 }
 
 require __DIR__ . '/../../config/KrisConfig.php';
+require __DIR__ . '/../../framework/lib/auth/PasswordCheck.php';
 require __DIR__ . '/../../framework/lib/auth/PasswordHash.php';
 require __DIR__ . '/../../framework/lib/controller/KrisController.php';
 require __DIR__ . '/../../framework/lib/controller/RouteRequest.php';
@@ -18,6 +19,7 @@ require __DIR__ . '/../../framework/lib/plumbing/BucketContainer.php';
 require __DIR__ . '/../../framework/lib/view/KrisView.php';
 require __DIR__ . '/../../framework/lib/view/Mustache.php';
 require __DIR__ . '/../../framework/lib/helpers/HtmlHelpers.php';
+
 
 
 require 'Auth/AllTests.php';
