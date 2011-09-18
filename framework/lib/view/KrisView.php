@@ -78,12 +78,7 @@ class KrisView
      */
     public function fetch($file = '', $vars = array(), $merge = true)
     {
-        if ($merge)
-        {
-            $vars = array_merge($this->_vars, $vars);
-        }
-
-        extract($vars);
+        extract($this->getVars($vars, $merge));
 
         if (strlen($file) == 0)
         {
@@ -92,6 +87,35 @@ class KrisView
         ob_start();
         /** @noinspection PhpIncludeInspection */
         require($file);
+        return ob_get_clean();
+    }
+
+    /**
+     * @param array $vars
+     * @param bool $merge
+     * @return array
+     */
+    protected function getVars($vars, $merge)
+    {
+        if ($merge)
+        {
+            return array_merge($this->_vars, $vars);
+        }
+        return $vars;
+    }
+
+
+    /**
+     * @param string $template
+     * @param array $vars
+     * @param bool $merge
+     * @return string
+     */
+    public function fetchFromString($template, $vars = array(), $merge = false)
+    {
+        extract($this->getVars($vars, $merge));
+        ob_start();
+        eval($template);
         return ob_get_clean();
     }
 
