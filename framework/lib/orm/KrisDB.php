@@ -43,6 +43,11 @@ abstract class KrisDB
     protected $_foreignKeys = array();
 
     /**
+     * @var array
+     */
+    protected $_dirty = array();
+
+    /**
      * Used to get a field from the Model/DBView
      *
      * @throws DatabaseException
@@ -76,6 +81,7 @@ abstract class KrisDB
             // If $val is null then isset will return false.  We don't want that cause get uses isset to determine
             // whether the field is valid or not..
             $this->_recordSet[$key] = is_null($val) ? '' : $val;
+            $this->_dirty[$key] = true;
         }
         return $this;
     }
@@ -297,7 +303,8 @@ abstract class KrisDB
      * @throws DatabaseException
      * @param array|string $where
      * @param array $bindings
-     * @param $likeQuery
+     * @param bool $likeQuery
+     * @param array $tables
      * @return string
      */
     protected function generateWhere($where, $bindings, $likeQuery, $tables = array())

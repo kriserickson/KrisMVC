@@ -86,7 +86,7 @@ class KrisCrudModel extends KrisModel
      * @param string $alias - the name of the alias...
      * @return void
      */
-    public function SetForeignKey($field, $name, $alias)
+    protected function SetForeignKey($field, $name, $alias)
     {
         $old_alias = $this->_foreignKeys[$field]['alias'];
         $this->_foreignKeys[$field]['display'] = $name;
@@ -110,7 +110,7 @@ class KrisCrudModel extends KrisModel
      */
     public function RetrieveMultiple($where = null, $bindings = null, $likeQuery = false, $count = 0, $offset = 0, $orderBy = '', $orderAscending = true)
     {
-        return $this->returnMultiple($this->generateStatement($where, $bindings, $likeQuery, $count, $offset, $orderBy, $orderAscending));
+        return $this->returnMultiple($this->generateStatement(null, $where, $bindings, $likeQuery, $count, $offset, $orderBy, $orderAscending));
     }
 
     /**
@@ -201,7 +201,7 @@ class KrisCrudModel extends KrisModel
     /**
      * @return array
      */
-    public function GetTableFields()
+    protected function GetTableFields()
     {
         $fields = array();
         foreach (array_keys($this->_recordSet) as $field)
@@ -221,7 +221,7 @@ class KrisCrudModel extends KrisModel
      *
      * @return array
      */
-    private function GetDisplayFields()
+    protected function GetDisplayFields()
     {
         $fields = array();
         $index = 0;
@@ -474,7 +474,7 @@ class KrisCrudModel extends KrisModel
      * @param $key
      * @return void
      */
-    private function AddJavascript($action, $type, $key)
+    protected function AddJavascript($action, $type, $key)
     {
         $methodName = 'Javascript' . ucfirst($action) . ucfirst($type);
         if (method_exists($this, $methodName))
@@ -491,7 +491,7 @@ class KrisCrudModel extends KrisModel
      * @param $type
      * @return string
      */
-    private function GetClass($action, $type)
+    protected function GetClass($action, $type)
     {
         $property = ucfirst($action) . ucfirst($type) . 'Class';
         if (property_exists($this, $property))
@@ -511,7 +511,7 @@ class KrisCrudModel extends KrisModel
      *
      * @return string
      */
-    private function GetFieldData($field, $data, $default = '')
+    protected function GetFieldData($field, $data, $default = '')
     {
         if ( isset( $this->_fieldData[$field]) && isset($this->_fieldData[$field][$data]))
         {

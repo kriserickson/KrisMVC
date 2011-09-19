@@ -74,6 +74,8 @@ abstract class KrisModel extends KrisDB
                 }
             }
         }
+
+
         $stmt = $dbh->prepare('INSERT INTO ' . $this->quoteDbObject($this->_tableName) . ' (' . $s1 . ') VALUES (' . $s2 . ')');
         $stmt->execute($params);
 
@@ -83,6 +85,7 @@ abstract class KrisModel extends KrisDB
         {
             return false;
         }
+
         $this->Set($this->_primaryKeyName, $dbh->lastInsertId());
         return $this;
     }
@@ -145,7 +148,7 @@ abstract class KrisModel extends KrisDB
      */
     public function Update()
     {
-        $this->updateFields($this->_recordSet);
+        return $this->updateFields($this->_recordSet);
     }
 
 
@@ -217,6 +220,16 @@ abstract class KrisModel extends KrisDB
     }
 
 
+    /**
+     * Whether or not the record has been edited....
+     *
+     * @return bool
+     */
+    public function IsDirty()
+    {
+        return count($this->_dirty) > 0;
+    }
+
 
     /**
      * @param string|array $what
@@ -268,13 +281,19 @@ abstract class KrisModel extends KrisDB
             if (!$this->isFakeField($key))
             {
                 $dbKey = $this->convertClassKeyToDBKey($key);
-                if ($dbKey != $this->_primaryKeyName)
+                if (isset($this->_dirty[$key]) && $dbKey != $this->_primaryKeyName)
                 {
                     $set .= (strlen($set) > 0 ? ',' : '') . $this->quoteDbObject($dbKey) . '=?';
                     $values[] = $value;
                 }
             }
         }
+
+        if (count($values) == 0)
+        {
+            return false;
+        }
+
         $stmt = $dbh->prepare('UPDATE ' . $this->quoteDbObject($this->_tableName) . ' SET ' . $set . ' WHERE ' . $this->quoteDbObject($this->_primaryKeyName) . '=?');
         $i = 1;
 
