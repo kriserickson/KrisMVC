@@ -38,7 +38,14 @@ class DebugController extends KrisController
             catch (Exception $ex)
             {
                 $trace = $ex->getTrace();
-                $log->Error('Uncaught exception: '.$ex->getMessage());
+                $message = '';
+                foreach ($trace as $line)
+                {
+                    $message .= '&nbsp;&nbsp;'.(isset($line['file']) ? 'file: '.$line['file'].', ' : 'Anonymous: ').(isset($line['line']) ? ' line: '.$line['line'].' : ' : '').
+                            (isset($line['class']) ? $line['class'].'->' : '').
+                            $line['function'].'('.implode(',', array_map(create_function('$a', 'return gettype($a);'), $line['args'])).')'.PHP_EOL;
+                }
+                $log->Error('Uncaught exception: '.$ex->getMessage().PHP_EOL.$message);
             }
             $endTime = microtime(true);
             $content = ob_get_clean();
