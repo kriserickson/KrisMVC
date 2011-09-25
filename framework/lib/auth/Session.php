@@ -23,7 +23,9 @@ class Session
      */
     private function __construct()
     {
-        session_name();
+        $params = session_get_cookie_params();
+        $domain = isset(KrisConfig::$SESSION_DOMAIN) ? KrisConfig::$SESSION_DOMAIN: $params["domain"];
+        session_set_cookie_params($params['lifetime'], $params["path"], $domain, $params["secure"], $params["httponly"]);
         session_start();
     }
 
