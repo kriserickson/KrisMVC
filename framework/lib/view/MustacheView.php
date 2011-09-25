@@ -67,14 +67,15 @@ class MustacheView extends KrisView
      */
     public function dump($vars = null)
     {
-        echo $this->contents($vars);
+        echo $this->contents($vars, true);
     }
 
     /**
      * @param array|null $vars
+     * @param bool $merge
      * @return string
      */
-    public function contents($vars = null)
+    public function contents($vars = null, $merge = false)
     {
         return $this->getMustache()->render(file_get_contents($this->_file, true), $this->getVars($vars, $merge));
     }

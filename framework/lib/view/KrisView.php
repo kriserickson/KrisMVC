@@ -97,6 +97,10 @@ class KrisView
      */
     protected function getVars($vars, $merge)
     {
+        if (is_null($vars))
+        {
+            $vars = array();
+        }
         if ($merge)
         {
             return array_merge($this->_vars, $vars);
