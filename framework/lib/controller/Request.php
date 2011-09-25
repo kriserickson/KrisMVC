@@ -46,7 +46,10 @@ class Request
     const CONTENT_TYPE_JSON = 'application/json';
     const CONTENT_TYPE_JAVASCRIPT = 'application/javascript';
     const CONTENT_TYPE_BINARY = 'application/octet-stream';
-
+    const CONTENT_TYPE_IMAGE_ICON = 'image/vnd.microsoft.icon';
+    const CONTENT_TYPE_IMAGE_PNG = 'image/png';
+    const CONTENT_TYPE_IMAGE_JPEG = 'image/jpeg';
+    const CONTENT_TYPE_IMAGE_GIF = 'image/gif';
 
     /**
      * @param string $controller
@@ -344,6 +347,7 @@ class Request
     {
         return $this->_controller.'/'.$this->_action.(count($this->_params) > 0 ? '/'.implode('/', $this->_params) : '');
     }
+
 
 
 }
