@@ -119,7 +119,7 @@ class KrisView
     {
         extract($this->getVars($vars, $merge));
         ob_start();
-        eval($template);
+        eval('?>'.$template);
         return ob_get_clean();
     }
 
