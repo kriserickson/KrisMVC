@@ -110,6 +110,11 @@ class KrisCrudModel extends KrisModel
      */
     public function RetrieveMultiple($where = null, $bindings = null, $likeQuery = false, $count = 0, $offset = 0, $orderBy = '', $orderAscending = true)
     {
+        if ($where != null && !is_array($where))
+        {
+            $where = array($where);
+            $bindings = is_array($bindings) ? $bindings : array($bindings);
+        }
         return $this->returnMultiple($this->generateStatement(null, $where, $bindings, $likeQuery, $count, $offset, $orderBy, $orderAscending));
     }
 

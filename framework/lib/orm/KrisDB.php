@@ -301,7 +301,7 @@ abstract class KrisDB
      * Generates the where portion of the query
      *
      * @throws DatabaseException
-     * @param array|string $where
+     * @param array|null $where
      * @param array $bindings
      * @param bool $likeQuery
      * @param array $tables
