@@ -70,6 +70,7 @@ class KrisController implements Controller
     protected function GetRequestUri()
     {
         $requestUri = $_SERVER['REQUEST_URI'];
+
         if (strlen(KrisConfig::WEB_FOLDER) == 0 || strpos($requestUri, KrisConfig::WEB_FOLDER) === 0)
         {
             $webFolder = KrisConfig::WEB_FOLDER;
