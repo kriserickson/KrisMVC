@@ -155,11 +155,10 @@ class Auth_DB extends Auth
 
     /**
      * @param string $loginName
-     * @param string $password
      * @param string $email
+     * @param string $password
      * @param string $displayName
      * @param bool $requireLoginName
-     * @param bool $loginUser;
      * @return bool
      */
     protected function AddUserRecord($loginName, $email, $password, $displayName, $requireLoginName)
