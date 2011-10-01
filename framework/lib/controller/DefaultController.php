@@ -32,12 +32,6 @@ abstract class DefaultController
 
 
     /**
-     * @return null|RouteRequest
-     */
-    abstract function Index();
-
-
-    /**
      * @abstract
      * @param $request Request
      */

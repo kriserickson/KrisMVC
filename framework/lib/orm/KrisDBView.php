@@ -64,6 +64,8 @@ abstract class KrisDBView  extends KrisDB
     }
 
     /**
+     * Public for testing
+     * 
      * @param array|string $where
      * @param array $bindings
      * @param $likeQuery
@@ -73,17 +75,19 @@ abstract class KrisDBView  extends KrisDB
      * @param bool $distinct
      * @return array
      */
-    protected function retrieveMultiple($where, $bindings, $likeQuery, $count = 0, $offset = 0, $order = '', $distinct = false)
+    public function retrieveMultiple($where, $bindings, $likeQuery, $count = 0, $offset = 0, $order = '', $distinct = false)
     {
         return $this->returnMultiple($this->returnStatement($where, $bindings, $likeQuery, $count, $offset, $order, $distinct));
     }
 
     /**
+     * Public for testing
+     *
      * @param array|string $where
      * @param array $bindings
      * @return KrisDBView
      */
-    protected function retrieveOne($where, $bindings)
+    public function retrieveOne($where, $bindings)
     {
         return $this->bindRecordSet($this->returnStatement($where, $bindings, false, 1, 0, '', false)->fetch(PDO::FETCH_ASSOC), $this);
     }

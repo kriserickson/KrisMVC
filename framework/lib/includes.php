@@ -12,7 +12,7 @@
 define('KRIS_MVC_VERSION', "0.8");
 
 /** @noinspection PhpIncludeInspection */
-require KrisConfig::FRAMEWORK_DIR.'/lib/controller/KrisController.php';
+require KrisConfig::FRAMEWORK_DIR.'/lib/controller/KrisRouter.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/controller/DefaultController.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/controller/RouteRequest.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/controller/Request.php';
@@ -54,19 +54,19 @@ if (KrisConfig::DEBUG)
     // Setup debug
     ini_set('display_errors', 'On');
     error_reporting(E_ALL);
-    AutoLoader::AddClass('DebugController', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugController.php', true);
+    AutoLoader::AddClass('DebugRouter', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugRouter.php', true);
     AutoLoader::AddClass('DebugPDO', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugPDO.php', true);
     AutoLoader::AddClass('DebugLog', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugLog.php', true);
 
 
-    $classes = array('Controller' => 'DebugController', 'Log' => 'DebugLog');
+    $classes = array('Router' => 'DebugRouter', 'Log' => 'DebugLog');
     $databaseClass = 'DebugPDO';
 }
 else
 {
     ini_set('display_errors', 'On');
     error_reporting(E_ERROR);
-    $classes = array('Controller' => 'KrisController', 'Log' => 'KrisLog');
+    $classes = array('Router' => 'KrisRouter', 'Log' => 'KrisLog');
     $databaseClass = 'PDO';
 }
 

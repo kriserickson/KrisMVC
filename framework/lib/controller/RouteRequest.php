@@ -13,6 +13,7 @@ class RouteRequest
     public $Controller;
     public $Action;
     public $Params;
+    protected $skipActionRoutes;
 
     /**
      * @param string $controller
@@ -39,17 +40,24 @@ class RouteRequest
 
         $parts = $requestUri ? explode('/', $requestUri) : array();
 
+        $partsStart = 1;
+
         if (isset($parts[0]) && $parts[0])
         {
             $this->Controller = $parts[0];
         }
-        if (isset($parts[1]) && $parts[1])
+        if (!isset($this->skipActionRoutes[$this->Controller]))
         {
-            $this->Action = $parts[1];
+            if (isset($parts[1]) && $parts[1])
+            {
+                $this->Action = $parts[1];
+            }
+            $partsStart = 2;
         }
-        if (isset($parts[2]))
+
+        if (isset($parts[$partsStart]))
         {
-            foreach (array_slice($parts, 2) as $array_item)
+            foreach (array_slice($parts, $partsStart) as $array_item)
             {
                 $this->Params[] = urldecode($array_item);
             }
@@ -68,16 +76,27 @@ class RouteRequest
      *
      * @static
      * @param string $requestUri
+     * @param array $skipActionRoutes
      * @return RouteRequest
      */
-    public static function CreateFromUri($requestUri)
+    public static function CreateFromUri($requestUri, $skipActionRoutes)
     {
 
         $route = new RouteRequest();
         $route->Controller = KrisConfig::DEFAULT_CONTROLLER;
         $route->Action = KrisConfig::DEFAULT_ACTION;
+        $route->SkipActionRoutes($skipActionRoutes);
         $route->ParseHttpRequest($requestUri);
         return $route;
+    }
+
+    /**
+     * @param array $skipActionRoutes
+     * @return void
+     */
+    private function SkipActionRoutes($skipActionRoutes)
+    {
+        $this->skipActionRoutes = $skipActionRoutes;
     }
 
 }
