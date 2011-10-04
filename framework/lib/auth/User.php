@@ -45,14 +45,12 @@ class User
     protected $_aclChanged;
 
 
-
     /**
      * @param int $userId
      * @param string $displayName
      * @param string $email
      * @param string $data
      * @param int $acl
-     * @param \Auth $auth
      * @return \User
      *
      */

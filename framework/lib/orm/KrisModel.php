@@ -148,7 +148,14 @@ abstract class KrisModel extends KrisDB
      */
     public function Update()
     {
-        return $this->updateFields($this->_recordSet);
+        if (!isset($this->_recordSet[$this->convertDBKeyToClassKey($this->_primaryKeyName)]))
+        {
+            return $this->Create();
+        }
+        else
+        {
+            return $this->updateFields($this->_recordSet);
+        }
     }
 
 
