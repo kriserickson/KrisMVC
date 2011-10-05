@@ -21,11 +21,6 @@ class Auth_DB extends Auth
     private $_db;
 
 
-    /**
-     * @var bool
-     */
-    private $_dataChanged;
-
 
     /**
      * return Auth_DB
@@ -41,7 +36,7 @@ class Auth_DB extends Auth
      */
     public function __destruct()
     {
-        if ($this->_dataChanged)
+        if ($this->_db->IsDirty())
         {
             $this->_db->Update();
         }
@@ -182,11 +177,8 @@ class Auth_DB extends Auth
             return false;
         }
 
-        /** @var $passwordCheck PasswordCheck */
-        $passwordCheck = AutoLoader::$Container->get('PasswordCheck');
-        $hash = $passwordCheck->HashPassword($password);
-
-        $this->_db->Set('LoginName', $loginName)->Set('PasswordHash', $hash)->Set('Email', $email)->Set('DisplayName', $displayName);
+        $this->_db->Set('LoginName', $loginName)->Set('Email', $email)->Set('DisplayName', $displayName);
+        $this->SetPassword($password);
         $this->_db->Create();
 
         return true;
@@ -198,7 +190,7 @@ class Auth_DB extends Auth
      */
     public function SaveData()
     {
-        $this->Set('Data', $this->_user->GetData());
+        $this->_db->Set('Data', $this->_user->GetData());
     }
 
     /**
@@ -206,19 +198,9 @@ class Auth_DB extends Auth
      */
     public function SaveAcl()
     {
-        $this->Set('Acl', $this->_user->GetAcl());
+        $this->_db->Set('Acl', $this->_user->GetAcl());
     }
 
-    /**
-     * @param string $name
-     * @param mixed $value
-     * @return void
-     */
-    protected function Set($name, $value)
-    {
-        $this->_db->Set($name, $value);
-        $this->_dataChanged = true;
-    }
 
     /**
      * @param $password
@@ -226,7 +208,10 @@ class Auth_DB extends Auth
      */
     public function SetPassword($password)
     {
-        $this->Set('Password', $password);
+        /** @var $passwordCheck PasswordCheck */
+        $passwordCheck = AutoLoader::$Container->get('PasswordCheck');
+        $hash = $passwordCheck->HashPassword($password);
+        $this->db->Set('PasswordHash', $hash);
     }
 
     /**
@@ -297,6 +282,68 @@ class Auth_DB extends Auth
         }
 
         return $this->_db->TotalRecords($searchField, $search, true);
+    }
+
+    /**
+     *
+     * @return bool|string
+     * @param $email
+     */
+    public function GetPasswordReminderToken($email)
+    {
+        $ret = $this->_db->Retrieve('Email', $email);
+        if (!$ret)
+        {
+            $this->_error = 'No user with email: '.$email;
+            return false;
+        }
+        else
+        {
+            $guid = uniqid('epr', true);
+
+            // Give 4 hours to reset the password
+            $this->_db->Set('RecoveryGuid', $guid)->Set('GuidExpire', date('Y-m-d h:i:s', time() + (60 * 60 * 4)));
+
+            $this->_db->Update();
+
+            return $guid;
+        }
+    }
+
+    public function IsValidPasswordReminderGuid($guid)
+    {
+        $ret = $this->_db->Retrieve('RecovertyGuid', $guid);
+        if ($ret)
+        {
+            return $this->ValidateGuidExpire($this->_db->Get('GuidExpire'));
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public function ChangePasswordWithPasswordReminderGuid($guid, $newPassword)
+    {
+        $ret = $this->_db->Retrieve('RecovertyGuid', $guid);
+        if ($ret)
+        {
+            if ($this->ValidateGuidExpire($this->_db->Get('GuidExpire')))
+            {
+                $this->SetPassword($newPassword);
+                return true;
+            }
+        }
+        else
+        {
+            $this->_error = 'Unknown recovery token guid';
+        }
+        return false;
+    }
+
+    private function ValidateGuidExpire($date)
+    {
+        return strtotime($date) > time();
     }
 }
 

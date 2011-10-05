@@ -267,6 +267,7 @@ abstract class Auth
 
 
     /**
+     * @abstract
      * @throws Exception
      * @param $email
      * @param $password
@@ -275,6 +276,7 @@ abstract class Auth
     public abstract function LoginWithEmail($email, $password);
 
     /**
+     * @abstract
      * @param string $loginName
      * @param string $password
      * @return bool
@@ -282,13 +284,36 @@ abstract class Auth
     public abstract function Login($loginName, $password);
 
     /**
+     * @abstract
      * @throws Exception
      * @return bool
      */
     public abstract function Logout();
 
+    /**
+     * @abstract
+     * @param string $email
+     * @return bool|string
+     */
+    public abstract function GetPasswordReminderToken($email);
+
 
     /**
+     * @abstract
+     * @param string $guid
+     * @return bool
+     */
+    public abstract function IsValidPasswordReminderGuid($guid);
+
+    /**
+     * @param string $guid
+     * @param string $newPassword
+     * @return bool
+     */
+    public abstract function ChangePasswordWithPasswordReminderGuid($guid, $newPassword);
+
+    /**
+     * @abstract
      * @param string $loginName
      * @param string $email
      * @param string $password
