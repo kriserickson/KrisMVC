@@ -132,8 +132,8 @@ class Auth_DB extends Auth
     public function SaveUserData($user_id, $data)
 
     {
-        $this->_db->Set('UserId', $user_id);
-        $this->_db->Set('Data', $data());
+        $this->_db->UserId =  $user_id;
+        $this->_db->Data = $data();
         $this->_db->Update();
     }
 
@@ -177,7 +177,9 @@ class Auth_DB extends Auth
             return false;
         }
 
-        $this->_db->Set('LoginName', $loginName)->Set('Email', $email)->Set('DisplayName', $displayName);
+        $this->_db->LoginName = $loginName;
+        $this->_db->Email = $email;
+        $this->_db->DisplayName = $displayName;
         $this->SetPassword($password);
         $this->_db->Create();
 
@@ -190,7 +192,7 @@ class Auth_DB extends Auth
      */
     public function SaveData()
     {
-        $this->_db->Set('Data', $this->_user->GetData());
+        $this->_dbData = $this->_user->GetData();
     }
 
     /**
@@ -198,7 +200,7 @@ class Auth_DB extends Auth
      */
     public function SaveAcl()
     {
-        $this->_db->Set('Acl', $this->_user->GetAcl());
+        $this->_db->Acl = $this->_user->GetAcl();
     }
 
 
@@ -211,7 +213,7 @@ class Auth_DB extends Auth
         /** @var $passwordCheck PasswordCheck */
         $passwordCheck = AutoLoader::$Container->get('PasswordCheck');
         $hash = $passwordCheck->HashPassword($password);
-        $this->db->Set('PasswordHash', $hash);
+        $this->_db->PasswordHash = $hash;
     }
 
     /**
@@ -302,7 +304,8 @@ class Auth_DB extends Auth
             $guid = uniqid('epr', true);
 
             // Give 4 hours to reset the password
-            $this->_db->Set('RecoveryGuid', $guid)->Set('GuidExpire', date('Y-m-d h:i:s', time() + (60 * 60 * 4)));
+            $this->_db->RecoveryGuid = $guid;
+            $this->_db->GuidExpire = date('Y-m-d h:i:s', time() + (60 * 60 * 4));
 
             $this->_db->Update();
 
@@ -315,7 +318,7 @@ class Auth_DB extends Auth
         $ret = $this->_db->Retrieve('RecovertyGuid', $guid);
         if ($ret)
         {
-            return $this->ValidateGuidExpire($this->_db->Get('GuidExpire'));
+            return $this->ValidateGuidExpire($this->_db->GuidExpire);
         }
         else
         {
@@ -328,7 +331,7 @@ class Auth_DB extends Auth
         $ret = $this->_db->Retrieve('RecovertyGuid', $guid);
         if ($ret)
         {
-            if ($this->ValidateGuidExpire($this->_db->Get('GuidExpire')))
+            if ($this->ValidateGuidExpire($this->_db->GuidExpire))
             {
                 $this->SetPassword($newPassword);
                 return true;
@@ -363,6 +366,8 @@ class DBUserModel extends KrisModel
     * @property datetime $LastLogin
     * @property string $Data
     * @property int $Acl
+    * @property string $RecoverGuid
+    * @property string $GuidExpire
     */
 
     /**
@@ -371,6 +376,6 @@ class DBUserModel extends KrisModel
     public function __construct()
     {
         parent::__construct('user_id', 'auth');
-        $this->initializeRecordSet(array('UserId', 'LoginName', 'PasswordHash', 'FailedLoginCount', 'DisplayName', 'Email', 'Ip', 'LastLogin', 'Data', 'Acl'));
+        $this->initializeRecordSet(array('UserId', 'LoginName', 'PasswordHash', 'FailedLoginCount', 'DisplayName', 'Email', 'Ip', 'LastLogin', 'Data', 'Acl', 'RecoveryGuid', 'GuidExpire'));
     }
 }
