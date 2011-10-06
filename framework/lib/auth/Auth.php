@@ -29,6 +29,9 @@ abstract class Auth
     const ERROR_LOGIN_NAME_ALREADY_EXISTS = 10;
     const ERROR_INVALID_EMAIL = 11;
     const ERROR_CONFIRM_PASSWORD_DOES_NOT_MATCH_PASSWORD = 12;
+    const ERROR_NO_USER_EMAIL = 13;
+    const ERROR_EXPIRED_RECOVERY_TOKEN = 14;
+    const ERROR_UNKNOWN_RECOVERY_TOKEN = 15;
 
     // ACLs
     const ACL_NONE = 0;
@@ -145,6 +148,7 @@ abstract class Auth
      * @param string $confirmPassword
      * @param string $displayName - Optionals
      * @param bool $requireLoginName - Whether login name is required
+     * @param bool $loginUser
      * @return bool
      */
     public function AddUser($loginName, $email, $password, $confirmPassword, $displayName = '', $requireLoginName = true, $loginUser = false)
@@ -160,7 +164,7 @@ abstract class Auth
 
             return false;
         }
-        else if (!$this->isValidPassword($password))
+        else if (!$this->IsValidPassword($password))
         {
             return false;
         }
@@ -226,7 +230,7 @@ abstract class Auth
      * @param string $password
      * @return bool
      */
-    private function isValidPassword($password)
+    public function IsValidPassword($password)
     {
         $error = 0;
 
@@ -345,6 +349,12 @@ abstract class Auth
 
     /**
      * @abstract
+     * @param string $email
+     */
+    public abstract function GetUsernameFromEmail($email);
+
+    /**
+     * @abstract
      * @param int $startPosition
      * @param int $pageSize
      * @param string $orderBy
@@ -370,6 +380,67 @@ abstract class Auth
      * @return void
      */
     public abstract function TotalUsers($searchType, $search);
+
+    public static function GetFriendlyAuthError($error_code)
+    {
+        switch ($error_code)
+        {
+            case Auth::ERROR_INVALID_PASSWORD:
+            case Auth::ERROR_INVALID_LOGIN:
+                $error = 'Invalid Username or Password';
+                break;
+            case Auth::ERROR_CONFIRM_PASSWORD_DOES_NOT_MATCH_PASSWORD:
+                $error = "Passwords don't match";
+                break;
+            case Auth::ERROR_EMAIL_ALREADY_EXISTS:
+                $error = 'Email Already Exists';
+                break;
+            case Auth::ERROR_TOO_MANY_INVALID_LOGINS:
+                $error = 'Too many invalid logins, try again in an hour';
+                break;
+            case Auth::ERROR_EXPIRED_RECOVERY_TOKEN:
+                $error = 'The recovery token has expired';
+                break;
+            case Auth::ERROR_INVALID_EMAIL:
+                $error = 'Invalid email address';
+                break;
+            case Auth::ERROR_INVALID_LOGIN:
+                $error = 'Invalid login name';
+                break;
+            case Auth::ERROR_LOGIN_NAME_ALREADY_EXISTS:
+                $error = 'Login name already exists';
+                break;
+            case Auth::ERROR_NO_USER_EMAIL:
+                $error = 'No user email given';
+                break;
+            case Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_CAPITAL_LETTER:
+                $error = 'Invalid password.  Password must include one capital letter';
+                break;
+            case Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_LETTER:
+                $error = 'Invalid password.  Password must include one letter';
+                break;
+            case Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_NUMBER:
+                $error = 'Invalid password.  Password must include one number';
+                break;
+            case Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_SYMBOL:
+                $error = 'Invalid password.  Password must include one symbol';
+                break;
+            case Auth::ERROR_PASSWORD_TOO_SHORT:
+                $error = 'Invalid password.  Password must be at least 8 characters';
+                break;
+            case Auth::ERROR_TOO_MANY_INVALID_LOGINS:
+                $error = 'Too many invalid logins, try again in an hour';
+                break;
+            case Auth::ERROR_UNKNOWN_RECOVERY_TOKEN:
+                $error = 'Unknown recover token';
+                break;
+            default:
+                $error = 'Unknown error';
+
+        }
+
+        return $error;
+    }
 
 
 }

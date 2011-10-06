@@ -66,7 +66,7 @@ abstract class KrisModel extends KrisDB
             if (!$this->isFakeField($key))
             {
                 $dbKey = $this->convertClassKeyToDBKey($key);
-                if ($dbKey != $this->_primaryKeyName || $value)
+                if ($dbKey != $this->_primaryKeyName && $value)
                 {
                     $s1 .= (strlen($s1) > 0 ? ',' : ''). $this->quoteDbObject($dbKey);
                     $s2 .= (strlen($s2) > 0 ? ',' : '').'?';

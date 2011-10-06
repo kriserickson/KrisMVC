@@ -16,7 +16,7 @@ class Auth_DB extends Auth
 
 
     /**
-     * @var \DBUserModel
+     * @var DBUserModel
      */
     private $_db;
 
@@ -49,10 +49,9 @@ class Auth_DB extends Auth
      */
     public function LoginWithEmail($email, $password)
     {
-        $ret = $this->_db->Retrieve('Email', $email);
-        if ($ret)
+        if ($this->_db->Retrieve('Email', $email))
         {
-            return $this->LoginWithRecord($ret, $password);
+            return $this->LoginWithRecord($password);
         }
         else
         {
@@ -72,7 +71,7 @@ class Auth_DB extends Auth
         $ret = $this->_db->Retrieve('LoginName', $loginName);
         if ($ret)
         {
-            return $this->LoginWithRecord($ret, $password);
+            return $this->LoginWithRecord($password);
         }
         else
         {
@@ -83,19 +82,18 @@ class Auth_DB extends Auth
     }
 
     /**
-     * @param KrisModel $record
      * @param string $password
      * @return bool
      */
-    protected  function LoginWithRecord($record, $password)
+    protected  function LoginWithRecord($password)
     {
         // One hour
-        if (time() - strtotime($record->Get('LastLogin')) > 3600)
+        if (time() - strtotime($this->_db->LastLogin) > 3600)
         {
-            $record->Set('FailedLoginCount', 0);
+            $this->_db->FailedLoginCount = 0;
         }
 
-        if ($record->Get('FailedLoginCount') > 5)
+        if ($this->_db->FailedLoginCount > 5)
         {
             $this->_error = self::ERROR_TOO_MANY_INVALID_LOGINS;
         }
@@ -103,22 +101,22 @@ class Auth_DB extends Auth
         {
             /** @var $passwordCheck PasswordCheck */
             $passwordCheck = AutoLoader::$Container->get('PasswordCheck');
-            $record->Set('Ip', $_SERVER['REMOTE_ADDR']);
-            $record->Set('LastLogin', date('Y-m-d h:i:s'));
+            $this->_db->Ip = $_SERVER['REMOTE_ADDR'];
+            $this->_db->LastLogin = date('Y-m-d H:i:s');
 
-            if ($passwordCheck->CheckPassword($password, $record->Get('PasswordHash')))
+            if ($passwordCheck->CheckPassword($password, $this->_db->PasswordHash))
             {
-                $this->_user = new User($record->Get('UserId'), $record->Get('DisplayName'), $record->Get('Email'), $record->Get('Data'), $record->Get('Acl'));
-                $record->Set('FailedLoginCount', 0);
-                $record->Update();
+                $this->_user = new User($this->_db->UserId, $this->_db->DisplayName, $this->_db->Email, $this->_db->Data, $this->_db->Acl);
+                $this->_db->FailedLoginCount = 0;
+                $this->_db->Update();
                 $this->LoginUserToSession();
                 return true;
             }
             else
             {
                 $this->_error = self::ERROR_INVALID_PASSWORD;
-                $record->Set('FailedLoginCount', $record->Get('FailedLoginCount') + 1);
-                $record->Update();
+                $this->_db->FailedLoginCount = ($this->_db->FailedLoginCount + 1);
+                $this->_db->Update();
             }
         }
         return false;
@@ -160,8 +158,7 @@ class Auth_DB extends Auth
     {
         if ($requireLoginName)
         {
-            $ret = $this->_db->Retrieve('LoginName', $loginName);
-            if ($ret)
+            if ($this->_db->Retrieve('LoginName', $loginName))
             {
                 // TODO: Add Suggestions...
                 $this->_error = Auth::ERROR_LOGIN_NAME_ALREADY_EXISTS;
@@ -169,8 +166,7 @@ class Auth_DB extends Auth
             }
         }
 
-        $ret = $this->_db->Retrieve('Email', $email);
-        if ($ret)
+        if ($this->_db->Retrieve('Email', $email))
         {
             $this->_error = Auth::ERROR_EMAIL_ALREADY_EXISTS;
 
@@ -293,10 +289,9 @@ class Auth_DB extends Auth
      */
     public function GetPasswordReminderToken($email)
     {
-        $ret = $this->_db->Retrieve('Email', $email);
-        if (!$ret)
+        if (!($this->_db->Retrieve('Email', $email)))
         {
-            $this->_error = 'No user with email: '.$email;
+            $this->_error = Auth::ERROR_NO_USER_EMAIL;
             return false;
         }
         else
@@ -313,10 +308,26 @@ class Auth_DB extends Auth
         }
     }
 
+    /**
+     * @param string $email
+     * @return string
+     */
+    public function GetUsernameFromEmail($email)
+    {
+        if ($this->_db->Email != $email)
+        {
+            $this->_db->Retrieve('Email', $email);
+        }
+        return $this->_db->DisplayName;
+    }
+
+    /**
+     * @param string $guid
+     * @return bool
+     */
     public function IsValidPasswordReminderGuid($guid)
     {
-        $ret = $this->_db->Retrieve('RecovertyGuid', $guid);
-        if ($ret)
+        if ($this->_db->Retrieve('RecoveryGuid', $guid))
         {
             return $this->ValidateGuidExpire($this->_db->GuidExpire);
         }
@@ -326,27 +337,40 @@ class Auth_DB extends Auth
         }
     }
 
+    /**
+     * @param string $guid
+     * @param string $newPassword
+     * @return bool
+     */
     public function ChangePasswordWithPasswordReminderGuid($guid, $newPassword)
     {
-        $ret = $this->_db->Retrieve('RecovertyGuid', $guid);
-        if ($ret)
+        if ($this->_db->Retrieve('RecovertyGuid', $guid))
         {
             if ($this->ValidateGuidExpire($this->_db->GuidExpire))
             {
                 $this->SetPassword($newPassword);
+                $this->_db->RecoverGuid = '';
+                $this->_db->Update();
                 return true;
             }
+            $this->_error = Auth::ERROR_EXPIRED_RECOVERY_TOKEN;
         }
         else
         {
-            $this->_error = 'Unknown recovery token guid';
+            $this->_error = Auth::ERROR_UNKNOWN_RECOVERY_TOKEN;
         }
         return false;
     }
 
+    /**
+     * @param string $date
+     * @return bool
+     */
     private function ValidateGuidExpire($date)
     {
         return strtotime($date) > time();
+
+
     }
 }
 
