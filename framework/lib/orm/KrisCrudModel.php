@@ -154,6 +154,14 @@ class KrisCrudModel extends KrisModel
 
             $displayFieldSelect = $this->GetForeignFieldSelectDisplay($tableAlias, $displayField, $aliasField);
 
+            if (isset($foreignFieldData['extra_fields']))
+            {
+                foreach ($foreignFieldData['extra_fields'] as $fieldName => $fieldAlias)
+                {
+                    $select .= ', '.$tableAlias.'.'.$fieldName.' AS '.$fieldAlias;
+                }
+            }
+
             $select .= $displayFieldSelect;
         }
 
@@ -198,8 +206,7 @@ class KrisCrudModel extends KrisModel
             $displayFieldSelect = ', ' . $tableAlias . '.' . $this->quoteDbObject($displayField);
         }
 
-        $displayFieldSelect .= ' AS ' . $aliasField;
-        return $displayFieldSelect;
+        return $displayFieldSelect.' AS ' . $aliasField;
     }
 
 
