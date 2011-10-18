@@ -296,7 +296,8 @@ class Auth_DB extends Auth
         }
         else
         {
-            $guid = uniqid('epr', true);
+            // There is no reason for this, I just don't like having .'s in a guid...
+            $guid = str_replace('.', 'c', uniqid('epr', true));
 
             // Give 4 hours to reset the password
             $this->_db->RecoveryGuid = $guid;
@@ -344,12 +345,12 @@ class Auth_DB extends Auth
      */
     public function ChangePasswordWithPasswordReminderGuid($guid, $newPassword)
     {
-        if ($this->_db->Retrieve('RecovertyGuid', $guid))
+        if ($this->_db->Retrieve('RecoveryGuid', $guid))
         {
             if ($this->ValidateGuidExpire($this->_db->GuidExpire))
             {
                 $this->SetPassword($newPassword);
-                $this->_db->RecoverGuid = '';
+                $this->_db->RecoveryGuid = '';
                 $this->_db->Update();
                 return true;
             }
@@ -375,24 +376,22 @@ class Auth_DB extends Auth
 }
 
 /**
- * Database Class for
- */
+  * @property int $UserId
+  * @property string $LoginName
+  * @property string $PasswordHash
+  * @property int $FailedLoginCount
+  * @property string $DisplayName
+  * @property string $Email
+  * @property string $Ip
+  * @property datetime $LastLogin
+  * @property string $Data
+  * @property int $Acl
+  * @property string $RecoverGuid
+  * @property string $GuidExpire
+  */
 class DBUserModel extends KrisModel
 {
-    /**
-    * @property int $UserId
-    * @property string $LoginName
-    * @property string $PasswordHash
-    * @property int $FailedLoginCount
-    * @property string $DisplayName
-    * @property string $Email
-    * @property string $Ip
-    * @property datetime $LastLogin
-    * @property string $Data
-    * @property int $Acl
-    * @property string $RecoverGuid
-    * @property string $GuidExpire
-    */
+
 
     /**
      * return DBAuth

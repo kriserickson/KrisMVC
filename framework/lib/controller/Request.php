@@ -50,6 +50,7 @@ class Request
     const CONTENT_TYPE_IMAGE_PNG = 'image/png';
     const CONTENT_TYPE_IMAGE_JPEG = 'image/jpeg';
     const CONTENT_TYPE_IMAGE_GIF = 'image/gif';
+    const CONTENT_TYPE_TEXT = 'text/plain';
 
     /**
      * @param string $controller
@@ -347,7 +348,6 @@ class Request
     {
         return $this->_controller.'/'.$this->_action.(count($this->_params) > 0 ? '/'.implode('/', $this->_params) : '');
     }
-
 
 
 }

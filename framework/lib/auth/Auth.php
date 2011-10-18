@@ -149,9 +149,10 @@ abstract class Auth
      * @param string $displayName - Optionals
      * @param bool $requireLoginName - Whether login name is required
      * @param bool $loginUser
+     * @param bool $ignorePasswordCheck
      * @return bool
      */
-    public function AddUser($loginName, $email, $password, $confirmPassword, $displayName = '', $requireLoginName = true, $loginUser = false)
+    public function AddUser($loginName, $email, $password, $confirmPassword, $displayName = '', $requireLoginName = true, $loginUser = false, $ignorePasswordCheck = false)
     {
         if ($requireLoginName && strlen($loginName) == 0)
         {

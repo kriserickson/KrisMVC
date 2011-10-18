@@ -38,10 +38,10 @@ class KrisCG extends KrisDB
      */
     public function SetupDirectories()
     {
-        $this->_applicationDirectory =  $this->_siteLocation . DIRECTORY_SEPARATOR . KrisConfig::APP_PATH;
+        $this->_applicationDirectory =  CodeGenHelpers::BuildPath($this->_siteLocation, KrisConfig::APP_PATH);
         $this->_baseModelDirectory = $this->_applicationDirectory . 'models';
-        $this->_generatedDirectory = $this->_baseModelDirectory . DIRECTORY_SEPARATOR . 'generated';
-        $this->_crudDirectory = $this->_baseModelDirectory . DIRECTORY_SEPARATOR . 'crud';
+        $this->_generatedDirectory = CodeGenHelpers::BuildPath($this->_baseModelDirectory, 'generated');
+        $this->_crudDirectory = CodeGenHelpers::BuildPath($this->_baseModelDirectory, 'crud');
 
 
     }
@@ -120,7 +120,7 @@ class KrisCG extends KrisDB
             throw new Exception('Unsupported template type: '.$viewType);
         }
 
-        $this->CreateDirectoryOrDie($this->_siteLocation.DIRECTORY_SEPARATOR.'config');
+        $this->CreateDirectoryOrDie(CodeGenHelpers::BuildPath($this->_siteLocation, 'config'));
 
         $m = new Mustache();
         $configContents = $m->render(file_get_contents(__DIR__.'/assets/CodeTemplates/KrisConfig.template'),
@@ -236,7 +236,7 @@ class KrisCG extends KrisDB
         $this->GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields, $fakeFields, $primaryKey, $fieldTypes);
 
         // Don't overwrite a class that has changes....
-        if (!file_exists($this->_crudDirectory . DIRECTORY_SEPARATOR . $filename))
+        if (!file_exists(CodeGenHelpers::BuildPath($this->_crudDirectory, $filename)))
         {
             $this->GenerateDerivedClass($filename, $safeClassName, $className);
         }
@@ -335,12 +335,12 @@ class KrisCG extends KrisDB
     {
 
         $m = new Mustache();
-        $output = $m->render(file_get_contents($this->BuildPath($this->BuildPath($this->BuildPath(__DIR__, 'assets'), 'CodeTemplates'), 'ModelGenerated.template')),
+        $output = $m->render(file_get_contents(CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath(__DIR__, 'assets'), 'CodeTemplates'), 'ModelGenerated.template')),
             array('BaseModelDirectory' => $this->_baseModelDirectory, 'tableName' => $tableName, 'className' => $className, 'filename' => $filename,
             'properties' => $properties, 'foreignKeyString' => $foreignKeyString, 'initializeFields' => $initializeFields, 'fakeFields' => $fakeFields,
             'primaryKey' => $primaryKey, 'fieldTypes' => $fieldTypes));
 
-        file_put_contents($this->BuildPath($this->_generatedDirectory, $className . 'Model' . '.php'), $output);
+        file_put_contents(CodeGenHelpers::BuildPath($this->_generatedDirectory, $className . 'Model' . '.php'), $output);
     }
 
     /**
@@ -353,7 +353,7 @@ class KrisCG extends KrisDB
     {
         $m = new Mustache();
         $output = $m->render(file_get_contents(__DIR__.'/assets/CodeTemplates/ModelCrud.template'), array('filename' => $filename, 'safeClassName' => $safeClassName, 'className' => $className));
-        file_put_contents($this->_crudDirectory . DIRECTORY_SEPARATOR . $filename, $output);
+        file_put_contents(CodeGenHelpers::BuildPath($this->_crudDirectory, $filename), $output);
     }
 
     /**
@@ -367,9 +367,9 @@ class KrisCG extends KrisDB
     {
         $m = new Mustache();
 
-        $controllerDirectory = $this->BuildPath($this->BuildPath($this->_applicationDirectory,'controllers'), $controllerLocation);
+        $controllerDirectory = CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($this->_applicationDirectory,'controllers'), $controllerLocation);
 
-        $assetDir = $this->BuildPath(__DIR__, 'assets');
+        $assetDir = CodeGenHelpers::BuildPath(__DIR__, 'assets');
 
         if ($viewType == 'KrisView' || $viewType == 'Kris')
         {
@@ -395,40 +395,40 @@ class KrisCG extends KrisDB
         }
 
 
-        $templateDir = $this->BuildPath($assetDir, $viewFolder);
+        $templateDir = CodeGenHelpers::BuildPath($assetDir, $viewFolder);
 
         $this->CreateDirectoryOrDie($controllerDirectory);
 
-        $output = $m->render(file_get_contents($this->BuildPath($this->BuildPath($assetDir,'CodeTemplates') ,'ScaffoldController.template')),
+        $output = $m->render(file_get_contents(CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($assetDir,'CodeTemplates') ,'ScaffoldController.template')),
             array('ControllerLocation' => $controllerLocation, 'ControllerName' => $controllerName, 'ScaffoldMainLayout' => $scaffoldMainLayout,
                 'ViewLocation' => $viewLocation, 'ViewView' => $viewView, 'EditView' => $editView, 'IndexView' => $indexView, 'ViewType' => $viewType));
 
-        file_put_contents($this->BuildPath($controllerDirectory, ucfirst($controllerLocation).'Controller.php'), $output);
+        file_put_contents(CodeGenHelpers::BuildPath($controllerDirectory, ucfirst($controllerLocation).'Controller.php'), $output);
 
-        copy($this->BuildPath($templateDir,$scaffoldMainLayout), $this->BuildPath($this->BuildPath($this->BuildPath($this->_applicationDirectory, 'views'), 'layouts'), $scaffoldMainLayout));
+        copy(CodeGenHelpers::BuildPath($templateDir,$scaffoldMainLayout), CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($this->_applicationDirectory, 'views'), 'layouts'), $scaffoldMainLayout));
         
-        $this->CreateDirectoryOrDie($this->BuildPath($this->BuildPath($this->_applicationDirectory, 'views'), $viewLocation));
+        $this->CreateDirectoryOrDie(CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($this->_applicationDirectory, 'views'), $viewLocation));
 
-        copy($this->BuildPath($templateDir, $viewView), $this->BuildPath($this->BuildPath($this->BuildPath($this->_applicationDirectory, 'views') , $viewLocation), $viewView));
-        copy($this->BuildPath($templateDir, $editView), $this->BuildPath($this->BuildPath($this->BuildPath($this->_applicationDirectory, 'views'), $viewLocation), $editView));
-        copy($this->BuildPath($templateDir, $indexView), $this->BuildPath($this->BuildPath($this->BuildPath($this->_applicationDirectory, 'views'), $viewLocation), $indexView));
+        copy(CodeGenHelpers::BuildPath($templateDir, $viewView), CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($this->_applicationDirectory, 'views') , $viewLocation), $viewView));
+        copy(CodeGenHelpers::BuildPath($templateDir, $editView), CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($this->_applicationDirectory, 'views'), $viewLocation), $editView));
+        copy(CodeGenHelpers::BuildPath($templateDir, $indexView), CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($this->_applicationDirectory, 'views'), $viewLocation), $indexView));
 
         // TODO: Add the ability to add different css's 
-        copy($this->BuildPath($this->BuildPath($assetDir, 'css'), 'scaffold.css'), $this->BuildPath($this->BuildPath($this->_siteLocation, 'css'), 'scaffold.css'));
-        $this->CreateDirectoryOrDie($this->BuildPath($this->BuildPath($this->_siteLocation, 'images'), 'scaffold'));
+        copy(CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($assetDir, 'css'), 'scaffold.css'), CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($this->_siteLocation, 'css'), 'scaffold.css'));
+        $this->CreateDirectoryOrDie(CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($this->_siteLocation, 'images'), 'scaffold'));
 
 
-        $imageSource = $this->BuildPath($assetDir, 'ScaffoldImages');
+        $imageSource = CodeGenHelpers::BuildPath($assetDir, 'ScaffoldImages');
         $d = dir($imageSource);
 
-        $scaffoldImagesDir = $this->BuildPath($this->BuildPath($this->_siteLocation, 'images'), 'scaffold');
+        $scaffoldImagesDir = CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($this->_siteLocation, 'images'), 'scaffold');
         $this->CreateDirectoryOrDie($scaffoldImagesDir);
 
         while($res = $d->read())
         {
             if ($res != '.' && $res != '..')
             {
-                copy($this->BuildPath($imageSource, $res), $this->BuildPath($scaffoldImagesDir, $res));
+                copy(CodeGenHelpers::BuildPath($imageSource, $res), CodeGenHelpers::BuildPath($scaffoldImagesDir, $res));
             }
         }
     }
@@ -582,21 +582,6 @@ class KrisCG extends KrisDB
         }
     }
 
-    /**
-     * Returns a path combined
-     *
-     * @param string $path1
-     * @param string $path2
-     * @return string
-     */
-    private function BuildPath($path1, $path2)
-    {
-        if (substr($path1,-1) != '/' && substr($path1,-1) != '\\')
-        {
-            $path1 .= DIRECTORY_SEPARATOR;
-        }
-        return $path1.$path2;
-    }
 
 
 }

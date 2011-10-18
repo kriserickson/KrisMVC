@@ -16,6 +16,8 @@ require dirname(__FILE__) . '/../lib/plumbing/BucketContainer.php';
 require dirname(__FILE__) . '/../lib/view/Mustache.php';
 require dirname(__FILE__) . '/Args.php';
 require dirname(__FILE__) . '/CodeGeneration.php';
+require dirname(__FILE__) . '/CodeGenHelpers.php';
+require dirname(__FILE__) . '/SiteDeploy.php';
 
 if (!defined('__DIR__'))
 {
@@ -47,25 +49,39 @@ class KrisCGCommandLineParser
         $success = false;
 
         $command = $this->_args->Command();
-        if (in_array($command, array('create-table', 'table', 'create-site', 'site', 'create-scaffold', 'scaffold')))
+        if (in_array($command, array('create-table', 'table', 'create-site', 'site', 'create-scaffold', 'scaffold', 'deploy-site')))
         {
             $location = $this->GetLocation();
             if ($location)
             {
-                $this->_cg = new KrisCG($location);
                 try
                 {
-                    if ($this->_args->Command() == 'create-table' || $this->_args->Command() == 'table')
+                    if ($this->_args->Command() == 'deploy-site')
                     {
-                        $success = $this->CreateTable();
+                        $success = $this->DeploySite($location);
                     }
-                    else  if ($this->_args->Command() == 'create-site' || $this->_args->Command() == 'site')
+                    else
                     {
-                        $success = $this->CreateSite();
-                    }
-                    else if ($this->_args->Command() == 'create-scaffold' || $this->_args->Command() == 'scaffold')
-                    {
-                        $success = $this->CreateScaffold();
+                        $this->_cg = new KrisCG($location);
+
+                        if ($this->_args->Command() == 'create-table' || $this->_args->Command() == 'table')
+                        {
+                            $success = $this->CreateTable();
+                        }
+                        else {
+                            if ($this->_args->Command() == 'create-site' || $this->_args->Command() == 'site')
+                            {
+                                $success = $this->CreateSite();
+                            }
+                            else
+                            {
+                                if ($this->_args->Command() == 'create-scaffold' || $this->_args->Command() == 'scaffold')
+                                {
+                                    $success = $this->CreateScaffold();
+                                }
+                            }
+                        }
+
                     }
                 }
                 catch (Exception $ex)
@@ -160,7 +176,7 @@ class KrisCGCommandLineParser
         }
         catch (Exception $ex)
         {
-            echo 'Error Creating Site: '.$ex->getMessage();
+            echo 'Error Creating Site: ' . $ex->getMessage();
         }
         return true;
     }
@@ -194,10 +210,46 @@ class KrisCGCommandLineParser
         }
         catch (Exception $ex)
         {
-            echo 'Error Creating Table: '.$ex->getMessage();
+            echo 'Error Creating Table: ' . $ex->getMessage();
         }
         return true;
     }
+
+    private function DeploySite($location)
+    {
+        $isLive = $this->_args->flag(array('L', 'live'), false);
+        $userName = $this->_args->flag(array('u', 'username'));
+        $password = $this->_args->flag(array('p', 'password'));
+        $host = $this->_args->flag(array('h', 'host'));
+        $temp = $this->_args->flag(array('t', 'temp'));
+        $destdir = $this->_args->flag(array('d', 'dest-directory'));
+        $yuiLocation = $this->_args->flag(array('y', 'yui-location'));
+        $write = $this->_args->flag(array('w', 'write'));
+
+        try
+        {
+            $deploy = new SiteDeploy($location, $isLive);
+            $deploy->Initialize($userName, $password, $host, $destdir, $temp, $yuiLocation);
+            if ($write)
+            {
+                $deploy->WriteDeployFile();
+                echo 'Deployment File Written..';
+            }
+            else
+            {
+                $deploy->Deploy();
+                echo 'Site Deployed';
+
+            }
+            return true;
+        }
+        catch (Exception $ex)
+        {
+            echo 'Error: ' . $ex;
+            return false;
+        }
+    }
+
 
     /**
      * @return bool
@@ -213,7 +265,7 @@ class KrisCGCommandLineParser
 
         if ($this->IsCli())
         {
-            if (strlen($this->_args->flag(array('l', 'scaffold-location'))) == 0)
+            if (strlen($this->_args->flag(array('L', 'scaffold-location'))) == 0)
             {
                 $controllerLocation = $this->GetInput('Controller Location (in app/controllers)', $controllerLocation);
             }
@@ -239,7 +291,7 @@ class KrisCGCommandLineParser
         }
         catch (Exception $ex)
         {
-            echo 'Error Creating Scaffold: '.$ex->getMessage();
+            echo 'Error Creating Scaffold: ' . $ex->getMessage();
         }
         return true;
     }
@@ -312,7 +364,8 @@ class KrisCGCommandLineParser
                 '                   -t --table              The table to create ' . PHP_EOL . PHP_EOL .
                 '   create-site or site                 Creates a new site' . PHP_EOL .
                 '                   -s --site               The base url of the site.  For example if you site is http://localhost/test ' . PHP_EOL .
-                '                   -n --no-database        If you do not want a database add this flag, otherwise an error will be generated' . PHP_EOL .
+                '                   -n --no-database        If you do not want a database add this flag, otherwise an error will be ' . PHP_EOL .
+                '                                           generated' . PHP_EOL .
                 '                   -h --host               The database host (ip, name), or the file location for SQLite' . PHP_EOL .
                 '                   -d --database           The database name (not required for SQLite)' . PHP_EOL .
                 '                   -u --user               The database user' . PHP_EOL .
@@ -321,7 +374,7 @@ class KrisCGCommandLineParser
                 '                   -a --site-name          The name of the site' . PHP_EOL .
                 '                   -v --view-type          The view engine (Mustache or KrisView)' . PHP_EOL . PHP_EOL .
                 '  create-scaffold scaffold             Create the crud scaffolding' . PHP_EOL .
-                '                   -l --scaffold-location  The in apps/controller of the scaffold (defaults to "scaffold")' . PHP_EOL .
+                '                   -L --scaffold-location  The in apps/controller of the scaffold (defaults to "scaffold")' . PHP_EOL .
                 '                   -n --scaffold-name      The name of the scaffold controller (defaults to "Scaffold")' . PHP_EOL .
                 '                   -s --scaffold-view      The main scaffold layout template (defaults to "scaffold.php")' . PHP_EOL .
                 '                   -o --view-location      The location in the views of scaffold view (defaults to "scaffold")' . PHP_EOL .
@@ -329,8 +382,17 @@ class KrisCGCommandLineParser
                 '                   -v --view               The template for View (defaults to "ViewView.php")' . PHP_EOL .
                 '                   -e --edit               The template for Edit (defaults to "EditView.php")' . PHP_EOL .
                 '                   -i --index              The template for Index (defaults to "IndexView.php")' . PHP_EOL . PHP_EOL .
+                '  deploy-site                          Deploys a site ' . PHP_EOL .
+                '                   -L --live               Deploys the live version of the site (the default is staging)' . PHP_EOL .
+                '                   -u --username           Site username' . PHP_EOL .
+                '                   -p --password           Site password' . PHP_EOL .
+                '                   -h --host               Site host' . PHP_EOL .
+                '                   -w --write              Write the deploy file (does not deploy the site, just writes defaults into' . PHP_EOL .
+                '                                           the deploy file)' . PHP_EOL .
+                '                   -t --temp               Temp location (defaults to $TEMP/$ProjectName)' . PHP_EOL .
+                '                   -c --yui-location       The location of the YUI compressor, note: Java is required to be installed ' . PHP_EOL .
                 '  Options available for all commands:' . PHP_EOL .
-                '                   -l --location       Location of the site' . PHP_EOL . PHP_EOL;
+                '                   -l --location       Location of the site (required unless the site is in the default location' . PHP_EOL . PHP_EOL;
 
     }
 
