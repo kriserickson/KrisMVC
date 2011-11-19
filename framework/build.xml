@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Krismvc" default="build">
+	<target name="build" depends="prepare,phpunit,phploc,pdepend,phpcpd,phpdoc"/>
+	<target name="clean" description="Cleanup build artifacts">
+		<delete dir="${basedir}/build/coverage"/>
+		<delete dir="${basedir}/build/logs"/>
+		<delete dir="${basedir}/build/pdepend"/> 
+	</target>
+	<target name="prepare" depends="clean" description="Prepare for build">
+		<mkdir dir="${basedir}/build/coverage"/>
+		<mkdir dir="${basedir}/build/logs"/>
+		<mkdir dir="${basedir}/build/pdepend"/> 
+	</target>
+	<target name="phpunit" description="Run unit tests with PHPUnit">
+		<exec executable="phpunit" failonerror="true"/>
+	</target>
+	<target name="phpdoc" description="Generate API documentation using PHPDocumentor">
+		<exec executable="phpdoc">
+			<arg value="--directory" />
+			<arg path="${basedir}/lib" />
+			<arg value="--target" />
+			<arg path="${basedir}/build/api" />
+		</exec>
+	</target>
+	<target name="phploc" description="Measure project size using PHPLOC">
+		<exec executable="phploc">
+			<arg value="--log-csv" />
+			<arg value="${basedir}/build/logs/phploc.csv" />
+			<arg path="${basedir}/lib" />
+		</exec>
+	</target>
+	<target name="pdepend" description="Calculate software metrics using PHP_Depend">
+		<exec executable="pdepend">
+			<arg value="--jdepend-xml=${basedir}/build/logs/jdepend.xml" />
+			<arg value="--jdepend-chart=${basedir}/build/pdepend/dependencies.svg" />
+			<arg value="--overview-pyramid=${basedir}/build/pdepend/overview-pyramid.svg" />
+			<arg path="${basedir}/lib" />
+		</exec>
+	</target>
+	<target name="phpcpd" description="Find duplicate code using PHPCPD">
+		<exec executable="phpcpd">
+			<arg value="--log-pmd" />
+			<arg value="${basedir}/build/logs/pmd-cpd.xml" />
+			<arg path="${basedir}/lib" />
+		</exec>
+	</target>
+</project>
