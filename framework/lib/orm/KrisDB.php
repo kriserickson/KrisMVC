@@ -70,7 +70,7 @@ abstract class KrisDB
             throw new KrisDatabaseException('Invalid key: '.$key);
         }
 
-        if (isset($this->_fakeFields[$fixedKey]) && $this->_fieldTypes[$fixedKey] == 'bool')
+        if (isset($this->_fieldTypes[$fixedKey]) && $this->_fieldTypes[$fixedKey] == 'bool')
         {
             return (bool)$this->_recordSet[$fixedKey];
         }
