@@ -100,13 +100,13 @@ class Auth_DB extends Auth
         else
         {
             /** @var $passwordCheck PasswordCheck */
-            $passwordCheck = AutoLoader::$Container->get('PasswordCheck');
+            $passwordCheck = AutoLoader::Container()->get('PasswordCheck');
             $this->_db->Ip = $_SERVER['REMOTE_ADDR'];
-            $this->_db->LastLogin = date('Y-m-d H:i:s');
+            $this->_db->LastLogin = date(KrisDB::ISO_DATE_STRING);
 
             if ($passwordCheck->CheckPassword($password, $this->_db->PasswordHash))
             {
-                $this->_user = new User($this->_db->UserId, $this->_db->DisplayName, $this->_db->Email, $this->_db->Data, $this->_db->Acl);
+                $this->_user = new User($this->_db->UserId, $this->_db->UserName, $this->_db->Email, $this->_db->Data, $this->_db->Acl);
                 $this->_db->FailedLoginCount = 0;
                 $this->_db->Update();
                 $this->LoginUserToSession();
@@ -160,7 +160,7 @@ class Auth_DB extends Auth
         {
             if ($this->_db->Retrieve('LoginName', $loginName))
             {
-                // TODO: Add Suggestions...
+                // TODO: Add Username Suggestions...
                 $this->_error = Auth::ERROR_LOGIN_NAME_ALREADY_EXISTS;
                 return false;
             }
@@ -175,7 +175,7 @@ class Auth_DB extends Auth
 
         $this->_db->LoginName = $loginName;
         $this->_db->Email = $email;
-        $this->_db->DisplayName = $displayName;
+        $this->_db->UserName = $displayName;
         $this->SetPassword($password);
         $this->_db->Create();
 
@@ -188,7 +188,7 @@ class Auth_DB extends Auth
      */
     public function SaveData()
     {
-        $this->_dbData = $this->_user->GetData();
+        $this->_db->Data = $this->_user->GetData();
     }
 
     /**
@@ -207,7 +207,7 @@ class Auth_DB extends Auth
     public function SetPassword($password)
     {
         /** @var $passwordCheck PasswordCheck */
-        $passwordCheck = AutoLoader::$Container->get('PasswordCheck');
+        $passwordCheck = AutoLoader::Container()->get('PasswordCheck');
         $hash = $passwordCheck->HashPassword($password);
         $this->_db->PasswordHash = $hash;
     }
@@ -301,7 +301,7 @@ class Auth_DB extends Auth
 
             // Give 4 hours to reset the password
             $this->_db->RecoveryGuid = $guid;
-            $this->_db->GuidExpire = date('Y-m-d h:i:s', time() + (60 * 60 * 4));
+            $this->_db->GuidExpire = date(KrisDB::ISO_DATE_STRING, time() + (60 * 60 * 4));
 
             $this->_db->Update();
 
@@ -319,7 +319,7 @@ class Auth_DB extends Auth
         {
             $this->_db->Retrieve('Email', $email);
         }
-        return $this->_db->DisplayName;
+        return $this->_db->UserName;
     }
 
     /**
@@ -380,13 +380,13 @@ class Auth_DB extends Auth
   * @property string $LoginName
   * @property string $PasswordHash
   * @property int $FailedLoginCount
-  * @property string $DisplayName
+  * @property string $UserName
   * @property string $Email
   * @property string $Ip
   * @property datetime $LastLogin
   * @property string $Data
   * @property int $Acl
-  * @property string $RecoverGuid
+  * @property string $RecoveryGuid
   * @property string $GuidExpire
   */
 class DBUserModel extends KrisModel
@@ -399,6 +399,6 @@ class DBUserModel extends KrisModel
     public function __construct()
     {
         parent::__construct('user_id', 'auth');
-        $this->initializeRecordSet(array('UserId', 'LoginName', 'PasswordHash', 'FailedLoginCount', 'DisplayName', 'Email', 'Ip', 'LastLogin', 'Data', 'Acl', 'RecoveryGuid', 'GuidExpire'));
+        $this->initializeRecordSet(array('UserId', 'LoginName', 'PasswordHash', 'FailedLoginCount', 'UserName', 'Email', 'Ip', 'LastLogin', 'Data', 'Acl', 'RecoveryGuid', 'GuidExpire'));
     }
 }

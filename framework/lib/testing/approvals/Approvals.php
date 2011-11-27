@@ -65,7 +65,7 @@ class Approvals {
 			$approvedContents = file_get_contents($approvedFilename);
 		}
 		$receivedContents = file_get_contents($receivedFilename);
-		if ($approvedContents === $receivedContents) {
+		if (self::equals($approvedContents,$receivedContents)) {
 			unlink($receivedFilename);
 		} else {
 			$hint = "\n------ To Approve, use the following command ------\n";
@@ -76,6 +76,10 @@ class Approvals {
 		}
 	}
 
+    private static function equals($val1, $val2)
+    {
+        return self::standardize_line_endings($val1) == self::standardize_line_endings($val2);
+    }
 
     /**
      * @static
@@ -96,6 +100,11 @@ class Approvals {
     public static function approveHtml($html) {
 		self::approve(new TextWriter($html, 'html'), new PHPUnitNamer(), self::getReporter('html'));
 	}
-	
+
+    private static function standardize_line_endings($val)
+    {
+        return str_replace(array("\r\n", "\r"), array("\n", "\n"), $val);
+    }
+
 
 }

@@ -349,5 +349,17 @@ class Request
         return $this->_controller.'/'.$this->_action.(count($this->_params) > 0 ? '/'.implode('/', $this->_params) : '');
     }
 
+    public function JsonResponse($data)
+    {
+        $this->SetContentType(Request::CONTENT_TYPE_JSON);
+        $res = json_encode($data);
+        if ($this->HasGet('callback'))
+        {
+            $res = $this->GetVar('callback').'('.$res.');';
+        }
+        echo $res;
+
+    }
+
 
 }

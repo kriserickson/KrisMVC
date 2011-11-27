@@ -14,6 +14,7 @@ class Helpers_AllTests extends PHPUnit_Framework_TestSuite
 		$suite = new self();
 
 		$suite->addTestFile(__DIR__ . '/HtmlHelpersTest.php');
+        $suite->addTestFile(__DIR__ . '/NumberHelpersTest.php');
 
 		return $suite;
 	}

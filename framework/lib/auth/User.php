@@ -98,7 +98,7 @@ class User
     /**
      * @return string
      */
-    function DisplayName()
+    function UserName()
     {
         return $this->_displayName;
     }

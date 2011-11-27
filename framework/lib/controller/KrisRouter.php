@@ -123,6 +123,8 @@ class KrisRouter implements Router
     {
         $this->_request = new Request($controller, $action, $params);
 
+        $error = '';
+
         if ($this->GetControllerRequest($controller, $this->_request->Action(), $error, $controllerObj, $function))
         {
             $res = call_user_func_array(array($controllerObj, $function), $this->_request->Params());
@@ -140,11 +142,12 @@ class KrisRouter implements Router
     }
 
     /**
-     * @param $controller
-     * @param $action
-     * @param $error
-     * @param $function
-     * @param $controllerObj
+     * @param string $controller
+     * @param string $action
+     * @param string $error
+     * @param object $controllerObj
+     * @param function $function
+     *
      * @return bool
      */
     protected function GetControllerRequest($controller, $action, &$error, &$controllerObj, &$function)
@@ -216,7 +219,7 @@ class KrisRouter implements Router
             else
             {
                 /** @var $log Log */
-                $log = AutoLoader::$Container->get('Log');
+                $log = AutoLoader::Container()->get('Log');
                 $log->Error('Unable to call Error404Handler, function ' . KrisConfig::$Error404Handler . ' does not exist');
             }
         }

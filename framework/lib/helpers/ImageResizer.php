@@ -86,8 +86,10 @@ class ImageResizer
     }
 
     /**
-     * @param $width
-     * @param $height
+     * Resizes the current image optimally from
+     *
+     * @param int $width
+     * @param int $height
      * @return void
      */
     function resizeToOptimal($width, $height)
@@ -110,6 +112,23 @@ class ImageResizer
 
         $new_image = imagecreatetruecolor($width, $height);
         imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $width, $height, $image_width, $image_height);
+        $this->image = $new_image;
+
+    }
+
+    /**
+     * Crops an image from x,y,width, height and makes the current image that crop...
+     *
+     * @param int $x
+     * @param int $y
+     * @param int $width
+     * @param int $height
+     * @return void
+     */
+    public function cropImage($x, $y, $width, $height)
+    {
+        $new_image = imagecreatetruecolor($width, $height);
+        imagecopy($new_image, $this->image, 0, 0, $x, $y, $width, $height);
         $this->image = $new_image;
     }
 

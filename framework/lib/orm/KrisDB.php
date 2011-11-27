@@ -17,6 +17,9 @@
  */
 abstract class KrisDB
 {
+
+    const ISO_DATE_STRING = 'Y-m-d H:i:s';
+
     /**
      * @var PDO
      */
@@ -62,7 +65,14 @@ abstract class KrisDB
             throw new KrisDatabaseException('Invalid key: '.$key);
         }
 
-        return $this->_recordSet[$fixedKey];
+        if (!isset($this->_fakeFields[$fixedKey]) && $this->_fieldTypes[$fixedKey] == 'bool')
+        {
+            return (bool)$this->_recordSet[$fixedKey];
+        }
+        else
+        {
+            return $this->_recordSet[$fixedKey];
+        }
     }
 
 
@@ -134,7 +144,7 @@ abstract class KrisDB
     {
         if (is_null($this->_dbh))
         {
-            $this->_dbh = AutoLoader::$Container->get('PDO');
+            $this->_dbh = AutoLoader::Container()->get('PDO');
         }
         return $this->_dbh;
     }
@@ -154,18 +164,18 @@ abstract class KrisDB
      */
     protected function quoteDbObject($name)
     {
-        if (KrisConfig::$DATABASE_TYPE == KrisConfig::DB_TYPE_MYSQL)
+        if (class_exists('KrisConfig', false))
         {
-            return '`' . $name . '`';
+            if (KrisConfig::$DATABASE_TYPE == KrisConfig::DB_TYPE_MYSQL)
+            {
+                return '`' . $name . '`';
+            }
+            elseif (KrisConfig::$DATABASE_TYPE ==  KrisConfig::DB_TYPE_MSSQL)
+            {
+                return '[' . $name . ']';
+            }
         }
-        elseif (KrisConfig::$DATABASE_TYPE ==  KrisConfig::DB_TYPE_MSSQL)
-        {
-            return '[' . $name . ']';
-        }
-        else
-        {
-            return '"' . $name . '"';
-        }
+        return $name;
     }
 
     /**

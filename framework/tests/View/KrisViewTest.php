@@ -22,6 +22,15 @@ class KrisViewTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
+     */
+    public function testFetchFromString()
+    {
+        $res = $this->object->fetchFromString('<test><?= $foo ?></test>', array('foo' => 'bar'));
+        $this->assertEquals('<test>bar</test>', $res);
+    }
+
+    /**
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */

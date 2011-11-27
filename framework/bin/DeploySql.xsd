@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="deploySql">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="changeSet"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="changeSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="precondition"/>
+        <xs:element ref="action"/>
+        <xs:element ref="rollback"/>
+      </xs:sequence>
+      <xs:attribute name="author" use="required" type="xs:NCName"/>
+      <xs:attribute name="id" use="required" type="xs:integer"/>
+      <xs:attribute name="type" use="required" type="changeSetType"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="precondition">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="tableDoesntExist"/>
+        <xs:element ref="fieldDoesntExist"/>
+        <xs:element ref="tableExists"/>
+        <xs:element ref="fieldExists"/>
+        <xs:element ref="dataDoesntExist"/>
+        <xs:element ref="dataNotEqual"/>
+        <xs:element ref="preconditionNone"/>
+        <xs:element ref="indexDoesntExist"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="preconditionNone"/>
+  <xs:element name="dataDoesntExist">
+    <xs:complexType>
+      <xs:attribute name="field" use="required" type="xs:NCName"/>
+      <xs:attribute name="table" use="required" type="xs:NCName"/>
+      <xs:attribute name="value" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="dataNotEqual">
+    <xs:complexType mixed="true">
+      <xs:attribute name="field" use="required" type="xs:NCName"/>
+      <xs:attribute name="table" use="required" type="xs:NCName"/>
+      <xs:attribute name="key" use="required" type="xs:NCName"/>
+      <xs:attribute name="keyValue" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="indexDoesntExist">
+    <xs:complexType>
+      <xs:attribute type="xs:NCName" use="required" name="table"/>
+      <xs:attribute type="xs:NCName" use="required" name="index"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="tableDoesntExist">
+    <xs:complexType>
+      <xs:attribute type="xs:NCName" use="required" name="table"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="tableExists">
+    <xs:complexType>
+      <xs:attribute type="xs:NCName" use="required" name="table"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="fieldDoesntExist">
+    <xs:complexType>
+      <xs:attribute type="xs:NCName" use="required" name="table"/>
+      <xs:attribute type="xs:NCName" use="required" name="field"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="fieldExists">
+    <xs:complexType>
+      <xs:attribute type="xs:NCName" use="required" name="table"/>
+      <xs:attribute type="xs:NCName" use="required" name="field"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="action" type="xs:string"/>
+  <xs:element name="rollback" type="xs:string"/>
+  <xs:simpleType name="changeSetType">    
+    <xs:restriction base="xs:string">      
+      <xs:enumeration value="create" />      
+      <xs:enumeration value="populate" />      
+      <xs:enumeration value="alterSchema" />      
+      <xs:enumeration value="alterData" />
+    </xs:restriction>    
+  </xs:simpleType>  
+</xs:schema>

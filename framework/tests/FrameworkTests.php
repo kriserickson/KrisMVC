@@ -8,9 +8,11 @@ if (!defined('__DIR__'))
 require __DIR__ . '/../../config/KrisConfig.php';
 require __DIR__ . '/../../framework/lib/auth/PasswordCheck.php';
 require __DIR__ . '/../../framework/lib/auth/PasswordHash.php';
-require __DIR__ . '/../../framework/lib/controller/KrisController.php';
+require __DIR__ . '/../../framework/lib/cache/Cache.php';
+require __DIR__ . '/../../framework/lib/controller/KrisRouter.php';
 require __DIR__ . '/../../framework/lib/controller/RouteRequest.php';
 require __DIR__ . '/../../framework/lib/controller/Request.php';
+require __DIR__ . '/../../framework/lib/log/Log.php';
 require __DIR__ . '/../../framework/lib/orm/KrisDB.php';
 require __DIR__ . '/../../framework/lib/orm/KrisModel.php';
 require __DIR__ . '/../../framework/lib/orm/KrisCrudModel.php';
@@ -19,6 +21,7 @@ require __DIR__ . '/../../framework/lib/plumbing/BucketContainer.php';
 require __DIR__ . '/../../framework/lib/view/KrisView.php';
 require __DIR__ . '/../../framework/lib/view/Mustache.php';
 require __DIR__ . '/../../framework/lib/helpers/HtmlHelpers.php';
+require __DIR__ . '/../../framework/lib/helpers/NumberHelpers.php';
 
 
 

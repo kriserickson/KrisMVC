@@ -35,7 +35,7 @@ class CacheDB extends KrisModel
     {
         if (is_null($this->_dbh))
         {
-            $this->_dbh = AutoLoader::$Container->get('CACHE_DB');
+            $this->_dbh = AutoLoader::Container()->get('CACHE_DB');
         }
         return $this->_dbh;
     }

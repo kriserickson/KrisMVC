@@ -28,6 +28,15 @@ class FileHelpers
         }
         return mkdir($directory, 777, true);
     }
+
+    public static function BuildPath($path1, $path2)
+    {
+        if (substr($path1,-1) != '/' && substr($path1,-1) != '\\')
+        {
+            $path1 .= DIRECTORY_SEPARATOR;
+        }
+        return $path1.$path2;
+    }
 }
 
 ?>

@@ -278,7 +278,8 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
      * @param string $template
      * @param string $output
      *
-     */
+
+
 	public function test__clone($class, $template, $output) {
 		if (isset($this->knownIssues[$class])) {
 			$this->markTestSkipped($this->knownIssues[$class]);
@@ -298,7 +299,7 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertNotSame($n, $o);
 		$this->assertNotSame($m, $o);
 	}
-
+    */
 
 
 	/**

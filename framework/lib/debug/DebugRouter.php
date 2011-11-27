@@ -26,7 +26,7 @@ class DebugRouter extends KrisRouter
         else
         {
             /** @var $log DebugLog */
-            $log = AutoLoader::$Container->get('Log');
+            $log = AutoLoader::Container()->get('Log');
             $log->Debug('Controller path: '.$controllerPath.' Controller: '.$route->Controller.' Action: '.$route->Action.' Params: ('.implode(',', $route->Params).')');
 
             $startTime = microtime(true);
@@ -81,7 +81,7 @@ class DebugRouter extends KrisRouter
         $dbVars = '';
 
         // Get Database Log
-        $db = AutoLoader::$Container->get('PDO');
+        $db = AutoLoader::Container()->get('PDO');
         /** @var $db DebugPDO */
         $databaseQueryCount = count($db->DatabaseLog);
         $dbTime = 0;

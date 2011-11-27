@@ -66,7 +66,7 @@ abstract class KrisModel extends KrisDB
             if (!$this->isFakeField($key))
             {
                 $dbKey = $this->convertClassKeyToDBKey($key);
-                if ($dbKey != $this->_primaryKeyName && $value)
+                if ($value)
                 {
                     $s1 .= (strlen($s1) > 0 ? ',' : ''). $this->quoteDbObject($dbKey);
                     $s2 .= (strlen($s2) > 0 ? ',' : '').'?';
@@ -92,12 +92,12 @@ abstract class KrisModel extends KrisDB
 
     /**
      * @param string $query
-     * @return void
+     * @return PDOStatement
      */
     public function Query($query)
     {
         $dbh = $this->getDatabaseHandle();
-        $dbh->query($query);
+        return $dbh->query($query);
     }
 
     /**
@@ -139,6 +139,16 @@ abstract class KrisModel extends KrisDB
         return $this->returnMultiple($this->generateStatement(null, $where, $bindings, $likeQuery, $count, $offset, $orderBy));
     }
 
+
+    /**
+     * Synonym for Update
+     * @see KrisModel::Update
+     * @return void
+     */
+    public function Save()
+    {
+        $this->Update();
+    }
 
 
     /**

@@ -35,7 +35,8 @@ abstract class Cache
             switch (KrisConfig::$CACHE_TYPE)
             {
                 case KrisConfig::CACHE_TYPE_APC :
-                    self::$instance = new ApcCache();
+                    throw new Exception('ApcCache not written yet');
+                    //self::$instance = new ApcCache();
                     break;
                 case KrisConfig::CACHE_TYPE_FILE :
                     self::$instance = new FileCache();
@@ -44,7 +45,8 @@ abstract class Cache
                     self::$instance = new DBCache();
                     break;
                 case KrisConfig::CACHE_TYPE_MEMCACHE :
-                    self::$instance = new MemcacheCache();
+                    throw new Exception('Memcache not written yet');
+                    //self::$instance = new MemcacheCache();
                     break;
                 default:
                     throw new Exception('Unsupported cache type');

@@ -67,11 +67,11 @@ class KrisDBTest extends PHPUnit_Framework_TestCase
         KrisConfig::$DATABASE_TYPE = KrisConfig::DB_TYPE_MSSQL;
         $this->assertEquals('[test]', $this->_krisDB->quoteDbObject('test'));
 
-        KrisConfig::$DATABASE_TYPE = KrisConfig::DB_TYPE_SQLITE;
-        $this->assertEquals('"test"', $this->_krisDB->quoteDbObject('test'));
-
-        KrisConfig::$DATABASE_TYPE = KrisConfig::DB_TYPE_POSTGRESQL;
-        $this->assertEquals('"test"', $this->_krisDB->quoteDbObject('test'));
+//        KrisConfig::$DATABASE_TYPE = KrisConfig::DB_TYPE_SQLITE;
+//        $this->assertEquals('"test"', $this->_krisDB->quoteDbObject('test'));
+//
+//        KrisConfig::$DATABASE_TYPE = KrisConfig::DB_TYPE_POSTGRESQL;
+//        $this->assertEquals('"test"', $this->_krisDB->quoteDbObject('test'));
 
 
     }

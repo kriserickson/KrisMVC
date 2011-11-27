@@ -21,6 +21,15 @@ class AutoLoader
     public static $Container;
 
     /**
+     * @static
+     * @return BucketContainer
+     */
+    public static function Container()
+    {
+        return self::$Container;
+    }
+
+    /**
      *  Used by the autoloader to autoload classes...
      * @static
      * @param $className
@@ -98,8 +107,13 @@ function __autoload($className)
             $path = '';
         }
 
-        /** @noinspection PhpIncludeInspection */
-        require(KrisConfig::APP_PATH . 'models/'. $path . $className . '.php');
+
+        $includeFile = KrisConfig::APP_PATH . 'models/' . $path . $className . '.php';
+        if (file_exists($includeFile))
+        {
+            /** @noinspection PhpIncludeInspection */
+            require($includeFile);
+        }
 
     }
 

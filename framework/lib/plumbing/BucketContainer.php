@@ -98,7 +98,7 @@ class BucketContainer
             $this->factory = new StdClass();
             foreach ($factory as $classname => $callback)
             {
-                $this->factory->{'new_' . strtolower($classname)} = $callback;
+                $this->RegisterFactory($classname, $callback);
             }
         }
         else
@@ -106,6 +106,11 @@ class BucketContainer
             $this->factory = $factory ? $factory : new StdClass();
         }
         $this->scope = new BucketScope($scope);
+    }
+
+    public function RegisterFactory($classname, $callback)
+    {
+        $this->factory->{'new_' . strtolower($classname)} = $callback;
     }
 
     /**

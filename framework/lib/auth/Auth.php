@@ -131,6 +131,16 @@ abstract class Auth
         return $this->_error;
     }
 
+    /**
+     * Function should really only be used for tests and mocking...
+     *
+     * @param int $error
+     * @return void
+     */
+    public function SetError($error)
+    {
+        $this->_error = $error;
+    }
 
 
     /**

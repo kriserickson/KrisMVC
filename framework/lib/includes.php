@@ -37,6 +37,7 @@ AutoLoader::AddClass('Session', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Session.php
 AutoLoader::AddClass('User', KrisConfig::FRAMEWORK_DIR.'/lib/auth/User.php', true);
 
 // Helpers
+AutoLoader::AddClass('FileHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/FileHelpers.php', true);
 AutoLoader::AddClass('HtmlHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/HtmlHelpers.php', true);
 AutoLoader::AddClass('ImageResizer', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/ImageResizer.php', true);
 AutoLoader::AddClass('NumberHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/NumberHelpers.php', true);
@@ -78,7 +79,7 @@ $factory = array('PDO' => create_function('$container', '$dsn = "mysql:host=".Kr
 AutoLoader::$Container = new BucketContainer($factory);
 foreach ($classes as $interface => $useClass)
 {
-    AutoLoader::$Container->registerImplementation($interface, $useClass);
+    AutoLoader::Container()->registerImplementation($interface, $useClass);
 }
 
 
