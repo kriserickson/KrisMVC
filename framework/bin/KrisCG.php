@@ -8,21 +8,19 @@
  * with this source code in the file LICENSE.
  */
 
-require dirname(__FILE__) . '/../lib/orm/KrisDB.php';
-require dirname(__FILE__) . '/../lib/debug/DebugPDO.php';
-require dirname(__FILE__) . '/../lib/helpers/FileHelpers.php';
-require dirname(__FILE__) . '/../lib/plumbing/AutoLoader.php';
-require dirname(__FILE__) . '/../lib/plumbing/BucketContainer.php';
-require dirname(__FILE__) . '/../lib/view/Mustache.php';
-require dirname(__FILE__) . '/Args.php';
-require dirname(__FILE__) . '/CodeGeneration.php';
-require dirname(__FILE__) . '/CodeGenHelpers.php';
-require dirname(__FILE__) . '/SiteDeploy.php';
+require_once dirname(__FILE__) . '/../lib/plumbing/AutoLoader.php';
+require_once dirname(__FILE__) . '/../lib/plumbing/BucketContainer.php';
+require_once dirname(__FILE__) . '/../lib/orm/KrisDB.php';
+require_once dirname(__FILE__) . '/../lib/orm/KrisModel.php';
+require_once dirname(__FILE__) . '/../lib/debug/DebugPDO.php';
+require_once dirname(__FILE__) . '/../lib/helpers/FileHelpers.php';
+require_once dirname(__FILE__) . '/../lib/view/Mustache.php';
+require_once dirname(__FILE__) . '/Args.php';
+require_once dirname(__FILE__) . '/CodeGenDB.php';
+require_once dirname(__FILE__) . '/CodeGeneration.php';
+require_once dirname(__FILE__) . '/CodeGenHelpers.php';
+require_once dirname(__FILE__) . '/SiteDeploy.php';
 
-if (!defined('__DIR__'))
-{
-    define('__DIR__', dirname(__FILE__));
-}
 
 /**
  * Class that
@@ -86,7 +84,7 @@ class KrisCGCommandLineParser
                 }
                 catch (Exception $ex)
                 {
-                    echo 'Error: ' . $ex;
+                    echo 'Error: ' . $ex->getMessage().PHP_EOL.PHP_EOL;
                 }
             }
         }
@@ -176,7 +174,7 @@ class KrisCGCommandLineParser
         }
         catch (Exception $ex)
         {
-            echo 'Error Creating Site: ' . $ex->getMessage();
+            echo 'Error Creating Site: ' . $ex->getMessage().PHP_EOL.PHP_EOL;
         }
         return true;
     }
@@ -210,7 +208,7 @@ class KrisCGCommandLineParser
         }
         catch (Exception $ex)
         {
-            echo 'Error Creating Table: ' . $ex->getMessage();
+            echo 'Error Creating Table: ' . $ex->getMessage().PHP_EOL.PHP_EOL;
         }
         return true;
     }
@@ -221,6 +219,7 @@ class KrisCGCommandLineParser
         $userName = $this->_args->flag(array('u', 'username'));
         $password = $this->_args->flag(array('p', 'password'));
         $host = $this->_args->flag(array('h', 'host'));
+        $port = $this->_args->flag(array('o', 'port'));
         $temp = $this->_args->flag(array('t', 'temp'));
         $destdir = $this->_args->flag(array('d', 'dest-directory'));
         $yuiLocation = $this->_args->flag(array('y', 'yui-location'));
@@ -229,7 +228,7 @@ class KrisCGCommandLineParser
         try
         {
             $deploy = new SiteDeploy($location, $isLive);
-            $deploy->Initialize($userName, $password, $host, $destdir, $temp, $yuiLocation);
+            $deploy->Initialize($userName, $password, $host, $destdir, $temp, $yuiLocation, $port);
             if ($write)
             {
                 $deploy->WriteDeployFile();
@@ -238,6 +237,7 @@ class KrisCGCommandLineParser
             else
             {
                 $deploy->Deploy();
+                $deploy->WriteDeployFile();
                 echo 'Site Deployed';
 
             }
@@ -245,8 +245,9 @@ class KrisCGCommandLineParser
         }
         catch (Exception $ex)
         {
-            echo 'Error: ' . $ex;
-            return false;
+            echo 'Error: ' . $ex->getMessage().PHP_EOL.PHP_EOL;
+            $deploy->WriteDeployFile();
+            return true;
         }
     }
 
@@ -399,7 +400,12 @@ class KrisCGCommandLineParser
 
 }
 
-new KrisCGCommandLineParser(new Args());
+function exception_error_handler($errorNumber, $errorString, $errorFile, $errorLine ) {
+    throw new ErrorException($errorString, 0, $errorNumber, $errorFile, $errorLine);
+}
+set_error_handler("exception_error_handler");
+
+new KrisCGCommandLineParser();
 
 
 

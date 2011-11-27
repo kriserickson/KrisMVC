@@ -12,7 +12,7 @@
  * Used for code generation...
  * @package CodeGeneration
  */
-class KrisCG extends KrisDB
+class KrisCG extends CodeGenDB
 {
 
     const UNDERSCORE_PLACEHOLDER = '+=+';
@@ -67,8 +67,10 @@ class KrisCG extends KrisDB
             die('File located at '.$configLocation.' not a valid config file');
         }
 
-        $factory = array('PDO' => create_function('$container', '$dsn = "mysql:host=".KrisConfig::DB_HOST.";dbname=".KrisConfig::DB_DATABASE;'.PHP_EOL.
-            'return new PDO($dsn, KrisConfig::DB_USER, KrisConfig::DB_PASSWORD);'));
+        $factory = array('PDO' => function()
+        {
+            return new PDO('mysql:host='.KrisConfig::DB_HOST.';dbname='.KrisConfig::DB_DATABASE, KrisConfig::DB_USER, KrisConfig::DB_PASSWORD);
+        });
 
         AutoLoader::$Container = new BucketContainer($factory);
 
@@ -433,142 +435,8 @@ class KrisCG extends KrisDB
         }
     }
 
-    /**
-     * @param $table
-     * @return array
-     */
-    private function GetColumnMetadata($table)
-    {
-        $dbh = $this->getDatabaseHandle();
-
-        $stmt = $dbh->prepare("select COLUMN_NAME, DATA_TYPE, COLUMN_KEY from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = ? AND TABLE_SCHEMA = ?");
-
-        $columnNames = array();
-
-        if ($stmt->execute(array($table, KrisConfig::DB_DATABASE)))
-        {
-            $raw_column_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            foreach ($raw_column_data as $column_data)
-            {
-                $columnNames[$column_data['COLUMN_NAME']] = array('type' => $this->GetTypeFromDataType($column_data['DATA_TYPE']),
-                    'displayType' => $column_data['DATA_TYPE'], 'primary' => $column_data['COLUMN_KEY'] == 'PRI');
-            }
-        }
-
-        return $columnNames;
-
-    }
-
-    /**
-     * @param $table
-     * @param $usedColumnNames
-     * @return array
-     */
-    private function GetForeignKeys($table, $usedColumnNames)
-    {
-        $dbh = $this->getDatabaseHandle();
-
-        $stmt = $dbh->prepare("SELECT COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM information_schema.TABLE_CONSTRAINTS c
-            INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE cu ON
-            (c.CONSTRAINT_NAME = cu.CONSTRAINT_NAME AND cu.TABLE_NAME = c.TABLE_NAME AND cu.TABLE_SCHEMA = c.TABLE_SCHEMA)
-            WHERE c.CONSTRAINT_TYPE = ? AND c.TABLE_SCHEMA = ? AND c.TABLE_NAME = ?");
-
-        $foreignKeys = array();
-
-        if ($stmt->execute(array('FOREIGN KEY', KrisConfig::DB_DATABASE, $table)))
-        {
-            $this->ValidateStatement($stmt);
-
-            $foreign_key_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            foreach ($foreign_key_data as $foreign_key)
-            {
-                $foreignKeys[$foreign_key['COLUMN_NAME']] = array('table' => $foreign_key['REFERENCED_TABLE_NAME'],
-                    'field' => $foreign_key['REFERENCED_COLUMN_NAME']);
-
-            }
-        }
 
 
-
-        foreach ($foreignKeys as $column => $colData)
-        {
-            $referencedTableColumns = $this->GetColumnMetadata($colData['table']);
-            $alias = '';
-            $aliasCount = 1;
-            foreach ($referencedTableColumns as $columnName => $columnData)
-            {
-                $foreignKeys[$column]['display'] = $columnName;
-                while (isset($usedColumnNames[$columnName.$alias]))
-                {
-                    $alias = '_c'.$aliasCount++;
-                }
-                $foreignKeys[$column]['alias'] = $columnName.$alias;
-                if (!$columnData['primary'] && $columnData['type'] == 'string')
-                {
-                    $usedColumnNames[$columnName.$alias] = true;
-                    break;
-                }
-
-            }
-        }
-
-        return $foreignKeys;
-    }
-
-    /**
-     * @param $type
-     * @return string
-     */
-    private function GetTypeFromDataType($type)
-    {
-        // TODO: Make this work with non-mysql types...
-        switch (strtolower($type))
-        {
-            case 'varchar' : case 'char': case 'set':
-                return 'string';
-            case 'mediumblob': case 'blob': case 'longblob':
-                return 'blob';
-            case 'text': case 'mediumtext': case 'tinytext':
-                return 'text';
-            case 'time': case 'timestamp': case 'datetime': case 'date': case 'enum':
-                return $type;
-            case 'bigint': case 'longtext': case 'int': case 'mediumint': case 'smallint':
-                return 'int';
-            case 'tinyint':
-                return 'bool';
-
-            case 'decimal': case 'float': case 'double':
-                return 'float';
-
-            default:
-                return 'mixed'; // Really unknown...
-
-        }
-    }
-
-    /**
-     * Returns whether or not a table exists..
-     *
-     * @param $tableName
-     * @return bool
-     */
-    private function TableExists($tableName)
-    {
-        $dbh = $this->getDatabaseHandle();
-
-        $stmt = $dbh->prepare("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?");
-
-        if ($stmt->execute(array(KrisConfig::DB_DATABASE, $tableName)))
-        {
-            $this->ValidateStatement($stmt);
-
-            return $stmt->rowCount() > 0;
-        }
-
-        return false;
-    }
 
     /**
      * @param string $directory
@@ -581,7 +449,6 @@ class KrisCG extends KrisDB
             throw new Exception('Failed to create directory: '.$directory);
         }
     }
-
 
 
 }

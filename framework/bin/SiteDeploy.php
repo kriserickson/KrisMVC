@@ -41,12 +41,20 @@ class SiteDeploy
      */
     private $_deploymentConfig = array();
 
+    private $_stageLive = '';
+
     /**
      * This is collection of files to be copied and hashes of those files...
      *
      * @var array
      */
     private $_files = array();
+
+    private $_validatedDirectories = array();
+
+    const ActionCopy = 1;
+    const ActionMerge = 2;
+    const ActionCompress = 3;
 
     /**
      * @param string $location
@@ -56,8 +64,9 @@ class SiteDeploy
     {
         $this->_location = $location;
         $this->_isLive = $isLive;
+        $this->_stageLive = $isLive ? 'live' : 'staging';
         $this->_appDir = CodeGenHelpers::BuildPath($location, 'app'); // TODO: Pull from config...
-        $this->_deploymentDirectory = CodeGenHelpers::BuildPath($this->_appDir, $deploymentDir);
+        $this->_deploymentDirectory = CodeGenHelpers::BuildPath($location, $deploymentDir);
 
         if (!is_dir($this->_deploymentDirectory))
         {
@@ -71,120 +80,588 @@ class SiteDeploy
         }
     }
 
-
-    public function Initialize($userName, $password, $host, $destdir, $temp, $yuiLocation)
+    /**
+     * @throws Exception
+     * @param string $userName
+     * @param string $password
+     * @param string $host
+     * @param string $destdir
+     * @param string $temp
+     * @param string $yuiLocation
+     * @param int $port
+     * @return void
+     */
+    public function Initialize($userName, $password, $host, $destdir, $temp, $yuiLocation, $port)
     {
-        if ($userName)
-        {
-            $this->_deploymentConfig['username'] = $userName;
-        }
-        if ($password)
-        {
-            $this->_deploymentConfig['password'] = $password;
-        }
-        if ($host)
-        {
-            $this->_deploymentConfig['host'] = $host;
-        }
         if ($temp)
         {
             $this->_deploymentConfig['temp_dir'] = $temp;
         }
+        if ($userName)
+        {
+            $this->_deploymentConfig[$this->_stageLive]['username'] = $userName;
+        }
+        if ($password)
+        {
+            $this->_deploymentConfig[$this->_stageLive]['password'] = $password;
+        }
+        if ($host)
+        {
+            $this->_deploymentConfig[$this->_stageLive]['host'] = $host;
+        }
+        if ($port)
+        {
+            $this->_deploymentConfig[$this->_stageLive]['port'] = $port;
+        }
+
         if ($destdir)
         {
-            $this->_deploymentConfig['dest_dir'] = $destdir;
+            $this->_deploymentConfig[$this->_stageLive]['dest_dir'] = $destdir;
         }
         if ($yuiLocation)
         {
             $this->_deploymentConfig['yui-location'] = $yuiLocation;
         }
 
-        if (!isset($this->_deploymentConfig['username']))
+        if (!isset($this->_deploymentConfig[$this->_stageLive]['username']))
         {
             throw new Exception('No username is set');
         }
-        if (!isset($this->_deploymentConfig['password']))
+        if (!isset($this->_deploymentConfig[$this->_stageLive]['password']))
         {
             throw new Exception('No password is set');
         }
-        if (!isset($this->_deploymentConfig['host']))
+        if (!isset($this->_deploymentConfig[$this->_stageLive]['host']))
         {
             throw new Exception('No host is set');
+        }
+        if (!isset($this->_deploymentConfig[$this->_stageLive]['port']))
+        {
+            $this->_deploymentConfig[$this->_stageLive]['port'] = 22;
+        }
+        if (!isset($this->_deploymentConfig[$this->_stageLive]['dest_dir']))
+        {
+            throw new Exception('Destination directory is not set');
+        }
+        if (!isset($this->_deploymentConfig['yui-location']))
+        {
+            throw new Exception('Yui-location is not set');
         }
         if (!isset($this->_deploymentConfig['temp_dir']))
         {
             $this->_deploymentConfig['temp_dir'] = CodeGenHelpers::BuildPath(sys_get_temp_dir(), basename($this->_location));
         }
+
+
     }
 
+    /**
+     * writes the deploy file which keeps track of which files are on the website...
+     *
+     * @return void
+     */
     public function WriteDeployFile()
     {
         file_put_contents($this->_deployFilename, json_encode($this->_deploymentConfig));
     }
 
+    /**
+     * Deploys the site...
+     *
+     * @throws Exception
+     * @return void
+     */
     public function Deploy()
     {
+        if (!function_exists('ssh2_connect'))
+        {
+            throw new Exception('SSH2 extension is not installed.');
+        }
+
+
         // Create the temp directory...
         $tmpDir = $this->_deploymentConfig['temp_dir'];
+        $configDirectory = CodeGenHelpers::BuildPath($tmpDir, 'config');
+        $appTmpDir = CodeGenHelpers::BuildPath($tmpDir, basename($this->_appDir));
 
+        echo 'Clearing out old site' . PHP_EOL;
         $this->CleanTempDirectory($tmpDir);
 
         // CopyDirectory
-        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath(dirname(__DIR__), 'lib'), CodeGenHelpers::BuildPath($tmpDir, 'lib'));
-        $appTmpDir = CodeGenHelpers::BuildPath($tmpDir, basename($this->_appDir));
+        echo 'Copy KrisMVC library' . PHP_EOL;
+        $frameworkDirectory = dirname(dirname(__FILE__));
+        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($frameworkDirectory, 'lib'), CodeGenHelpers::BuildPath($tmpDir, 'lib'));
+        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($frameworkDirectory, 'bin'), CodeGenHelpers::BuildPath($tmpDir, 'bin'));
+
+        echo 'Copying controllers' . PHP_EOL;
         $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_appDir, 'controllers'), CodeGenHelpers::BuildPath($appTmpDir, 'controllers'));
+
+        echo 'Copying library' . PHP_EOL;
         $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_appDir, 'library'), CodeGenHelpers::BuildPath($appTmpDir, 'library'));
+
+        echo 'Copying models' . PHP_EOL;
         $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_appDir, 'models'), CodeGenHelpers::BuildPath($appTmpDir, 'models'));
+
+        echo 'Copying sql' . PHP_EOL;
+        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_appDir, 'sql'), CodeGenHelpers::BuildPath($appTmpDir, 'sql'));
+
+        echo 'Copying vendor directory' . PHP_EOL;
         $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_appDir, 'vendor'), CodeGenHelpers::BuildPath($appTmpDir, 'vendor'));
+
+        echo 'Copying images' . PHP_EOL;
         $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_location, 'images'), CodeGenHelpers::BuildPath($tmpDir, 'images'));
 
-        //  Copy and combine javascript into a different temp directory.
-        //  YUI Minimize Javascript that javascript...
+        echo 'Copying css' . PHP_EOL;
+        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_location, 'css'), CodeGenHelpers::BuildPath($tmpDir, 'css'));
 
-        //  Copy and combine css into a different temp directory.
-        //  YUI Minimize Javascript that javascript...
+        echo 'Copying js' . PHP_EOL;
+        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_location, 'js'), CodeGenHelpers::BuildPath($tmpDir, 'js'));
 
-        // Create config based on whether we are live or not...
+        echo 'Copying and merging views' . PHP_EOL;
+        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_appDir, 'views'), CodeGenHelpers::BuildPath($appTmpDir, 'views'), SiteDeploy::ActionMerge, $tmpDir);
 
-        // Get all the hashes from the server
+        echo 'Compressing Javascript' . PHP_EOL;
+        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($tmpDir, 'js'), '', SiteDeploy::ActionCompress);
 
-        // Put a site closed message up...
+        echo 'Compressing CSS' . PHP_EOL;
+        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($tmpDir, 'css'), '', SiteDeploy::ActionCompress);
 
-        // Run any SQL transformations through SCP.
+        echo 'Copying Config' . PHP_EOL;
+        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_location, 'config'), $configDirectory);
 
-        // Copy all files that have different hashes.
+        echo 'Merging Config Files' . PHP_EOL;
+        $this->MergeConfigFiles($configDirectory, $tmpDir);
 
-        // Move the site live again...
+
+        $destDirectory = $this->_deploymentConfig[$this->_stageLive]['dest_dir'];
+        $this->CopySingleFile('index.php', $tmpDir);
+        $this->CopySingleFile('maintenance.html', $tmpDir);
+        $this->CopySingleFile('.htaccess', $tmpDir);
+        $this->CopySingleFile('favicon.ico', $tmpDir);
+        $this->FixHtaccessFile($tmpDir, $destDirectory);
+
+
+        echo 'Connecting to server ' . $this->_deploymentConfig[$this->_stageLive]['host'] . PHP_EOL;
+
+        $connection = ssh2_connect($this->_deploymentConfig[$this->_stageLive]['host'], $this->_deploymentConfig[$this->_stageLive]['port']);
+        if (!$connection)
+        {
+            throw new Exception('Invalid host:' . $this->_deploymentConfig[$this->_stageLive]['host'] . ' nothing listening on port: ' . $this->_deploymentConfig[$this->_stageLive]['port']);
+        }
+
+        if (!ssh2_auth_password($connection, $this->_deploymentConfig[$this->_stageLive]['username'], $this->_deploymentConfig[$this->_stageLive]['password']))
+        {
+            throw new Exception('Invalid username password for host:' . $this->_deploymentConfig[$this->_stageLive]['host']);
+        }
+
+
+        $sftp = ssh2_sftp($connection);
+
+        $this->GetDeploymentFiles($destDirectory, $sftp);
+
+        $copyFiles = $this->GetFilesToDeploy();
+
+        $siteClosed = $this->CloseSiteForMaintenance($sftp, $connection, $destDirectory);
+
+        $totalCopyFiles = count($copyFiles);
+        $currentCopyFile = 0;
+        $lastPercent = 0;
+
+        try
+        {
+            // Copy all files that have different hashes.
+            foreach ($copyFiles as $file => $hash)
+            {
+                // Handle the special cases for index.php and maintenance.html if the site is closed...
+                if ($siteClosed && $file == 'index.php')
+                {
+                    $destFile = CodeGenHelpers::BuildPath($destDirectory, 'index.php.tmp', true);
+                }
+                else if ($siteClosed && $file == 'maintenance.html')
+                {
+                    $destFile = CodeGenHelpers::BuildPath($destDirectory, 'index.php', true);
+                }
+                else
+                {
+                    $destFile = CodeGenHelpers::BuildPath($destDirectory, $file, true);
+                }
+
+                $destFile = CodeGenHelpers::UnixifyPath($destFile);
+
+                if ($this->UploadFile(CodeGenHelpers::BuildPath($tmpDir, $file), $destFile, $connection, $sftp))
+                {
+                    $this->_deploymentConfig[$this->_stageLive]['files'][$file] = $hash;
+                }
+                else
+                {
+                    throw new Exception('Unable to scp file: ' . $file . ' to ' . $destFile);
+                }
+
+                $percent = (int)(($currentCopyFile / $totalCopyFiles) * 100);
+                if ($percent != $lastPercent)
+                {
+                    echo 'Percent copied: ' . $percent . PHP_EOL;
+                    $lastPercent = $percent;
+                }
+            }
+        }
+        catch (Exception $ex)
+        {
+            $this->SaveDeploymentFiles($tmpDir, $destDirectory, $connection, $sftp);
+            throw $ex;
+        }
+
+        $this->SaveDeploymentFiles($tmpDir, $destDirectory, $connection, $sftp);
+
+        $this->DeploySqlChanges($connection, CodeGenHelpers::BuildPath($destDirectory, 'app', true), CodeGenHelpers::BuildPath($destDirectory, 'bin', true),  $configDirectory);
+
+        if ($siteClosed)
+        {
+            $this->ReopenSite($sftp, $connection, $destDirectory);
+        }
 
     }
 
-    private function CopyDirectoryRecursive($source, $dest)
-    {
-        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source), RecursiveIteratorIterator::SELF_FIRST);
-        $sourceLen = strlen($source);
 
-        mkdir($dest, 0777, true);
+    /**
+     * @throws Exception
+     * @param string $file
+     * @param string $destFile
+     * @param resource $connection
+     * @param resource $sftp
+     * @return bool
+     */
+    private function UploadFile($file, $destFile, $connection, $sftp)
+    {
+        $destDir = dirname($destFile);
+
+        // Make sure the directory exists...
+        if (!isset($this->_validatedDirectories[$destDir]))
+        {
+            //$res = ssh2_sftp_stat($sftp, $destDir);
+            $directoryExists = file_exists('ssh2.sftp://' . $sftp . $destDir);
+            if (!$directoryExists)
+            {
+                if (!ssh2_sftp_mkdir($sftp, $destDir, 0777, true))
+                {
+                    throw new Exception('Unable to mkdir for ' . $destDir);
+                }
+            }
+            $this->_validatedDirectories[$directoryExists] = true;
+        }
+
+        return ssh2_scp_send($connection, $file, $destFile);
+
+    }
+
+    private function DeploySqlChanges($connection, $destAppDirectory, $binDirectory, $configDirectory)
+    {
+        $sqlDir = CodeGenHelpers::BuildPath($destAppDirectory, 'sql', true);
+        $sqlDeployScript = CodeGenHelpers::BuildPath($binDirectory, 'SqlDeploy.php', true);
+        $sqlConfig = $this->GetSqlConfigData($configDirectory);
+        
+        $cmd = 'php '.$sqlDeployScript.' migrate --directory="'.$sqlDir.'" --host=' . $sqlConfig['host'] . ' --user=' . $sqlConfig['user'] . ' --password=' . $sqlConfig['password'] . ' --database=' . $sqlConfig['database'];
+        $outputString = '';
+        $errorString = '';
+        $this->ExecuteSSHCommand($connection, $cmd, $outputString, $errorString);
+        if (strlen($errorString))
+        {
+            throw new Exception('Migrating SQL [' . trim($errorString) . ']');
+        }
+    }
+
+
+    /**
+     * @param resource $connection
+     * @param string $cmd
+     * @param string $outputString
+     * @param string $errorString
+     * @return bool
+     */
+    public function ExecuteSSHCommand($connection, $cmd, &$outputString, &$errorString)
+    {
+        $stream = ssh2_exec($connection, $cmd);
+        $errorStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
+
+
+        // Enable blocking for both streams
+        stream_set_blocking($errorStream, true);
+        stream_set_blocking($stream, true);
+
+        // Whichever of the two below commands is listed first will receive its appropriate output.  The second command receives nothing
+        $outputString = stream_get_contents($stream);
+        $errorString = stream_get_contents($errorStream);
+
+        // Close the streams
+        fclose($errorStream);
+        fclose($stream);
+
+        return strlen($errorString) == 0;
+    }
+
+    /**
+     * Reopens the site after a site closure.
+     *
+     * @throws Exception
+     * @param resource $sftp
+     * @param $connection
+     * @param string $destDirectory
+     * @return void
+     */
+    private function ReopenSite($sftp, $connection, $destDirectory)
+    {
+        echo 'Reopening site' . PHP_EOL;
+
+        $success = ssh2_sftp_unlink($sftp, $destDirectory . '/index.php');
+        if ($success)
+        {
+            $success = ssh2_sftp_rename($sftp, $destDirectory . '/index.php.tmp', $destDirectory . '/index.php');
+            if (!$success)
+            {
+                ssh2_exec($connection, 'cp ' . $destDirectory . '/maintenance.html ' . $destDirectory . '/index.php');
+                throw new Exception('Could not reopen store, unable to move index.php');
+            }
+        }
+        else
+        {
+
+
+            throw new Exception('Could not reopen store, unable to remove maintenance page');
+        }
+
+    }
+
+    /**
+     * Puts up a closed message while the site is being updated
+     *
+     * @throws Exception
+     * @param resource $sftp
+     * @param resource $connection
+     * @param string $destDirectory
+     * @return bool
+     */
+    private function CloseSiteForMaintenance($sftp, $connection, $destDirectory)
+    {
+        $closedIndexExists = file_exists('ssh2.sftp://' . $sftp . $destDirectory . '/index.php.tmp');
+
+        if (isset($this->_deploymentConfig[$this->_stageLive]['files']['index.php']) &&
+                isset($this->_deploymentConfig[$this->_stageLive]['files']['maintenance.html'])
+        )
+        {
+
+            echo 'Closing site with maintenance page' . PHP_EOL;
+
+            if (!$closedIndexExists)
+            {
+                $success = ssh2_sftp_rename($sftp, $destDirectory . '/index.php', $destDirectory . '/index.php.tmp');
+                if (!$success)
+                {
+                    throw new Exception('Could not close store, unable to move index.php');
+                }
+            }
+
+            $success = ssh2_exec($connection, 'cp ' . $destDirectory . '/maintenance.html ' . $destDirectory . '/index.php');
+            if (!$success)
+            {
+                throw new Exception('Could not close store, unable to move maintenance page in place');
+            }
+            ssh2_exec($connection, 'chown 666 ' . $destDirectory . '/index.php');
+
+            return true;
+        }
+
+        // If something went wrong last time we want to make sure we are closing the store...
+        return $closedIndexExists;
+    }
+
+    /**
+     * Gets a list of files that have changed since the last deployment...
+     *
+     * @return array
+     */
+    public function GetFilesToDeploy()
+    {
+        if (!isset($this->_deploymentConfig[$this->_stageLive]['files']))
+        {
+            $this->_deploymentConfig[$this->_stageLive]['files'] = array();
+        }
+
+        $copyFiles = array();
+
+        foreach ($this->_files as $fileLocation => $md5)
+        {
+            if (!isset($this->_deploymentConfig[$this->_stageLive]['files'][$fileLocation]) || $this->_deploymentConfig[$this->_stageLive]['files'][$fileLocation] != $md5)
+            {
+                $copyFiles[$fileLocation] = $md5;
+            }
+        }
+        return $copyFiles;
+    }
+
+    /**
+     * Gets the values from the live or staging config and merges it into the main config
+     *
+     * @param string $configDirectory
+     * @param string $basePath
+     * @return void
+     */
+    public function MergeConfigFiles($configDirectory, $basePath)
+    {
+        // Load the original config contents...
+        $configFilePath = CodeGenHelpers::BuildPath($configDirectory, 'KrisConfig.php');
+        $configFile = file_get_contents($configFilePath);
+
+        // Load the merged config contents...
+        $configMerge = CodeGenHelpers::BuildPath($configDirectory, $this->_isLive ? 'KrisConfig.php.live' : 'KrisConfig.php.staging');
+        $configLines = file($configMerge);
+
+        // Merge the contents
+        foreach ($configLines as $configLine)
+        {
+            if (preg_match('/^\s*([a-z0-9_ $]+)\s*=\s*(.*);/i', $configLine, $matches))
+            {
+                $configFile = preg_replace('/' . str_replace(array(' ', '$'), array('\s+', '\$'), $matches[1]) . '\s*=\s*(.*);/', $matches[1] . ' = ' . $matches[2] . ';', $configFile);
+            }
+        }
+
+        // Write it to file....
+        file_put_contents($configFilePath, $configFile);
+
+        // Remove Live and Staging from the deploy files...
+        $liveConfig = CodeGenHelpers::BuildPath($configDirectory, 'KrisConfig.php.live');
+        unlink($liveConfig);
+        $basePathLength = strlen($basePath) + 1;
+        unset($this->_files[substr($liveConfig, $basePathLength)]);
+        $stagingConfig = CodeGenHelpers::BuildPath($configDirectory, 'KrisConfig.php.staging');
+        unlink($stagingConfig);
+        unset($this->_files[substr($stagingConfig, $basePathLength)]);
+
+        $configFilename = substr($configFilePath, $basePathLength);
+
+        // Recompute the hash for config...
+        $this->_files[$configFilename] = md5_file($configFilePath);
+
+    }
+
+
+    /**
+     * @param string $source
+     * @param string $destinationDirectory
+     * @param int $process (really an enum of ActionCopy, ActionMerge, ActionCompress)
+     * @param string $tmpDir
+     * @return void
+     */
+    private function CopyDirectoryRecursive($source, $destinationDirectory, $process = SiteDeploy::ActionCopy, $tmpDir = '')
+    {
+        // Create an iterator to go through all of the release files...
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source), RecursiveIteratorIterator::SELF_FIRST);
+        $sourceLen = strlen($source) + 1;
+
+        if (strlen($destinationDirectory) > 0)
+        {
+            mkdir($destinationDirectory, 0777, true);
+        }
+
+        $baseDirLength = strlen($this->_deploymentConfig['temp_dir']) + 1;
 
         foreach ($iterator as $path)
         {
+            /** @var $path SplFileInfo */
             $sourceLocation = $path->__toString();
-            if (strpos($sourceLocation, DIRECTORY_SEPARATOR.'.') > 0)
+
+            // If is a special file (.svn), but not an htaccess file then ignore...
+            if (strpos($sourceLocation, DIRECTORY_SEPARATOR . '.') > 0 && basename($sourceLocation) != '.htaccess')
             {
                 continue;
             }
-            $destLocation = $dest . substr($sourceLocation, $sourceLen);
+
+            $destinationPath = substr($sourceLocation, $sourceLen);
+            $destLocation = CodeGenHelpers::BuildPath($destinationDirectory, $destinationPath);
             if ($path->isDir())
             {
                 mkdir($destLocation);
             }
             else
             {
-                copy($sourceLocation, $destLocation);
-                $this->_files[$destLocation] = md5_file($destLocation);
+                if ($process == SiteDeploy::ActionCopy)
+                {
+                    copy($sourceLocation, $destLocation);
+                }
+                else
+                {
+                    if ($process == SiteDeploy::ActionMerge)
+                    {
+                        $html = file_get_contents($sourceLocation);
+                        $cssJsFileBase = $this->ConvertPathToLongName($destinationPath);
+                        $html = $this->ProcessHtmlForCss($html, $cssJsFileBase, $tmpDir);
+                        $html = $this->ProcessHtmlForJavascript($html, $cssJsFileBase, $tmpDir);
+                        file_put_contents($destLocation, $html);
+                    }
+                    else
+                    {
+                        if ($process == SiteDeploy::ActionCompress)
+                        {
+                            $destLocation = '';
+                            if (strpos($sourceLocation, '.min.js') === false)
+                            {
+                                $output = '';
+                                $error = '';
+                                $res = $this->runExternal('java -jar ' . $this->_deploymentConfig['yui-location'] . ' -o "' . $sourceLocation . '.tmp" "' . $sourceLocation . '"', $output, $error);
+                                if ($res == 0 && file_exists($sourceLocation . '.tmp'))
+                                {
+                                    unlink($sourceLocation);
+                                    rename($sourceLocation . '.tmp', $sourceLocation);
+                                    $destLocation = $sourceLocation;
+
+                                    if (strlen($error) > 0)
+                                    {
+                                        echo 'Error compressing file: ' . $sourceLocation . ' ' . PHP_EOL . $error . PHP_EOL . PHP_EOL;
+                                    }
+                                }
+                                else
+                                {
+                                    if (strlen($error) > 0)
+                                    {
+                                        echo 'Error compressing file: ' . $sourceLocation . ' ' . PHP_EOL . $error . PHP_EOL . PHP_EOL;
+                                    }
+                                    else
+                                    {
+                                        echo 'Cannot compress file: ' . $sourceLocation . '. unknown Error.' . PHP_EOL;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+                if (strlen($destLocation) > 0)
+                {
+                    $this->_files[substr($destLocation, $baseDirLength)] = md5_file($destLocation);
+                }
             }
         }
     }
 
+    /**
+     * Copies a single file
+     *
+     * @param string $file
+     * @param string $tmpDir
+     * @return void
+     */
+    private function CopySingleFile($file, $tmpDir)
+    {
+        $destLocation = CodeGenHelpers::BuildPath($tmpDir, $file);
+        copy(CodeGenHelpers::BuildPath($this->_location, $file), $destLocation);
+        $this->_files[$file] = md5_file($destLocation);
+    }
+
+    /**
+     * Cleans up the temp directory...
+     *
+     * @param string $tmpDir
+     * @return void
+     */
     private function CleanTempDirectory($tmpDir)
     {
         if (!is_dir($tmpDir))
@@ -196,17 +673,339 @@ class SiteDeploy
             $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($tmpDir), RecursiveIteratorIterator::CHILD_FIRST);
             foreach ($iterator as $path)
             {
+                /** @var $path SplFileInfo */
                 if ($path->isDir())
                 {
                     rmdir($path->__toString());
                 }
                 else
                 {
-                    unlink($path->__toString());
+                    if ($path->isFile())
+                    {
+                        unlink($path->__toString());
+                    }
                 }
             }
         }
     }
 
+    /**
+     * Runs through an html file and pulls out all the javascript files that are local and merges them into a single file.
+     * Speeds up a site by only having one JS file to download...
+     *
+     * @param string $html
+     * @param string $jsFileBase
+     * @param string $tmpDir
+     * @return string
+     */
+    private function ProcessHtmlForJavascript($html, $jsFileBase, $tmpDir)
+    {
+        if (preg_match_all('/<script((\s+[a-z]+="[^"]*")*).*<\/script>/', $html, $matches, PREG_SET_ORDER))
+        {
+            $scripts = array();
+
+            foreach ($matches as $script_match)
+            {
+                if (preg_match_all('/([a-z]+)="([^"]*)"/', $script_match[1], $attribute_match, PREG_SET_ORDER))
+                {
+                    $attributes = array('src' => '');
+
+                    foreach ($attribute_match as $attribute)
+                    {
+                        $attributes[$attribute[1]] = $attribute[2];
+                    }
+
+                    if (preg_match('/^(<\?= +\$WEB_FOLDER;? +\?>|{{WEB_FOLDER}})/', $attributes['src'], $matchHref))
+                    {
+                        $scripts[] = array('script' => $script_match[0], 'location' => str_replace($matchHref[0], $this->_location, $attributes['src']),
+                            'template' => substr($matchHref[1], 0, 2) == '<?' ? 'php' : 'mustache');
+                    }
+                }
+            }
+
+            if (count($scripts))
+            {
+                $javascript = '';
+                $replace_script = '<script src="' . ($scripts[0]['template'] == 'php' ? '<?= $WEB_FOLDER ?>' : '{{WEB_FOLDER}}') .
+                        '/js/' . $jsFileBase . 'Joined.js"></script>';
+
+                $html = str_replace($scripts[0]['script'], $replace_script, $html);
+                for ($i = 1; $i < count($scripts); $i++)
+                {
+                    $html = str_replace($scripts[$i]['script'], '', $html);
+                }
+
+                foreach ($scripts as $link)
+                {
+                    $javascript .= file_get_contents($link['location']);
+                }
+
+                $joinedJsLocation =  CodeGenHelpers::BuildPath('js', $jsFileBase . 'Joined.js');
+                $destLocation = CodeGenHelpers::BuildPath($tmpDir, $joinedJsLocation);
+                file_put_contents($destLocation, $javascript);
+                $this->_files[$joinedJsLocation] = md5_file($destLocation);
+
+            }
+        }
+
+        return $html;
+    }
+
+    /**
+     * Runs through an html file and pulls out all the css files that are local and merges them into a single file.
+     * Speeds up a site by only having one css file to download...
+     *
+     * @param string $html
+     * @param string $cssFileBase
+     * @param string $tmpDir
+     * @return string
+     */
+    private function ProcessHtmlForCss($html, $cssFileBase, $tmpDir)
+    {
+        if (preg_match_all('/<link((\s+[a-z]+="[^"]*")*)\s*\/?>/', $html, $matches, PREG_SET_ORDER))
+        {
+            $links = array();
+
+            foreach ($matches as $link_match)
+            {
+                if (preg_match_all('/([a-z]+)="([^"]*)"/', $link_match[1], $attribute_match, PREG_SET_ORDER))
+                {
+                    $attributes = array('rel' => '', 'media' => 'screen');
+                    foreach ($attribute_match as $attribute)
+                    {
+                        $attributes[$attribute[1]] = $attribute[2];
+                    }
+                    if ($attributes['rel'] == 'stylesheet' && $attributes['media'] == 'screen' &&
+                            preg_match('/^(<\?= +\$WEB_FOLDER;? +\?>|{{WEB_FOLDER}})/', $attributes['href'], $matchHref)
+                    )
+                    {
+                        $links[] = array('link' => $link_match[0], 'location' => str_replace($matchHref[0], $this->_location, $attributes['href']),
+                            'template' => substr($matchHref[1], 0, 2) == '<?' ? 'php' : 'mustache');
+                    }
+                }
+            }
+
+            if (count($links))
+            {
+                $stylesheet = '';
+                $replace_stylesheet = '<link rel="stylesheet" href="' . ($links[0]['template'] == 'php' ? '<?= $WEB_FOLDER ?>' : '{{WEB_FOLDER}}') .
+                        '/css/' . $cssFileBase . 'Joined.css" type="text/css" media="screen" />';
+
+                $html = str_replace($links[0]['link'], $replace_stylesheet, $html);
+                for ($i = 1; $i < count($links); $i++)
+                {
+                    $html = str_replace($links[$i]['link'], '', $html);
+                }
+
+                foreach ($links as $link)
+                {
+                    $stylesheet .= file_get_contents($link['location']);
+                }
+
+                $joinedCss = CodeGenHelpers::BuildPath('css', $cssFileBase . 'Joined.css');
+                $destLocation = CodeGenHelpers::BuildPath($tmpDir, $joinedCss);
+                file_put_contents($destLocation, $stylesheet);
+                $this->_files[$joinedCss] = md5_file($destLocation);
+            }
+
+
+        }
+
+        return $html;
+    }
+
+    /**
+     * Used to generate merged CSS and JS path names
+     *
+     * @param string $destinationPath
+     * @return mixed
+     */
+    private function ConvertPathToLongName($destinationPath)
+    {
+        $destinationPath = str_replace(' ', '', ucwords(str_replace(array('/', '\\'), ' ', $destinationPath)));
+        return pathinfo($destinationPath, PATHINFO_FILENAME);
+    }
+
+    /**
+     * Processes an external application and allows reading of stdError on both unix and windows...
+     *
+     * @param string $cmd
+     * @param string $output (out)
+     * @param string $errorOut (out)
+     * @return bool
+     */
+    private function runExternal($cmd, &$output, &$errorOut)
+    {
+        $descriptors = array(
+            0 => array("pipe", "r"), // stdin is a pipe that the child will read from
+            1 => array("pipe", "w"), // stdout is a pipe that the child will write to
+            2 => array("pipe", "w") // stderr is a file to write to
+        );
+
+        $pipes = array();
+        $process = proc_open($cmd, $descriptors, $pipes);
+
+        $output = "";
+        $errorOut = "";
+
+        if (!is_resource($process))
+        {
+            return false;
+        }
+
+        #close child's input immediately
+        fclose($pipes[0]);
+
+        stream_set_blocking($pipes[1], false);
+        stream_set_blocking($pipes[2], false);
+
+        while (true)
+        {
+            $stdout = false;
+            $error = false;
+            $read = array();
+
+            if (!feof($pipes[1]))
+            {
+                $stdout = $pipes[1];
+                $read[] = $stdout;
+            }
+            if (!feof($pipes[2]))
+            {
+                $error = $pipes[2];
+                $read[] = $error;
+            }
+
+            if (!$read)
+            {
+                break;
+            }
+
+            $write = NULL;
+            $ex = NULL;
+
+            $ready = stream_select($read, $write, $ex, 2);
+
+            if ($ready === false)
+            {
+                break; #should never happen - something died
+            }
+
+            if ($stdout)
+            {
+                $output .= fread($stdout, 1024);
+            }
+            if ($error)
+            {
+                $errorOut .= fread($error, 1024);
+            }
+        }
+
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+
+        return proc_close($process);
+
+    }
+
+    private function GetSqlConfigData($configDirectory)
+    {
+        $configFilename = CodeGenHelpers::BuildPath($configDirectory, 'KrisConfig.php');
+        $configFile = file_get_contents($configFilename);
+
+        $res = array('host' => '', 'user' => '', 'password' => '', 'database' => '');
+
+        foreach (array_keys($res) as $key)
+        {
+            if (!preg_match('/const\s+DB_' . strtoupper($key) . '\s+=\s+[\'"]([^\'"]+)[\'"]/', $configFile, $match))
+            {
+                throw new Exception('Could not find SQL Config for ' . $key . ' in KrisConfig.php');
+            }
+            $res[$key] = $match[1];
+        }
+
+
+        return $res;
+
+    }
+
+    private function FixHtaccessFile($tmpDir, $destDirectory)
+    {
+        $oldRewriteBase = basename($this->_location);
+        $newRewriteBase = basename($destDirectory);
+        $htaccessFileLocation = CodeGenHelpers::BuildPath($tmpDir, '.htaccess');
+        $htaccess = file_get_contents($htaccessFileLocation);
+        $htaccess = str_replace('/' . $oldRewriteBase . '/', '/' . $newRewriteBase . '/', $htaccess);
+        file_put_contents($htaccessFileLocation, $htaccess);
+        $this->_files['.htaccess'] = md5_file($htaccessFileLocation);
+    }
+
+    private function json_encode_pretty($string)
+    {
+        $out = '';
+        $indent = 0;
+        $isText = false;
+
+        for ($i = 0; $i < strlen($string); $i++)
+        {
+            $character = $string[$i];
+            $breakBefore = $breakAfter = false;
+            $charBefore = $charAfter = '';
+
+            if ($character === '"' && ($i > 0 && substr($string, $i - 1, 1) !== '\\'))
+            {
+                $isText = !$isText;
+            }
+
+            // toggle
+            if (!$isText)
+            {
+                switch ($character)
+                {
+                    case '[':
+                    case '{':
+                        $indent++;
+                    case ',':
+                        $breakAfter = true;
+                        break;
+                    case ']':
+                    case '}':
+                        $indent--;
+                        $breakBefore = true;
+                        break;
+                    case ':':
+                        $charBefore = $charAfter = ' ';
+                        break;
+                }
+            }
+            $out .= ($breakBefore ? PHP_EOL . str_repeat(' ', $indent) : '')
+                    . $charBefore . $character . $charAfter
+                    . ($breakAfter ? PHP_EOL . str_repeat(' ', $indent) : '');
+        }
+        return $out;
+    }
+
+    private function GetDeploymentFiles($destPath, $sftp)
+    {
+
+        $fp = fopen('ssh2.sftp://' . $sftp . CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($destPath, 'deploy', true), 'deployFiles.json', true), 'r');
+        if ($fp)
+        {
+            $json = '';
+            while (($buffer = fgets($fp, 4096)) !== false)
+            {
+                $json .= $buffer;
+            }
+            fclose($fp);
+            $this->_deploymentConfig[$this->_stageLive]['files'] = json_decode($json, true);
+        }
+    }
+
+    private function SaveDeploymentFiles($tmpDir, $destPath, $connection, $sftp)
+    {
+        $deployFileList = CodeGenHelpers::BuildPath($tmpDir, 'deployFileList.txt');
+        file_put_contents($deployFileList, $this->json_encode_pretty(json_encode($this->_deploymentConfig[$this->_stageLive]['files'])));
+        $this->UploadFile($deployFileList, CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($destPath, 'deploy', true), 'deployFiles.json', true), $connection, $sftp);
+    }
 
 }

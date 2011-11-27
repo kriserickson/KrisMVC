@@ -10,12 +10,31 @@
 
 class CodeGenHelpers
 {
-    public static function BuildPath($path1, $path2)
+    /**
+     * @static
+     * @param string $path1
+     * @param string $path2
+     * @param bool $forceUnix
+     * @return string
+     */
+    public static function BuildPath($path1, $path2, $forceUnix = false)
     {
-        if (substr($path1,-1) != '/' && substr($path1,-1) != '\\')
+        $dirSep = $forceUnix ? '/' : DIRECTORY_SEPARATOR;
+        if (substr($path1,-1) != DIRECTORY_SEPARATOR && substr($path2,0,1) != DIRECTORY_SEPARATOR)
         {
-            $path1 .= DIRECTORY_SEPARATOR;
+            $path1 .= $dirSep;
         }
         return $path1.$path2;
+    }
+
+    /**
+     * @static
+     * @param string $path
+     * @return string
+     */
+    public static function UnixifyPath($path)
+    {
+        // Converts paths like '\tmp\dir' to '/tmp/dir' and '//tmp//dir' to '/tmp/dir'
+        return preg_replace('|[\\\/]+|', '/', $path);
     }
 }
