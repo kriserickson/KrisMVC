@@ -16,11 +16,6 @@ class KrisCrudModel extends KrisModel
 {
 
     /**
-     * @var array - FieldName -> Type (string, text, int, date, bool, image, upload, etc)
-     */
-    protected $_fieldTypes = array();
-
-    /**
      * @var array - Override these to change the sort order.  FieldName => Order...
      */
     protected $_fieldSortOrder = array();

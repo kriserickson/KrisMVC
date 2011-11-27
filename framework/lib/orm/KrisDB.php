@@ -50,6 +50,11 @@ abstract class KrisDB
      */
     protected $_dirty = array();
 
+     /**
+     * @var array - FieldName -> Type (string, text, int, date, bool, image, upload, etc)
+     */
+    protected $_fieldTypes = array();
+
     /**
      * Used to get a field from the Model/DBView
      *
@@ -65,7 +70,7 @@ abstract class KrisDB
             throw new KrisDatabaseException('Invalid key: '.$key);
         }
 
-        if (!isset($this->_fakeFields[$fixedKey]) && $this->_fieldTypes[$fixedKey] == 'bool')
+        if (isset($this->_fakeFields[$fixedKey]) && $this->_fieldTypes[$fixedKey] == 'bool')
         {
             return (bool)$this->_recordSet[$fixedKey];
         }
