@@ -35,7 +35,7 @@ class AuthController extends DefaultController
 
     /**
      * Index is an alias for login...
-     * @return null|\RouteRequest
+     * @return null|RouteRequest
      */
     public function Index()
     {
@@ -43,7 +43,7 @@ class AuthController extends DefaultController
     }
 
     /**
-     * @return null|\RouteRequest
+     * @return null|RouteRequest
      */
     public function Login()
     {
@@ -186,11 +186,17 @@ class AuthController extends DefaultController
     }
 
 
+    /**
+     *
+     */
     private function AddUser()
     {
     }
 
 
+    /**
+     *
+     */
     private function DisplayUsers()
     {
         $searchField = $this->_request->PostVar('search_field');
@@ -233,6 +239,9 @@ class AuthController extends DefaultController
         $this->_view->dump($this->_data);
     }
 
+    /**
+     * @return null|RouteRequest|string
+     */
     public function SignUp()
     {
         $error = '';
@@ -297,12 +306,22 @@ class AuthController extends DefaultController
         return null;
     }
 
+    /**
+     * @return RouteRequest
+     */
     public function Logout()
     {
         Auth::instance()->Logout();
         return new RouteRequest(KrisConfig::DEFAULT_CONTROLLER, KrisConfig::DEFAULT_ACTION);
     }
 
+    /**
+     * @param $searchType
+     * @param $search
+     * @param $startPosition
+     * @param $pageSize
+     * @return array
+     */
     private function GetUsers($searchType, $search, $startPosition, $pageSize)
     {
         if (strlen($search) == 0)
@@ -327,6 +346,10 @@ class AuthController extends DefaultController
         return $userList;
     }
 
+    /**
+     * @param $acl
+     * @return array
+     */
     private function GetAclStringArray($acl)
     {
         $acl_array = array();
