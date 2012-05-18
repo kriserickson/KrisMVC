@@ -28,6 +28,10 @@ class KrisConfig
     const DEFAULT_ACTION = 'index';
 
 
+    public static $SESSION_DOMAIN = '';
+
+    public static $SESSION_LIFETIME = 0;
+
     // Options
     public static $AUTH_TYPE = KrisConfig::AUTH_TYPE_DB;     // Currently only DB is implimented...
 
