@@ -8,6 +8,9 @@
  * with this source code in the file LICENSE.
  */
 
+/**
+ *
+ */
 abstract class CodeGenDB extends KrisModel
 {
     /**
@@ -92,9 +95,9 @@ abstract class CodeGenDB extends KrisModel
             case 'mediumblob': case 'blob': case 'longblob':
                 return 'blob';
             case 'text': case 'mediumtext': case 'tinytext':
-                return 'text';
+                return 'string';
             case 'time': case 'timestamp': case 'datetime': case 'date': case 'enum':
-                return $type;
+                return 'string';
             case 'bigint': case 'longtext': case 'int': case 'mediumint': case 'smallint':
                 return 'int';
             case 'tinyint':

@@ -7,7 +7,7 @@ class Plumbing_AllTests extends PHPUnit_Framework_TestSuite
 {
 	/**
 	 * Creates the suite.
-     * @return \AspSystem_AllTests
+     * @return Plumbing_AllTests
      */
 	public static function suite()
 	{

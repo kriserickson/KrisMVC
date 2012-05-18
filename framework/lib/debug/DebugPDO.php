@@ -7,11 +7,14 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
- 
+
+/**
+ *  @package debug
+ */
 class DebugPDO
 {
     /**
-     * @var \PDO
+     * @var PDO
      */
     private $_pdo;
     public $DatabaseLog = array();
@@ -181,7 +184,7 @@ class DebugPDOStatement
 {
 
     /**
-     * @var \PDOStatement
+     * @var PDOStatement
      */
     private $_statement;
 
@@ -194,7 +197,7 @@ class DebugPDOStatement
     /**
      * @param PDOStatement $statement
      * @param DebugPDO $debugPdo
-     * @return \DebugPDOStatement
+     * @return DebugPDOStatement
      *
      */
     public function __construct($statement, $debugPdo)

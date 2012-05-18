@@ -1,18 +1,18 @@
 <?php
-/*
- * This file is part of the KrisMvc framework.
- *
- * (c) Kris Erickson
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
+
+//  This file is part of the KrisMvc framework.
+//
+//  (c) Kris Erickson
+//
+//  This source file is subject to the MIT license that is bundled
+//  with this source code in the file LICENSE.
+
 
 
 /**
- * @package Model
+ * KrisModel
+ * @package Orm
  *
- * Model
  * Simplistic ActiveRecord style ORM that represents a table in the database...
  */
 abstract class KrisModel extends KrisDB
@@ -169,17 +169,34 @@ abstract class KrisModel extends KrisDB
     }
 
 
-
     /**
      * Deletes this model from the table
      *
+     * @param null|string $primaryKeyOrFieldName
+     * @param null|string $value
      * @return bool
      */
-    public function Delete()
+    public function Delete($primaryKeyOrFieldName = null, $value = null)
     {
+        $primaryKey = $this->_primaryKeyName;
+
+        if (is_null($primaryKeyOrFieldName))
+        {
+            $value = $this->PrimaryKey();
+        }
+        else if (is_null($value))
+        {
+            $value = $primaryKeyOrFieldName;
+        }
+        else
+        {
+            $primaryKey = $primaryKeyOrFieldName;
+        }
+
         $dbh = $this->getDatabaseHandle();
-        $stmt = $dbh->prepare('DELETE FROM ' . $this->quoteDbObject($this->_tableName) . ' WHERE ' . $this->quoteDbObject($this->_primaryKeyName) . ' = ?');
-        $stmt->bindValue(1, $this->PrimaryKey());
+        $stmt = $dbh->prepare($query = 'DELETE FROM ' . $this->quoteDbObject($this->_tableName) . ' WHERE ' .
+                $this->quoteDbObject($this->convertClassKeyToDBKey($primaryKey)).' = ?');
+        $stmt->bindValue(1, $value);
         $res = $stmt->execute();
         $this->ValidateStatement($stmt);
 
@@ -212,7 +229,7 @@ abstract class KrisModel extends KrisDB
      * @param string $where
      * @param string $bindings
      * @param bool $likeQuery
-     * @return
+     * @return int
      */
     public function TotalRecords($where = '', $bindings = '', $likeQuery)
     {

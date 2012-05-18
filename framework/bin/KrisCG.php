@@ -28,12 +28,12 @@ require_once dirname(__FILE__) . '/SiteDeploy.php';
 class KrisCGCommandLineParser
 {
     /**
-     * @var \Args
+     * @var Args
      */
     private $_args;
 
     /**
-     * @var \KrisCG
+     * @var KrisCG
      */
     private $_cg;
 
@@ -47,7 +47,7 @@ class KrisCGCommandLineParser
         $success = false;
 
         $command = $this->_args->Command();
-        if (in_array($command, array('create-table', 'table', 'create-site', 'site', 'create-scaffold', 'scaffold', 'deploy-site')))
+        if (in_array($command, array('create-table', 'table', 'create-site', 'site', 'create-scaffold', 'scaffold', 'deploy-site', 'deploy-sql')))
         {
             $location = $this->GetLocation();
             if ($location)
@@ -57,6 +57,10 @@ class KrisCGCommandLineParser
                     if ($this->_args->Command() == 'deploy-site')
                     {
                         $success = $this->DeploySite($location);
+                    }
+                    else if ($this->_args->Command() == 'deploy-sql')
+                    {
+                        $success = $this->DeploySql($location);
                     }
                     else
                     {
@@ -213,6 +217,45 @@ class KrisCGCommandLineParser
         return true;
     }
 
+    /**
+     * @param string $location
+     * @return bool
+     */
+    private function DeploySql($location)
+    {
+        $isLive = $this->_args->flag(array('L', 'live'), false);
+        $userName = $this->_args->flag(array('u', 'username'));
+        $password = $this->_args->flag(array('p', 'password'));
+        $host = $this->_args->flag(array('h', 'host'));
+        $port = $this->_args->flag(array('o', 'port'));
+        $destdir = $this->_args->flag(array('d', 'dest-directory'));
+        $validate  = $this->_args->flag(array('v', 'validate'));
+        $mark  = $this->_args->flag(array('m', 'mark'));
+        $clearDatabase = $this->_args->flag(array('c', 'clear'));
+
+
+        try
+        {
+            $deploy = new SiteDeploy($location, $isLive);
+            $deploy->Initialize($userName, $password, $host, $destdir, '', '', $port, true, $clearDatabase);
+
+            $deploy->DeploySql($validate, $mark);
+            echo 'Sql Deployed';
+
+            return true;
+        }
+        catch (Exception $ex)
+        {
+            echo 'Error: ' . $ex->getMessage().PHP_EOL.PHP_EOL;
+            $deploy->WriteDeployFile();
+            return true;
+        }
+    }
+
+    /**
+     * @param string $location
+     * @return bool
+     */
     private function DeploySite($location)
     {
         $isLive = $this->_args->flag(array('L', 'live'), false);
@@ -224,11 +267,12 @@ class KrisCGCommandLineParser
         $destdir = $this->_args->flag(array('d', 'dest-directory'));
         $yuiLocation = $this->_args->flag(array('y', 'yui-location'));
         $write = $this->_args->flag(array('w', 'write'));
+        $clearDatabase = $this->_args->flag(array('c', 'clear'));
 
         try
         {
             $deploy = new SiteDeploy($location, $isLive);
-            $deploy->Initialize($userName, $password, $host, $destdir, $temp, $yuiLocation, $port);
+            $deploy->Initialize($userName, $password, $host, $destdir, $temp, $yuiLocation, $port, false, $clearDatabase);
             if ($write)
             {
                 $deploy->WriteDeployFile();
@@ -236,7 +280,7 @@ class KrisCGCommandLineParser
             }
             else
             {
-                $deploy->Deploy();
+                $deploy->Deploy($clearDatabase);
                 $deploy->WriteDeployFile();
                 echo 'Site Deployed';
 
@@ -392,6 +436,13 @@ class KrisCGCommandLineParser
                 '                                           the deploy file)' . PHP_EOL .
                 '                   -t --temp               Temp location (defaults to $TEMP/$ProjectName)' . PHP_EOL .
                 '                   -c --yui-location       The location of the YUI compressor, note: Java is required to be installed ' . PHP_EOL .
+                '  deploy-sql                          Deploys the sql only for a site ' . PHP_EOL .
+                '                   -L --live               Deploys the live version of the site (the default is staging)' . PHP_EOL .
+                '                   -u --username           Site username' . PHP_EOL .
+                '                   -p --password           Site password' . PHP_EOL .
+                '                   -h --host               Site host' . PHP_EOL .
+                '                   -v --validate           Validate Sql' . PHP_EOL .
+                '                   -m --mark           Mark Sql' . PHP_EOL .
                 '  Options available for all commands:' . PHP_EOL .
                 '                   -l --location       Location of the site (required unless the site is in the default location' . PHP_EOL . PHP_EOL;
 
@@ -400,6 +451,13 @@ class KrisCGCommandLineParser
 
 }
 
+/**
+ * @param int $errorNumber
+ * @param string $errorString
+ * @param string $errorFile
+ * @param int $errorLine
+ * @throws ErrorException
+ */
 function exception_error_handler($errorNumber, $errorString, $errorFile, $errorLine ) {
     throw new ErrorException($errorString, 0, $errorNumber, $errorFile, $errorLine);
 }

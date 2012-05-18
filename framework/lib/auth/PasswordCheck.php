@@ -7,6 +7,9 @@
  * To change this template use File | Settings | File Templates.
  */
 
+/**
+ * @package auth
+ */
 interface PasswordCheck {
 /**
      * @param string $password

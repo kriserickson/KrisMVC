@@ -28,6 +28,11 @@ AutoLoader::AddClass('KrisDBView', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisDBVie
 AutoLoader::AddClass('KrisCrudModel', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisCrudModel.php', true);
 AutoLoader::AddClass('KrisLog', KrisConfig::FRAMEWORK_DIR.'/lib/log/Log.php', true);
 
+AutoLoader::AddClass('Cache', KrisConfig::FRAMEWORK_DIR.'/lib/cache/Cache.php', true);
+AutoLoader::AddClass('ApcCache', KrisConfig::FRAMEWORK_DIR.'/lib/cache/ApcCache.php', true);
+AutoLoader::AddClass('DbCache', KrisConfig::FRAMEWORK_DIR.'/lib/cache/DbCache.php', true);
+AutoLoader::AddClass('FileCache', KrisConfig::FRAMEWORK_DIR.'/lib/cache/FileCache.php', true);
+
 // Authentication
 AutoLoader::AddClass('Auth', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Auth.php', true);
 AutoLoader::AddClass('Auth_DB', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Auth_DB.php', true);
@@ -59,6 +64,7 @@ if (KrisConfig::DEBUG)
     AutoLoader::AddClass('DebugPDO', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugPDO.php', true);
     AutoLoader::AddClass('DebugLog', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugLog.php', true);
 
+    $errorHandler = E_ALL | E_STRICT;
 
     $classes = array('Router' => 'DebugRouter', 'Log' => 'DebugLog');
     $databaseClass = 'DebugPDO';
@@ -66,15 +72,26 @@ if (KrisConfig::DEBUG)
 else
 {
     ini_set('display_errors', 'On');
-    error_reporting(E_ERROR);
+
+    $errorHandler = E_ERROR;
+
     $classes = array('Router' => 'KrisRouter', 'Log' => 'KrisLog');
     $databaseClass = 'PDO';
 }
 
-// Eventually this will improve with 5.3 and better lambda functions and closures...
-$factory = array('PDO' => create_function('$container', '$dsn = "mysql:host=".KrisConfig::DB_HOST.";dbname=".KrisConfig::DB_DATABASE;'.PHP_EOL.
-    'return new '.$databaseClass.'($dsn, KrisConfig::DB_USER, KrisConfig::DB_PASSWORD);'),
-    'PasswordCheck' => create_function('', 'return new PasswordHash(8,true);'));
+error_reporting($errorHandler);
+
+$factory = array('PDO' => function() use($databaseClass) {
+        $dsn = "mysql:host=".KrisConfig::DB_HOST.";dbname=".KrisConfig::DB_DATABASE;
+        return new $databaseClass($dsn, KrisConfig::DB_USER, KrisConfig::DB_PASSWORD);
+    },
+    'PasswordCheck' => function() {
+        return new PasswordHash(8,true);
+    },
+    'Cache' => function()
+    {
+        return new ApcCache();
+    });
 
 AutoLoader::$Container = new BucketContainer($factory);
 foreach ($classes as $interface => $useClass)
@@ -82,6 +99,29 @@ foreach ($classes as $interface => $useClass)
     AutoLoader::Container()->registerImplementation($interface, $useClass);
 }
 
+// Turn error handlers into exceptions...
+/**
+ * @param int $errorNumber
+ * @param string $errorString
+ * @param string $errorFile
+ * @param int $errorLine
+ * @throws ErrorException
+ */
+function exception_error_handler($errorNumber, $errorString, $errorFile, $errorLine )
+{
+    if ($errorNumber != E_USER_NOTICE)
+    {
+        throw new ErrorException($errorString, 0, $errorNumber, $errorFile, $errorLine);
+    }
+    else
+    {
+        /** @var $log DebugLog */
+        $log = AutoLoader::Container()->get('Log');
+        $log->Debug('File: '.$errorFile.' Line: '.$errorLine.' '.$errorString);
+    }
+
+}
+set_error_handler('exception_error_handler', $errorHandler );
 
 
 ?>

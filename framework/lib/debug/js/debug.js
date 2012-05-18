@@ -1,7 +1,7 @@
 
 
 (function() {
-    var lastVisible = false;
+    var _lastVisible = false;
 
     function debugLoaded()
     {
@@ -79,10 +79,11 @@
             {
                 var debugWhat = $(this).attr('id'), holder = $('#krisMvcDebugDataHolder'), visible = holder.is(':visible'), text = '';
 
-                if (lastVisible == debugWhat && visible)
+                if (_lastVisible == debugWhat && visible)
                 {
                     holder.slideToggle('fast');
-                    lastVisible = false;
+                    //noinspection JSUnusedAssignment
+                    _lastVisible = false;
                 }
                 else
                 {
@@ -120,7 +121,7 @@
                         holder.slideToggle('fast');
                     }
 
-                    lastVisible = debugWhat;
+                    _lastVisible = debugWhat;
                 }
             });
         });

@@ -7,7 +7,10 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
- 
+
+/**
+ * @package controller
+ */
 class RouteRequest
 {
     public $Controller;
@@ -19,7 +22,7 @@ class RouteRequest
      * @param string $controller
      * @param string|null $action
      * @param array|null $params
-     * @return \RouteRequest
+     * @return RouteRequest
      *
      */
     public function __construct($controller = '', $action = '', $params = null)
@@ -27,6 +30,44 @@ class RouteRequest
         $this->Controller = $controller;
         $this->Action = $action;
         $this->Params = is_array($params) ? $params : array();
+    }
+
+    /**
+     * Returns a 404 routRequest based on KrisConfig...
+     *
+     * @static
+     * @param array $param
+     * @return RouteRequest
+     */
+    public static function Get404Request($param = array())
+    {
+        if (is_array(KrisConfig::$Error404Handler))
+        {
+            return new RouteRequest(KrisConfig::$Error404Handler['controller'], KrisConfig::$Error404Handler['action'], $param);
+        }
+        else
+        {
+            return new RouteRequest(KrisConfig::$Error404Handler, 'NotFound', $param);
+        }
+    }
+
+    /**
+     * @static
+     * @param $errorNumber
+     * @param $message
+     * @return \RouteRequest
+     */
+    public static function GetErrorRequest($errorNumber, $message)
+    {
+        $param = array('error_number' => $errorNumber, 'message' => $message);
+        if (is_array(KrisConfig::$Error500Handler))
+        {
+            return new RouteRequest(KrisConfig::$Error500Handler['controller'], KrisConfig::$Error500Handler['action'], $param);
+        }
+        else
+        {
+            return new RouteRequest(KrisConfig::$Error500Handler, 'SystemError', $param);
+        }
     }
 
     /**
@@ -79,7 +120,7 @@ class RouteRequest
      * @param array $skipActionRoutes
      * @return RouteRequest
      */
-    public static function CreateFromUri($requestUri, $skipActionRoutes)
+    public static function CreateFromUri($requestUri, $skipActionRoutes = array())
     {
 
         $route = new RouteRequest();

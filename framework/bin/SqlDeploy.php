@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of the KrisMvc framework.
  *
  * (c) Kris Erickson 
@@ -17,6 +17,7 @@ require_once dirname(__FILE__) . '/CodeGenHelpers.php';
 require_once dirname(__FILE__) . '/CodeGenDB.php';
 
 /**
+ *
  * @throws Exception
  *
  * @property int $ChangesetId
@@ -30,6 +31,10 @@ class SqlDeploy extends CodeGenDB
 {
     const DEPLOY_TABLE = '_db_deploy';
 
+    const CHANGESET_TYPE_CREATE = 'create';
+    const CHANGESET_TYPE_POPULATE = 'populate';
+    const CHANGESET_TYPE_ALTER_SCHEMA = 'alterSchema';
+    const CHANGESET_TYPE_ALTER_DATA = 'alterData';
 
     /**
      * @var bool
@@ -41,15 +46,17 @@ class SqlDeploy extends CodeGenDB
      */
     private $_directory;
 
+
+    /**
+     * @var string
+     */
+    private $_databaseName;
+
     /**
      * @var array
      */
     private $_allChangesets = array();
 
-    /**
-     * @var array
-     */
-    private $_executeChangesets = array();
 
     /**
      * @var bool
@@ -65,6 +72,11 @@ class SqlDeploy extends CodeGenDB
      * @var bool
      */
     private $_showOnly;
+
+    /**
+     * @var bool
+     */
+    private $_changesLoaded;
 
     /**
      * @throws Exception
@@ -91,33 +103,42 @@ class SqlDeploy extends CodeGenDB
                 }
                 foreach ($options as $requiredName => $shortcut)
                 {
-                    if (!($args->flag($shortcut) || $args->flag($requiredName)))
+                    if (!$args->flag(array($shortcut, $requiredName)))
                     {
                         throw new Exception('Missing required argument ' . $requiredName);
                     }
-                    $options[$requiredName] = !$args->flag($shortcut) ? $args->flag($requiredName) : $args->flag($shortcut);
+                    $options[$requiredName] = $args->flag(array($shortcut, $requiredName));
                 }
 
                 $this->_directory = $options['directory'];
-                $this->_force = $args->flag('f') || $args->flag('force');
-                $this->_markPreconditionComplete = $args->flag('m') || $args->flag('mark');
-                $this->_verbose = $args->flag('v') || $args->flag('verbose');
-                $this->_showOnly = $args->flag('s') || $args->flag('showsql');
-
+                $this->_force = $args->flag(array('f', 'force'));
+                $this->_markPreconditionComplete = $args->flag(array('m', 'mark'));
+                $this->_verbose = $args->flag(array('v','verbose'));
+                $this->_showOnly = $args->flag(array('s', 'showsql'));
+                $this->_databaseName = $options['database'];
 
                 $factory = array('PDO' => function() use ($options)
                 {
                     $dsn = 'mysql:host=' . $options['host'] . ';dbname=' . $options['database'];
                     return new PDO($dsn, $options['user'], $options['password']);
                 });
+
                 AutoLoader::$Container = new BucketContainer($factory);
 
                 $this->_dbh = $this->getDatabaseHandle();
 
-                $this->ValidateMigration();
+                if ($args->flag(array('c', 'clear')))
+                {
+                    $this->ClearDatabase();
+                }
+
                 if ($command == 'migrate')
                 {
                     $this->Migrate();
+                }
+                else if ($command == 'validate')
+                {
+                    $this->ValidateMigration();
                 }
                 elseif ($command == 'rollback')
                 {
@@ -158,6 +179,7 @@ class SqlDeploy extends CodeGenDB
                 '   Commands:       Options ' . PHP_EOL . PHP_EOL .
                 '   validate                            Validates the deployment files in directory' . PHP_EOL .
                 '   migrate                             Runs the migration' . PHP_EOL .
+                '   clear                               Clears the database by running rollback on all create commands' . PHP_EOL .
                 '   rollback                            Runs the rollback command on a single changesets' . PHP_EOL .
                 '                   -c --changeset      The id of the changeset to rollback' . PHP_EOL . PHP_EOL .
                 '  Required for all commands:' . PHP_EOL .
@@ -165,7 +187,7 @@ class SqlDeploy extends CodeGenDB
                 '                   -h --host           Database host.' . PHP_EOL .
                 '                   -d --database       Database name' . PHP_EOL .
                 '                   -u --user           Database user.' . PHP_EOL .
-                '                   -h --password       Database password.' . PHP_EOL . PHP_EOL;
+                '                   -h --password       Database password.' . PHP_EOL . PHP_EOL.
                 '  Options:' . PHP_EOL .
                 '                   -f --force          Ignore non-fatal errors' . PHP_EOL . PHP_EOL.
                 '                   -m --mark           Mark changesets that fail their precondition as complete' . PHP_EOL .
@@ -180,45 +202,57 @@ class SqlDeploy extends CodeGenDB
      */
     private function Migrate()
     {
-        foreach ($this->_executeChangesets as $changeSetId => $changeset)
+        $this->LoadAllChangesetsXml();
+
+        if (!$this->TableExists(self::DEPLOY_TABLE))
         {
-            // 'action', 'hash', 'type', 'author'
-            $actions = str_getcsv($changeset['action'], ';');
-            foreach ($actions as $action)
+            $this->CreateDeployDatabase();
+        }
+
+        foreach ($this->_allChangesets as $changeSetId => $allChangeset)
+        {
+            $changeset = $this->ValidateChangeset($allChangeset, $changeSetId);
+
+            if ($changeset != null)
             {
-                if (strlen(trim($action)) > 0)
+                // 'action', 'hash', 'type', 'author'
+                $actions = str_getcsv($changeset['action'], ';');
+                foreach ($actions as $action)
                 {
-                    if ($this->_verbose)
+                    if (strlen(trim($action)) > 0)
                     {
-                        echo 'Executing changeset #'.$changeSetId.' : '.$action.PHP_EOL;
-                    }
-
-                    if (!$this->_showOnly)
-                    {
-                        $res = $this->_dbh->exec($action);
-                    }
-                    else
-                    {
-                        if (!$this->_verbose)
+                        if ($this->_verbose)
                         {
-                            echo $action.PHP_EOL;
+                            echo 'Executing changeset #'.$changeSetId.' : '.$action.PHP_EOL;
                         }
-                        $res = true;
-                    }
-                    if ($res === false)
-                    {
 
-                        $res = $this->_dbh->errorInfo();
+                        if (!$this->_showOnly)
+                        {
+                            $res = $this->_dbh->exec($action);
+                        }
+                        else
+                        {
+                            if (!$this->_verbose)
+                            {
+                                echo $action.PHP_EOL;
+                            }
+                            $res = true;
+                        }
+                        if ($res === false)
+                        {
 
-                        $this->Rollback($changeSetId, true);
+                            $res = $this->_dbh->errorInfo();
 
-                        throw new Exception('Failed to migrate database error ('.$this->_dbh->errorCode().'): '.$res[2].PHP_EOL.$action);
+                            $this->Rollback($changeSetId, true);
+
+                            throw new Exception('Failed to migrate database error ('.$this->_dbh->errorCode().'): '.$res[2].PHP_EOL.$action);
+                        }
                     }
                 }
-            }
-            if (!$this->_showOnly)
-            {
-                $this->MarkChangesetComplete($changeSetId, $changeset['type'], $changeset['author'], $changeset['hash']);
+                if (!$this->_showOnly)
+                {
+                    $this->MarkChangesetComplete($changeSetId, $changeset['type'], $changeset['author'], $changeset['hash']);
+                }
             }
         }
     }
@@ -278,60 +312,68 @@ class SqlDeploy extends CodeGenDB
      */
     private function GetExecutedChangesets()
     {
-        if (!$this->TableExists(self::DEPLOY_TABLE))
-        {
-            $this->CreateDeployDatabase();
-        }
-
         foreach ($this->_allChangesets as $changeSetId => $changeSet)
         {
-            $action = trim($changeSet->action);
-            $hash = md5($action);
-            if ($this->Retrieve($changeSetId))
+            $this->ValidateChangeset($changeSet, $changeSetId);
+        }
+    }
+
+    /**
+     * @throws Exception
+     * @param object $changeSet
+     * @param int $changeSetId
+     * @return array|null
+     */
+    private function ValidateChangeset($changeSet, $changeSetId)
+    {
+        $action = trim($changeSet->action);
+        $hash = md5($action);
+        if ($this->Retrieve($changeSetId))
+        {
+            // If the hash has changed then we are in a bad state, and throw an exception...
+            if (!$this->Hash == $hash)
             {
-                // If the hash has changed then we are in a bad state, and throw an exception...
-                if (!$this->Hash == $hash)
-                {
-                    throw new Exception('Changeset #' . $changeSetId . ' has changed');
-                }
-                if ($this->_verbose)
-                {
-                    echo 'Changeset #'.$changeSetId.' already run'.PHP_EOL;
-                }
+                throw new Exception('Changeset #' . $changeSetId . ' has changed');
+            }
+            if ($this->_verbose)
+            {
+                echo 'Changeset #' . $changeSetId . ' already run' . PHP_EOL;
+            }
+        }
+        else
+        {
+            $author = (string)$changeSet['author'];
+            $type = (string)$changeSet['type'];
+            $errorMsg = '';
+
+            if ($this->ValidatePrecondition($changeSet->precondition, $errorMsg))
+            {
+                echo 'Validated changeset #' . $changeSetId . PHP_EOL;
+                return array('action' => $action, 'hash' => $hash, 'type' => $type, 'author' => $author);
             }
             else
             {
-                $author = (string)$changeSet['author'];
-                $type = (string)$changeSet['type'];
-                $errorMsg = '';
-
-                if ($this->ValidatePrecondition($changeSet->precondition, $errorMsg))
+                if ($this->_markPreconditionComplete)
                 {
-                    $this->_executeChangesets[$changeSetId] = array('action' => $action, 'hash' => $hash, 'type' => $type, 'author' => $author);
-                    echo 'Executing changeset #'.$changeSetId.PHP_EOL;
+                    $this->MarkChangesetComplete($changeSetId, $type, $author, $hash);
                 }
                 else
                 {
-                    if ($this->_markPreconditionComplete)
+                    $error = 'Precondition failed: ' . $errorMsg . PHP_EOL;
+                    if ($this->_force)
                     {
-                        $this->MarkChangesetComplete($changeSetId, $type, $author, $hash);
+
+                        echo $error;
                     }
                     else
                     {
-                        $error = 'Precondition failed: ' . $errorMsg.PHP_EOL;
-                        if ($this->_force)
-                        {
-
-                            echo $error;
-                        }
-                        else
-                        {
-                            throw new Exception($error);
-                        }
+                        throw new Exception($error);
                     }
                 }
             }
         }
+
+        return null;
     }
 
     /**
@@ -358,9 +400,27 @@ class SqlDeploy extends CodeGenDB
     {
         $this->LoadAllChangesetsXml();
 
+        if (!$this->TableExists(self::DEPLOY_TABLE))
+        {
+            $this->CreateDeployDatabase();
+        }
+
         $this->GetExecutedChangesets();
 
     }
+
+    /**
+     *
+     */
+    private function ClearDatabase()
+    {
+        echo 'Dropping database: '.$this->_databaseName.PHP_EOL;
+        $this->_dbh->exec('DROP DATABASE IF EXISTS '.$this->_databaseName);
+        echo 'Creating database: '.$this->_databaseName.PHP_EOL;
+        $this->_dbh->exec('CREATE DATABASE '.$this->_databaseName);
+
+    }
+
 
     /**
      * @throws Exception
@@ -368,6 +428,8 @@ class SqlDeploy extends CodeGenDB
      */
     private function LoadAllChangesetsXml()
     {
+        $this->_changesLoaded = true;
+
         libxml_use_internal_errors(true);
 
         $xsd = CodeGenHelpers::BuildPath(__DIR__, 'DeploySql.xsd');
@@ -425,6 +487,10 @@ class SqlDeploy extends CodeGenDB
         }
     }
 
+    /**
+     * @param $error
+     * @return string
+     */
     private function GetLibXmlError($error)
     {
         $return = '';
@@ -476,12 +542,16 @@ class SqlDeploy extends CodeGenDB
         {
             echo 'Creating deployment database'.PHP_EOL;
         }
+        // If we have dropped the table we may have to use the database to be connected...
+        $this->_dbh->exec('USE '.$this->_databaseName);
         $this->_dbh->exec("CREATE TABLE ".self::DEPLOY_TABLE." (changeset_id INTEGER UNSIGNED NOT NULL, ".
             "type ENUM('create', 'populate', 'alterSchema', 'alterData') NOT NULL, ".
             "author VARCHAR(45) NOT NULL, hash VARCHAR(45) NOT NULL, executed DATETIME NOT NULL,  PRIMARY KEY (changeset_id))");
+
         if (!$this->TableExists(self::DEPLOY_TABLE))
         {
-            throw new Exception('Unable to create table '.self::DEPLOY_TABLE);
+            $res = $this->_dbh->errorInfo();
+            throw new Exception('Unable to create table '.self::DEPLOY_TABLE.PHP_EOL.'Error ('.$this->_dbh->errorCode().'): '.$res[2]);
         }
     }
 
@@ -520,8 +590,16 @@ class SqlDeploy extends CodeGenDB
                     $success = !$this->IndexExists($child['table'], $child['index']);
                     $error = $success ? '' : 'index '.$child['table'].'.'.$child['index'].' exists';
                     break;
+                case 'indexExists' :
+                    $success = $this->IndexExists((string)$child['table'], (string)$child['index']);
+                    $error = $success ? '' : 'index '.$child['table'].'.'.$child['index'].' exists';
+                    break;
                 case 'dataDoesntExist':
                     $success = !$this->DataExists($child['table'], $child['field'], $child['value']);
+                    $error = $success ? '' : 'data '.$child['table'].'.'.$child['field'].' = '.$child['value'].' exists';
+                    break;
+                case 'dataExists':
+                    $success = $this->DataExists($child['table'], $child['field'], $child['value']);
                     $error = $success ? '' : 'data '.$child['table'].'.'.$child['field'].' = '.$child['value'].' exists';
                     break;
                 case 'dataNotEqual':
@@ -572,7 +650,7 @@ class SqlDeploy extends CodeGenDB
     {
         $stmt = $this->_dbh->prepare('SELECT '.$field.' FROM '.$table.' WHERE '.$key.' = ?');
 
-        if ($stmt->execute(array($keyValue)))
+        if ($stmt->execute(array((string)$keyValue)))
         {
             $this->ValidateStatement($stmt);
             return trim($data) == trim($stmt->fetchColumn(0));
@@ -582,9 +660,9 @@ class SqlDeploy extends CodeGenDB
     }
 
 
-
 }
 
+/** @noinspection PhpMissingDocCommentInspection */
 function exception_error_handler($errorNumber, $errorString, $errorFile, $errorLine ) {
     throw new ErrorException($errorString, 0, $errorNumber, $errorFile, $errorLine);
 }

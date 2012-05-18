@@ -6,7 +6,7 @@
 /**
 {{{properties}}}
  */
-class {{{className}}}Model extends KrisCrudModel
+abstract class {{{className}}}Model extends KrisCrudModel
 {
     {{{foreignKeyString}}}
     {{{fakeFields}}}

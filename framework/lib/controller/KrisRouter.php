@@ -8,6 +8,9 @@
  * with this source code in the file LICENSE.
  */
 
+/**
+ * @package controller
+ */
 interface Router
 {
     /**
@@ -36,7 +39,7 @@ interface Router
 /**
  * Controller
  * Parses the HTTP request and routes to the appropriate function
- * @package Controller
+ * @package controller
  */
 class KrisRouter implements Router
 {
@@ -73,7 +76,35 @@ class KrisRouter implements Router
     {
         $this->_controllerPath = $controllerPath;
         $route =  RouteRequest::CreateFromUri($this->GetRequestUri(), $this->_routeActionOnly);
-        $this->ParseRequest($route->Controller, $route->Action, $route->Params);
+        try
+        {
+            $this->ParseRequest($route->Controller, $route->Action, $route->Params);
+        }
+        catch (Exception $ex)
+        {
+            /** @var $log Log */
+            $log = AutoLoader::Container()->get('Log');
+            $trace = $ex->getTrace();
+            $message = '';
+            foreach ($trace as $line)
+            {
+                $message .= '   '.(isset($line['file']) ? 'file: '.$line['file'].', ' : 'Anonymous: ').(isset($line['line']) ? ' line: '.$line['line'].' : ' : '').
+                        (isset($line['class']) ? $line['class'].'->' : '').
+                        $line['function'].'('.implode(',', array_map(create_function('$a', 'return gettype($a);'), $line['args'])).')'.PHP_EOL;
+            }
+            $log->Error('Uncaught exception: '.$ex->getMessage().PHP_EOL.$message);
+
+            if ($this->_request->IsJson)
+            {
+                $this->_request->JsonResponse(array('success' => false, 'message' => 'An error occurred, please try again later'));
+            }
+            else
+            {
+                $route = RouteRequest::GetErrorRequest(500, 'An unknown error has occurred.  Please try again later.');
+                $this->ParseRequest($route->Controller, $route->Action, $route->Params);
+            }
+        }
+
     }
 
     /**
@@ -104,8 +135,8 @@ class KrisRouter implements Router
     }
 
     /**
-     * @param $originalUrl string | route regex
-     * @param $reroutedUrl string - reroute address
+     * @param string $originalUrl - route regex
+     * @param string $reroutedUrl - reroute address
      * @return void
      */
     public function ReRoute($originalUrl, $reroutedUrl)
@@ -146,7 +177,7 @@ class KrisRouter implements Router
      * @param string $action
      * @param string $error
      * @param object $controllerObj
-     * @param function $function
+     * @param string $function
      *
      * @return bool
      */
@@ -156,45 +187,47 @@ class KrisRouter implements Router
 
         $controllerFile = $this->_controllerPath . $controller . '/' . $controllerClass . '.php';
 
+
+
         if (!preg_match('#^[a-z0-9_-]+$#i', $controller) || !file_exists($controllerFile))
         {
-            $error = 'Controller file not found: ' . $controllerFile;
+            $action = $controller;
+            $controller = KrisConfig::DEFAULT_CONTROLLER;
+            $controllerClass = ucfirst($controller) . 'Controller';
+            $controllerFile = $this->_controllerPath . $controller . '/' . $controllerClass . '.php';
+        }
+
+        $function = ucfirst($action);
+
+        if (!preg_match('/^\w[a-z0-9_-]*$/i', $function))
+        {
+            $error = 'Invalid function name: ' . $function;
         }
         else
         {
+            /** @noinspection PhpIncludeInspection */
+            require_once($controllerFile);
 
-            $function = ucfirst($action);
-
-
-            if (!preg_match('/^\w[a-z0-9_-]*$/i', $function))
+            if (!class_exists($controllerClass))
             {
-                $error = 'Invalid function name: ' . $function;
+                $error = 'Controller class (' . $controllerClass . ') not found';
             }
             else
             {
-                /** @noinspection PhpIncludeInspection */
-                require_once($controllerFile);
 
-                if (!class_exists($controllerClass))
+                $controllerObj = new $controllerClass($this->_request);
+
+                if (!method_exists($controllerObj, $function))
                 {
-                    $error = 'Controller class (' . $controllerClass . ') not found';
+                    $error = 'Function not found: ' . $function . ' in controller: ' . $controllerClass;
                 }
                 else
                 {
-
-                    $controllerObj = new $controllerClass($this->_request);
-
-                    if (!method_exists($controllerObj, $function))
-                    {
-                        $error = 'Function not found: ' . $function . ' in controller: ' . $controllerClass;
-                    }
-                    else
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
+
 
         return false;
     }
@@ -213,6 +246,10 @@ class KrisRouter implements Router
         {
             if ($this->GetControllerRequest(KrisConfig::$Error404Handler['controller'], KrisConfig::$Error404Handler['action'], $error, $controllerObj, $function))
             {
+                if (!KrisConfig::DEBUG)
+                {
+                    $msg = '';
+                }
                 call_user_func_array(array($controllerObj, $function), array($msg));
                 $displayedError = true;
             }
@@ -223,8 +260,6 @@ class KrisRouter implements Router
                 $log->Error('Unable to call Error404Handler, function ' . KrisConfig::$Error404Handler . ' does not exist');
             }
         }
-
-
 
         if (!$displayedError)
         {

@@ -10,6 +10,7 @@
 
 /**
  * Auth_DB is a database authentication layer...
+ * @package auth
  */
 class Auth_DB extends Auth
 {
@@ -38,12 +39,16 @@ class Auth_DB extends Auth
     {
         if ($this->_db->IsDirty())
         {
+            if (!$this->_db->UserId)
+            {
+                $this->_db->UserId = $this->User()->UserId();
+            }
             $this->_db->Update();
         }
     }
 
     /**
-     * @param $email
+     * @param string $email
      * @param string $password
      * @return bool
      */
@@ -285,13 +290,13 @@ class Auth_DB extends Auth
     /**
      *
      * @return bool|string
-     * @param $email
+     * @param string $email
      */
     public function GetPasswordReminderToken($email)
     {
         if (!($this->_db->Retrieve('Email', $email)))
         {
-            $this->_error = Auth::ERROR_NO_USER_EMAIL;
+            $this->_error = str_replace('%EMAIL%', $email, Auth::ERROR_NO_USER_EMAIL);
             return false;
         }
         else

@@ -1,18 +1,19 @@
 <?php
 
-/*
- * This file is part of the KrisMvc framework.
- *
- * (c) Kris Erickson
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
+
+// This file is part of the KrisMvc framework.
+//
+// (c) Kris Erickson
+//
+// This source file is subject to the MIT license that is bundled
+// with this source code in the file LICENSE.
+
 
 /**
- * @throws DatabaseException
- * @package Model
- * DB
+ * KrisDB
+ * @throws KrisDatabaseException
+ * @package Orm
+ *
  * Base class that is shared by Model and DBView
  */
 abstract class KrisDB
@@ -58,7 +59,7 @@ abstract class KrisDB
     /**
      * Used to get a field from the Model/DBView
      *
-     * @throws DatabaseException
+     * @throws KrisDatabaseException
      * @param string $key
      * @return string
      */
@@ -95,6 +96,10 @@ abstract class KrisDB
         {
             // If $val is null then isset will return false.  We don't want that cause get uses isset to determine
             // whether the field is valid or not..
+            if (isset($this->_fieldTypes[$key]) && $this->_fieldTypes[$key] == 'bool')
+            {
+                $val = $val ? '1' : '0';
+            }
             $this->_recordSet[$key] = is_null($val) ? '' : $val;
             $this->_dirty[$key] = true;
         }
@@ -315,7 +320,7 @@ abstract class KrisDB
     /**
      * Generates the where portion of the query
      *
-     * @throws DatabaseException
+     * @throws KrisDatabaseException
      * @param array|null $where
      * @param array $bindings
      * @param bool $likeQuery
@@ -396,7 +401,7 @@ abstract class KrisDB
     /**
      * Validates
      *
-     * @throws DatabaseException
+     * @throws KrisDatabaseException
      * @param PDOStatement $stmt
      * @return void
      */

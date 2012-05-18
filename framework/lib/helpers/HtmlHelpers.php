@@ -9,6 +9,7 @@
  */
 
 /**
+ * @package helpers
  * Static methods used for Html Generation
  */
 class HtmlHelpers
@@ -123,12 +124,13 @@ class HtmlHelpers
      * @param string $value
      * @param string $name
      * @param string $class
+     * @param string $type
      * @return string
      */
-    public static function CreateInput($id, $value, $name = '', $class = '')
+    public static function CreateInput($id, $value, $name = '', $class = '', $type = 'text')
     {
         $name = (strlen($name) == 0) ? $id : $name;
-        return  '<input name="' . $name . '" id="' . $id . '" class="' . $class . '" value="' . $value . '"/>';
+        return  '<input type="' . $type . '" name="' . $name . '" id="' . $id . '" class="' . $class . '" value="' . $value . '"/>';
     }
 
     /**
@@ -184,5 +186,21 @@ class HtmlHelpers
         $name = (strlen($name) == 0) ? $id : $name;
         return '<input type="hidden" name="MAX_FILE_SIZE" value="'.$max_file_size.'" />'.
                 '<input type="file" name="'.$name.'" id="'.$id.'"'.(strlen($class) > 0 ? ' class="' . $class . '"' : '').'/>';
+    }
+
+    /**
+     * @static
+     * @param string|array $cssArray
+     */
+    public static function CreateCssFiles($cssArray)
+    {
+        if (!is_array($cssArray))
+        {
+            $cssArray = array($cssArray);
+        }
+        foreach ($cssArray as $css)
+        {
+            echo '<link rel="stylesheet" href="'.KrisConfig::WEB_FOLDER.'/css/'.$css.'.css" type="text/css" media="screen" />';
+        }
     }
 }

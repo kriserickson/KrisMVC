@@ -9,6 +9,7 @@
  */
 
 /**
+ * @package helpers
  * Number formatting functions
  */
 class NumberHelpers

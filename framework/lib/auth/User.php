@@ -7,6 +7,10 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
+
+/**
+ * @package auth
+ */
 class User
 {
     /**
@@ -51,7 +55,7 @@ class User
      * @param string $email
      * @param string $data
      * @param int $acl
-     * @return \User
+     * @return User
      *
      */
     function __construct($userId, $displayName, $email, $data, $acl)
@@ -155,7 +159,7 @@ class User
      */
     public function RemoveAcl($acl)
     {
-        $this->_acl | $acl;
+        $this->_acl = $this->_acl & ~$acl;
         $this->_aclChanged = true;
     }
 

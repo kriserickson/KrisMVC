@@ -1,4 +1,7 @@
 <?php
+/**
+ *
+ */
 interface Reporter
 {
     /**

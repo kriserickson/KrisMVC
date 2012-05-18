@@ -27,9 +27,11 @@
         <xs:element ref="tableExists"/>
         <xs:element ref="fieldExists"/>
         <xs:element ref="dataDoesntExist"/>
+        <xs:element ref="dataExists"/>
         <xs:element ref="dataNotEqual"/>
         <xs:element ref="preconditionNone"/>
         <xs:element ref="indexDoesntExist"/>
+        <xs:element ref="indexExists"/>
       </xs:choice>
     </xs:complexType>
   </xs:element>
@@ -38,7 +40,14 @@
     <xs:complexType>
       <xs:attribute name="field" use="required" type="xs:NCName"/>
       <xs:attribute name="table" use="required" type="xs:NCName"/>
-      <xs:attribute name="value" use="required" type="xs:NCName"/>
+      <xs:attribute name="value" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="dataExists">
+    <xs:complexType>
+      <xs:attribute name="field" use="required" type="xs:NCName"/>
+      <xs:attribute name="table" use="required" type="xs:NCName"/>
+      <xs:attribute name="value" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="dataNotEqual">
@@ -50,6 +59,12 @@
     </xs:complexType>
   </xs:element>
   <xs:element name="indexDoesntExist">
+    <xs:complexType>
+      <xs:attribute type="xs:NCName" use="required" name="table"/>
+      <xs:attribute type="xs:NCName" use="required" name="index"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="indexExists">
     <xs:complexType>
       <xs:attribute type="xs:NCName" use="required" name="table"/>
       <xs:attribute type="xs:NCName" use="required" name="index"/>

@@ -7,7 +7,7 @@
 /**
  * @property string Name
  * @property string Description
- * @property decimal Price
+ * @property number Price
  * @property string Image
  * @property int Multiple
  */

@@ -1,19 +1,18 @@
 <?php
-/*
- * This file is part of the KrisMvc framework.
- *
- * (c) Kris Erickson
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
 
+// This file is part of the KrisMvc framework.
+//
+// (c) Kris Erickson
+//
+// This source file is subject to the MIT license that is bundled
+// with this source code in the file LICENSE.
+ 
 
 /**
- * @throws Exception
- * @package Model
  *
  * KrisDBView
+ * @package Orm
+ * @throws Exception
  * Represents a view of the multiple tables in the database...
  */
 abstract class KrisDBView  extends KrisDB
@@ -33,7 +32,7 @@ abstract class KrisDBView  extends KrisDB
      * @param array $tables
      * @param array $joins
      * @param array $alias
-     * @return \KrisDBView
+     * @return KrisDBView
      *
      */
     function __construct($tables, $joins, $alias = array())

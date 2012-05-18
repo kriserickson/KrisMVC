@@ -7,7 +7,7 @@ class Controller_AllTests extends PHPUnit_Framework_TestSuite
 {
 	/**
 	 * Creates the suite.
-     * @return \AspSystem_AllTests
+     * @return Controller_AllTests
      */
 	public static function suite()
 	{

@@ -31,6 +31,11 @@ class Request
     public $IsHtml = true;
 
     /**
+     * @var bool
+     */
+    public $IsJson = false;
+
+    /**
      * @var array
      */
     static $_post = null;
@@ -78,6 +83,10 @@ class Request
         }
     }
 
+    /**
+     * @param string $var
+     * @return string
+     */
     private function ParseQueryVariables($var)
     {
         self::$_get = $this->ParseStr($_SERVER['QUERY_STRING']);
@@ -86,24 +95,21 @@ class Request
         return $varAndQueryString[0];
     }
 
+    /**
+     * @return array
+     */
     public function Params()
     {
         return $this->_params;
     }
 
+    /**
+     * @param $queryString
+     * @return array
+     */
     private function ParseStr($queryString)
     {
-        $res = parse_str($queryString);
-        // parse_str is returning null...
-        if (is_null($res))
-        {
-            $res = array();
-            foreach(explode('&', $queryString) as $key=>$value)
-            {
-                $data = explode('=', $value);
-                $res[$data[0]] = urldecode($data[1]);
-            }
-        }
+        parse_str($queryString, $res);
         return $res;
     }
 
@@ -124,7 +130,7 @@ class Request
     }
 
     /**
-     * @param $index
+     * @param string $index
      * @return string
      */
     public function Param($index)
@@ -133,7 +139,7 @@ class Request
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @return string
      */
     public function __get($key)
@@ -142,7 +148,7 @@ class Request
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @param string $default
      * @return string
      */
@@ -156,7 +162,15 @@ class Request
     }
 
     /**
-     * @param $key
+     * @return array
+     */
+    public function EnumeratePostVars()
+    {
+        return self::$_post;
+    }
+
+    /**
+     * @param string $key
      * @param string $default
      * @return string
      */
@@ -167,6 +181,14 @@ class Request
             return get_magic_quotes_gpc() ? stripslashes(self::$_get[$key]) : self::$_get[$key];
         }
         return $default;
+    }
+
+    /**
+     * @return array
+     */
+    public function EnumerateGetVars()
+    {
+        return self::$_get;
     }
 
     /**
@@ -204,7 +226,7 @@ class Request
      * @param string $message
      * @return void
      */
-    public function SetError($code, $message)
+    public function SetError($code, $message = '')
     {
         switch ($code)
         {
@@ -315,7 +337,10 @@ class Request
 
         header('HTTP/1.0 ' . $code . ' ' . $httpMessage);
 
-        echo $message;
+        if (strlen($message) > 0)
+        {
+            echo $message;
+        }
 
     }
 
@@ -328,6 +353,10 @@ class Request
         if ($mimeType != Request::CONTENT_TYPE_HTML)
         {
             $this->IsHtml = false;
+        }
+        if ($mimeType == Request::CONTENT_TYPE_JSON)
+        {
+            $this->IsJson = true;
         }
         header('Content-type: ' . $mimeType);
     }
@@ -349,9 +378,19 @@ class Request
         return $this->_controller.'/'.$this->_action.(count($this->_params) > 0 ? '/'.implode('/', $this->_params) : '');
     }
 
-    public function JsonResponse($data)
+    /**
+     *
+     */
+    public function SetJson()
     {
         $this->SetContentType(Request::CONTENT_TYPE_JSON);
+    }
+
+    /**
+     * @param mixed $data
+     */
+    public function JsonResponse($data)
+    {
         $res = json_encode($data);
         if ($this->HasGet('callback'))
         {
@@ -359,6 +398,30 @@ class Request
         }
         echo $res;
 
+    }
+
+    /**
+     * @return string
+     */
+    public function GetUserAgent()
+    {
+        return $_SERVER['HTTP_USER_AGENT'];
+    }
+
+    /**
+     * @param $header
+     */
+    public function AddHeader($header)
+    {
+        header($header);
+    }
+
+    /**
+     * @return string
+     */
+    public function GetIpAddress()
+    {
+        return $_SERVER['REMOTE_ADDR'];
     }
 
 

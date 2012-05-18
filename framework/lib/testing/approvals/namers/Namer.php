@@ -1,5 +1,8 @@
 <?php
 
+/**
+ *
+ */
 interface Namer
 {
     /**

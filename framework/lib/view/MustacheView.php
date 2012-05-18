@@ -12,6 +12,7 @@ require_once 'Mustache.php';
 
 /**
  * View Class that uses Moustache Templating engine instead of PHP.
+ * @package view
  */
 class MustacheView extends KrisView
 {

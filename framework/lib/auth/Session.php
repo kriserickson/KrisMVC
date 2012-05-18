@@ -9,6 +9,7 @@
  */
 
 /**
+ * @package auth
  * Default session instance, implemented through the _SESSION object...
  */
 class Session
@@ -34,7 +35,7 @@ class Session
             $lifetime = $params['lifetime'];
         }
 
-        session_set_cookie_params($lifetime, $params["path"], $domain, $params["secure"], $params["httponly"]);
+        session_set_cookie_params($lifetime, $params["path"], $domain, $params["secure"], true);
         session_start();
     }
 

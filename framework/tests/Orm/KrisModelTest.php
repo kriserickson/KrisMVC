@@ -43,7 +43,7 @@ class KrisModelTest extends PHPUnit_Framework_TestCase
 
         $modelMock->expects($this->once())->method('getDatabaseHandle')->will($this->returnValue($PDOMock));
 
-        /** @var $modelMock StoreItem */
+        /** @var $modelMock StoreItemTest */
         $modelMock->retrieve($store_id);
         $this->assertEquals($name, $modelMock->Name);
         $this->assertEquals($description, $modelMock->Description);

@@ -12,6 +12,10 @@
  *
  * @author Justin Hileman {@link http://justinhileman.com}
  */
+
+/**
+ * @package view
+ */
 class Mustache {
 
 	const VERSION = '0.7.1';
@@ -100,7 +104,7 @@ class Mustache {
      * @param mixed|null $view (default: null)
      * @param array|null $partials (default: null)
      * @param array|null $options (default: array())
-     * @return \Mustache
+     * @return Mustache
      */
 	public function __construct($template = null, $view = null, $partials = null, array $options = null) {
 		if ($template !== null) $this->_template = $template;

@@ -12,7 +12,7 @@
  * Authentication class...
  *
  * @throws Exception
- *
+ * @package auth
  */
 abstract class Auth
 {
@@ -56,17 +56,17 @@ abstract class Auth
 
 
     /**
-     * @var \Auth
+     * @var Auth
      */
     private static $_instance;
 
     /**
-     * @var \User
+     * @var User
      */
     protected $_user = null;
 
     /**
-     * @var \Session
+     * @var Session
      */
     protected $_session;
 
@@ -88,7 +88,7 @@ abstract class Auth
     /**
      * @static
      * @param Auth $auth - used for mocking...
-     * @return \Auth
+     * @return Auth
      */
     public static function instance(Auth $auth = null)
     {
@@ -175,7 +175,7 @@ abstract class Auth
 
             return false;
         }
-        else if (!$this->IsValidPassword($password))
+        else if (!$ignorePasswordCheck && !$this->IsValidPassword($password))
         {
             return false;
         }
@@ -284,9 +284,9 @@ abstract class Auth
     /**
      * @abstract
      * @throws Exception
-     * @param $email
-     * @param $password
-     * @return void
+     * @param string $email
+     * @param string $password
+     * @return bool
      */
     public abstract function LoginWithEmail($email, $password);
 
@@ -392,6 +392,11 @@ abstract class Auth
      */
     public abstract function TotalUsers($searchType, $search);
 
+    /**
+     * @static
+     * @param $error_code
+     * @return string
+     */
     public static function GetFriendlyAuthError($error_code)
     {
         switch ($error_code)
@@ -413,7 +418,7 @@ abstract class Auth
                 $error = 'The recovery token has expired';
                 break;
             case Auth::ERROR_INVALID_EMAIL:
-                $error = 'Invalid email address';
+                $error = 'Invalid email address - please check your email address';
                 break;
             case Auth::ERROR_INVALID_LOGIN:
                 $error = 'Invalid login name';
@@ -422,7 +427,7 @@ abstract class Auth
                 $error = 'Login name already exists';
                 break;
             case Auth::ERROR_NO_USER_EMAIL:
-                $error = 'No user email given';
+                $error = 'No user with email address %EMAIL%';
                 break;
             case Auth::ERROR_PASSWORD_MUST_INCLUDE_ONE_CAPITAL_LETTER:
                 $error = 'Invalid password.  Password must include one capital letter';

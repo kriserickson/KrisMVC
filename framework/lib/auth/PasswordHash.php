@@ -26,6 +26,7 @@
 #
 
 /**
+ * @package auth
  * PasswordHash
  */
 class PasswordHash implements PasswordCheck

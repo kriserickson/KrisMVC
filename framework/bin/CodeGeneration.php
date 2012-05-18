@@ -262,7 +262,7 @@ class KrisCG extends CodeGenDB
         foreach ($columnNames as $columnName => $columnData)
         {
             $dbKey = $this->convertDBKeyToClassKey($columnName);
-            $properties .= '* @property ' . $columnData['type'] . ' $' . $dbKey . PHP_EOL;
+            $properties .= '* @property ' . $columnData['type'] . ' $' . $dbKey . ' - DBType '.$columnData['displayType'].PHP_EOL;
             $initializeFields .= (strlen($initializeFields) > 0 ? ', ' : '')."'$dbKey'";
             $fieldTypes .= (strlen($fieldTypes) > 0 ? ', ' : '')."'$dbKey' => '".$columnData['type']."'";
 

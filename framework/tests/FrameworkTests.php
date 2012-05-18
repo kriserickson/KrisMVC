@@ -41,7 +41,7 @@ class AllUnitTests extends PHPUnit_Framework_TestSuite
 {
 	/**
 	 * Creates the suite.
-     * @return \AllUnitTests
+     * @return AllUnitTests
      */
 	public static function suite()
 	{

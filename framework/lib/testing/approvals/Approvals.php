@@ -76,9 +76,15 @@ class Approvals {
 		}
 	}
 
+    /**
+     * @static
+     * @param $val1
+     * @param $val2
+     * @return bool
+     */
     private static function equals($val1, $val2)
     {
-        return self::standardize_line_endings($val1) == self::standardize_line_endings($val2);
+        return self::standardizeLineEndings($val1) == self::standardizeLineEndings($val2);
     }
 
     /**
@@ -101,7 +107,12 @@ class Approvals {
 		self::approve(new TextWriter($html, 'html'), new PHPUnitNamer(), self::getReporter('html'));
 	}
 
-    private static function standardize_line_endings($val)
+    /**
+     * @static
+     * @param $val
+     * @return mixed
+     */
+    private static function standardizeLineEndings($val)
     {
         return str_replace(array("\r\n", "\r"), array("\n", "\n"), $val);
     }

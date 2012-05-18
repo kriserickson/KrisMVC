@@ -7,6 +7,11 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
+
+/**
+ * Autoloader
+ * @package plumbing
+ */
 class AutoLoader
 {
 
@@ -81,7 +86,7 @@ class AutoLoader
 
 /**
  * Autoloading for Business Classes
- *
+ * @package plumbing
  * @param $className
  * @return void
  */

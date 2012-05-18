@@ -11,6 +11,8 @@
 
 
 /**
+ * @package cache
+ *
  * DBCache
  */
 class FileCache extends Cache
@@ -29,7 +31,7 @@ class FileCache extends Cache
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param string $value
      * @param int $ttl
      * @return void
      */
@@ -42,7 +44,7 @@ class FileCache extends Cache
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param string $value
      * @param int $ttl
      * @return void
      */

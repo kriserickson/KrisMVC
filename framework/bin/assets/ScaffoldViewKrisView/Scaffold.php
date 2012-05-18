@@ -23,10 +23,10 @@
 <div class="logout"><a href="<?= KrisConfig::WEB_FOLDER.'/'.KrisConfig::AUTH_CONTROLLER.'/logout'; ?>">Logout</a></div>
 <?php endif; ?>
 
-<table width="100%">
+<table style="width:100%">
     <tr>
         <?php foreach ($tables as $table): ?>
-        <td width="<?= $table_width ?>%"><a href="<?= $display_base_href.$table['link'] ?>"><?= $table['name'] ?></a></td>
+        <td style="width:<?= $table_width ?>%"><a href="<?= $display_base_href.$table['link'] ?>"><?= $table['name'] ?></a></td>
         <?php endforeach; ?>
     </tr>
 </table>

@@ -7,53 +7,20 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
+
+/**
+ * @package cache
+ */
 abstract class Cache
 {
     /**
-     * @var \Cache
+     * @var Cache
      */
     private static $instance;
 
     const ONE_DAY = 86400;
 
 
-    /**
-     * @static
-     * @throws Exception
-     * @param \Cache $instance
-     * @return \Cache
-     */
-    public static function instance(Cache $instance = null)
-    {
-        if (!is_null($instance))
-        {
-            self::$instance = $instance;
-        }
-
-        if (!isset(self::$instance))
-        {
-            switch (KrisConfig::$CACHE_TYPE)
-            {
-                case KrisConfig::CACHE_TYPE_APC :
-                    throw new Exception('ApcCache not written yet');
-                    //self::$instance = new ApcCache();
-                    break;
-                case KrisConfig::CACHE_TYPE_FILE :
-                    self::$instance = new FileCache();
-                    break;
-                case KrisConfig::CACHE_TYPE_DB :
-                    self::$instance = new DBCache();
-                    break;
-                case KrisConfig::CACHE_TYPE_MEMCACHE :
-                    throw new Exception('Memcache not written yet');
-                    //self::$instance = new MemcacheCache();
-                    break;
-                default:
-                    throw new Exception('Unsupported cache type');
-            }
-        }
-        return self::$instance;
-    }
 
     /**
      * @abstract

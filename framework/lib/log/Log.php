@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @package log
+ */
 abstract class Log
 {
     const FATAL = 1;
@@ -10,9 +13,16 @@ abstract class Log
     /**
      * @var int
      */
-    protected  $_verbosity;
+    protected  $_verbosity = self::WARNING;
+
+    /**
+     * @var string
+     */
     protected  $_fatalMessage = 'An error occurred.';
 
+    /**
+     * @param int $verbosity
+     */
     public function SetVerbosity($verbosity)
     {
         if ($verbosity > self::DEBUG)
@@ -26,16 +36,25 @@ abstract class Log
 
     }
 
+    /**
+     * @param string $msg
+     */
     public function SetFatalMessage($msg)
     {
         $this->_fatalMessage = $msg;
     }
 
+    /**
+     * @return int
+     */
     public function GetVerbosity()
     {
         return $this->_verbosity;
     }
 
+    /**
+     * @param string $msg
+     */
     public function Debug($msg)
     {
         if ($this->_verbosity >= self::DEBUG)
@@ -43,6 +62,10 @@ abstract class Log
             error_log($msg);
         }
     }
+
+    /**
+     * @param string $msg
+     */
     public function Warning($msg)
     {
         if ($this->_verbosity >= self::WARNING)
@@ -51,6 +74,9 @@ abstract class Log
         }
     }
 
+    /**
+     * @param string $msg
+     */
     public function Error($msg)
     {
         if ($this->_verbosity >= self::ERROR)
@@ -59,6 +85,9 @@ abstract class Log
         }
     }
 
+    /**
+     * @param string $msg
+     */
     public function Fatal($msg)
     {
         error_log($msg);
@@ -67,6 +96,9 @@ abstract class Log
 
 }
 
+/**
+ *
+ */
 class KrisLog extends Log
 {
 

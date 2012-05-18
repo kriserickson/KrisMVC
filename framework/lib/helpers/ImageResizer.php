@@ -9,6 +9,7 @@
  */
 
 /**
+ * @package helpers
  * Image resizing class...
  */
 class ImageResizer
@@ -92,29 +93,40 @@ class ImageResizer
      * @param int $height
      * @return void
      */
-    function resizeToOptimal($width, $height)
+    public function resizeToOptimal($width, $height = 0)
     {
-        $image_height = imagesy($this->image);
-        $image_width = imagesx($this->image);
 
-        if ($image_height > $height && $height > $width)
+
+        $image_height = $this->height();
+        $image_width = $this->width();
+
+        $multiplier = $width / $image_width;
+
+        if ($height == 0 && $image_height > $image_height)
         {
-            $ratio = $height / $image_height;
-            $width = $image_width * $ratio;
+            $height = $width;
+            $width = (int)($width * ($image_width / $image_height));
+        }
 
+        if ($image_height * $multiplier <= $height || $height == 0)
+        {
+            $return_height = round($image_height * $multiplier);
+            $return_width = round($width);
         }
         else
         {
-            $ratio = $width / $image_width;
-            $height = $image_height * $ratio;
-
+            $multiplier = $height / $image_height;
+            $return_width = round($image_width * $multiplier);
+            $return_height = $height;
         }
 
-        $new_image = imagecreatetruecolor($width, $height);
-        imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $width, $height, $image_width, $image_height);
+        $new_image = imagecreatetruecolor($return_width, $return_height);
+        imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $return_width, $return_height, $image_width, $image_height);
         $this->image = $new_image;
 
     }
+
+
 
     /**
      * Crops an image from x,y,width, height and makes the current image that crop...
@@ -131,6 +143,25 @@ class ImageResizer
         imagecopy($new_image, $this->image, 0, 0, $x, $y, $width, $height);
         $this->image = $new_image;
     }
+
+    /**
+     * returns the width of an image
+     * @return int
+     */
+    public function width()
+    {
+        return imagesx($this->image);
+    }
+
+    /**
+     * returns the height of an image
+     * @return int
+     */
+    public function height()
+    {
+        return imagesy($this->image);
+    }
+
 
 }
 

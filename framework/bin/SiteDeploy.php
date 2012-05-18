@@ -8,6 +8,9 @@
  * with this source code in the file LICENSE.
  */
 
+/**
+ *
+ */
 class SiteDeploy
 {
     /**
@@ -41,6 +44,9 @@ class SiteDeploy
      */
     private $_deploymentConfig = array();
 
+    /**
+     * @var string
+     */
     private $_stageLive = '';
 
     /**
@@ -50,11 +56,23 @@ class SiteDeploy
      */
     private $_files = array();
 
+    /**
+     * @var array
+     */
     private $_validatedDirectories = array();
+
+    /**
+     * @var bool
+     */
+    private $_clearDatabase = false;
 
     const ActionCopy = 1;
     const ActionMerge = 2;
     const ActionCompress = 3;
+
+    const DEPLOY_LIVE = 'live';
+    const DEPLOY_STAGING = 'staging';
+
 
     /**
      * @param string $location
@@ -64,7 +82,7 @@ class SiteDeploy
     {
         $this->_location = $location;
         $this->_isLive = $isLive;
-        $this->_stageLive = $isLive ? 'live' : 'staging';
+        $this->_stageLive = $isLive ? self::DEPLOY_LIVE : 'staging';
         $this->_appDir = CodeGenHelpers::BuildPath($location, 'app'); // TODO: Pull from config...
         $this->_deploymentDirectory = CodeGenHelpers::BuildPath($location, $deploymentDir);
 
@@ -89,9 +107,11 @@ class SiteDeploy
      * @param string $temp
      * @param string $yuiLocation
      * @param int $port
+     * @param bool $deploySql
+     * @param bool $clearDatabase
      * @return void
      */
-    public function Initialize($userName, $password, $host, $destdir, $temp, $yuiLocation, $port)
+    public function Initialize($userName, $password, $host, $destdir, $temp, $yuiLocation, $port, $deploySql = false, $clearDatabase = false)
     {
         if ($temp)
         {
@@ -122,6 +142,8 @@ class SiteDeploy
         {
             $this->_deploymentConfig['yui-location'] = $yuiLocation;
         }
+        $this->_clearDatabase = $clearDatabase;
+
 
         if (!isset($this->_deploymentConfig[$this->_stageLive]['username']))
         {
@@ -143,7 +165,7 @@ class SiteDeploy
         {
             throw new Exception('Destination directory is not set');
         }
-        if (!isset($this->_deploymentConfig['yui-location']))
+        if (!isset($this->_deploymentConfig['yui-location']) && !$deploySql)
         {
             throw new Exception('Yui-location is not set');
         }
@@ -169,6 +191,66 @@ class SiteDeploy
      * Deploys the site...
      *
      * @throws Exception
+     * @param bool $validate
+     * @param bool $mark
+     * @return void
+     */
+    public function DeploySql($validate, $mark)
+    {
+
+        if ($this->_stageLive == self::DEPLOY_LIVE && $this->_clearDatabase)
+        {
+            throw new Exception('Refusing to clear the live database, clear can only be performed on the staging database');
+        }
+
+        $tmpDir = $this->_deploymentConfig['temp_dir'];
+
+        echo 'Clearing out old site' . PHP_EOL;
+        $this->CleanTempDirectory($tmpDir);
+
+        $configDirectory = CodeGenHelpers::BuildPath($tmpDir, 'config');
+
+        echo 'Copying Config' . PHP_EOL;
+        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_location, 'config'), $configDirectory);
+
+        echo 'Merging Config Files' . PHP_EOL;
+        $this->MergeConfigFiles($configDirectory, $tmpDir);
+
+        $connection = ssh2_connect($this->_deploymentConfig[$this->_stageLive]['host'], $this->_deploymentConfig[$this->_stageLive]['port']);
+        if (!$connection)
+        {
+            throw new Exception('Invalid host:' . $this->_deploymentConfig[$this->_stageLive]['host'] . ' nothing listening on port: ' . $this->_deploymentConfig[$this->_stageLive]['port']);
+        }
+
+        if (!ssh2_auth_password($connection, $this->_deploymentConfig[$this->_stageLive]['username'], $this->_deploymentConfig[$this->_stageLive]['password']))
+        {
+            throw new Exception('Invalid username password for host:' . $this->_deploymentConfig[$this->_stageLive]['host']);
+        }
+
+
+        $sftp = ssh2_sftp($connection);
+
+        $destDirectory = $this->_deploymentConfig[$this->_stageLive]['dest_dir'];
+
+
+        $siteClosed = $this->CloseSiteForMaintenance($sftp, $connection, $destDirectory);
+
+        $this->DeploySqlChanges($connection, CodeGenHelpers::BuildPath($destDirectory, 'app', true), CodeGenHelpers::BuildPath($destDirectory, 'bin', true),
+            $configDirectory, $validate, $mark);
+
+        if ($siteClosed)
+       {
+           $this->ReopenSite($sftp, $connection, $destDirectory);
+       }
+
+
+
+    }
+
+    /**
+     * Deploys the site...
+     *
+     * @throws Exception
      * @return void
      */
     public function Deploy()
@@ -178,6 +260,10 @@ class SiteDeploy
             throw new Exception('SSH2 extension is not installed.');
         }
 
+        if ($this->_stageLive == self::DEPLOY_LIVE && $this->_clearDatabase)
+        {
+            throw new Exception('Refusing to clear the live database, clear can only be performed on the staging database');
+        }
 
         // Create the temp directory...
         $tmpDir = $this->_deploymentConfig['temp_dir'];
@@ -265,10 +351,20 @@ class SiteDeploy
 
         $totalCopyFiles = count($copyFiles);
         $currentCopyFile = 0;
-        $lastPercent = 0;
+        $lastPercent = -1;
 
         try
         {
+
+            if (count($copyFiles) > 0)
+            {
+                echo 'Uploading '.count($copyFiles).' files to server'.PHP_EOL;
+            }
+            else
+            {
+                echo 'No files to upload to server'.PHP_EOL;
+            }
+
             // Copy all files that have different hashes.
             foreach ($copyFiles as $file => $hash)
             {
@@ -297,7 +393,7 @@ class SiteDeploy
                     throw new Exception('Unable to scp file: ' . $file . ' to ' . $destFile);
                 }
 
-                $percent = (int)(($currentCopyFile / $totalCopyFiles) * 100);
+                $percent = (int)(($currentCopyFile++ / $totalCopyFiles) * 100);
                 if ($percent != $lastPercent)
                 {
                     echo 'Percent copied: ' . $percent . PHP_EOL;
@@ -311,9 +407,17 @@ class SiteDeploy
             throw $ex;
         }
 
+        if (count($copyFiles) > 0)
+        {
+            echo 'Completed file transfer'.PHP_EOL;
+        }
+
+        echo 'Saving deployment status to the server'.PHP_EOL;
+
         $this->SaveDeploymentFiles($tmpDir, $destDirectory, $connection, $sftp);
 
-        $this->DeploySqlChanges($connection, CodeGenHelpers::BuildPath($destDirectory, 'app', true), CodeGenHelpers::BuildPath($destDirectory, 'bin', true),  $configDirectory);
+        $this->DeploySqlChanges($connection, CodeGenHelpers::BuildPath($destDirectory, 'app', true), CodeGenHelpers::BuildPath($destDirectory, 'bin', true),
+            $configDirectory, false, true);
 
         if ($siteClosed)
         {
@@ -339,35 +443,63 @@ class SiteDeploy
         if (!isset($this->_validatedDirectories[$destDir]))
         {
             //$res = ssh2_sftp_stat($sftp, $destDir);
-            $directoryExists = file_exists('ssh2.sftp://' . $sftp . $destDir);
-            if (!$directoryExists)
+            if (!($this->RemoteDirectoryExists($sftp, $destDir)))
             {
                 if (!ssh2_sftp_mkdir($sftp, $destDir, 0777, true))
                 {
                     throw new Exception('Unable to mkdir for ' . $destDir);
                 }
             }
-            $this->_validatedDirectories[$directoryExists] = true;
+            $this->_validatedDirectories[$destDir] = true;
         }
 
         return ssh2_scp_send($connection, $file, $destFile);
 
     }
 
-    private function DeploySqlChanges($connection, $destAppDirectory, $binDirectory, $configDirectory)
+    /**
+     * @param string $sftp
+     * @param string $destDir
+     * @return bool
+     */
+    private function RemoteDirectoryExists($sftp, $destDir)
+    {
+        return file_exists('ssh2.sftp://' . $sftp . $destDir);
+    }
+
+    /**
+     * @param resource $connection
+     * @param string $destAppDirectory
+     * @param string $binDirectory
+     * @param string $configDirectory
+     * @param bool $validate
+     * @param bool $mark
+     * @throws Exception
+     */
+    private function DeploySqlChanges($connection, $destAppDirectory, $binDirectory, $configDirectory, $validate = false, $mark = false)
     {
         $sqlDir = CodeGenHelpers::BuildPath($destAppDirectory, 'sql', true);
         $sqlDeployScript = CodeGenHelpers::BuildPath($binDirectory, 'SqlDeploy.php', true);
         $sqlConfig = $this->GetSqlConfigData($configDirectory);
         
-        $cmd = 'php '.$sqlDeployScript.' migrate --directory="'.$sqlDir.'" --host=' . $sqlConfig['host'] . ' --user=' . $sqlConfig['user'] . ' --password=' . $sqlConfig['password'] . ' --database=' . $sqlConfig['database'];
+        $cmd = 'php '.$sqlDeployScript.' '.($validate ? 'validate' : 'migrate').($mark ? ' --mark' : '').($this->_clearDatabase  ? ' --clear' : '').
+                ' --verbose --directory="'.$sqlDir.'" --host=' . $sqlConfig['host'] . ' --user=' . $sqlConfig['user'] .
+                ' --password=' . $sqlConfig['password'] . ' --database=' . $sqlConfig['database'];
+
+        echo 'SQL DEPLOY '.$cmd.PHP_EOL;
+        
         $outputString = '';
         $errorString = '';
+
+        echo 'Deploying SQL'.PHP_EOL;
+
         $this->ExecuteSSHCommand($connection, $cmd, $outputString, $errorString);
+        echo $outputString;
         if (strlen($errorString))
         {
             throw new Exception('Migrating SQL [' . trim($errorString) . ']');
         }
+
     }
 
 
@@ -404,7 +536,7 @@ class SiteDeploy
      *
      * @throws Exception
      * @param resource $sftp
-     * @param $connection
+     * @param resource $connection
      * @param string $destDirectory
      * @return void
      */
@@ -579,7 +711,10 @@ class SiteDeploy
             $destLocation = CodeGenHelpers::BuildPath($destinationDirectory, $destinationPath);
             if ($path->isDir())
             {
-                mkdir($destLocation);
+                if (strlen($destinationDirectory) > 0)
+                {
+                    mkdir($destLocation);
+                }
             }
             else
             {
@@ -602,7 +737,8 @@ class SiteDeploy
                         if ($process == SiteDeploy::ActionCompress)
                         {
                             $destLocation = '';
-                            if (strpos($sourceLocation, '.min.js') === false)
+                            $ext = pathinfo($sourceLocation, PATHINFO_EXTENSION);
+                            if (strpos($sourceLocation, '.min.js') === false && ($ext == 'js' || $ext == 'css'))
                             {
                                 $output = '';
                                 $error = '';
@@ -727,7 +863,7 @@ class SiteDeploy
             {
                 $javascript = '';
                 $replace_script = '<script src="' . ($scripts[0]['template'] == 'php' ? '<?= $WEB_FOLDER ?>' : '{{WEB_FOLDER}}') .
-                        '/js/' . $jsFileBase . 'Joined.js"></script>';
+                        '/js/' . $jsFileBase . 'Joined.js?'.time().'"></script>';
 
                 $html = str_replace($scripts[0]['script'], $replace_script, $html);
                 for ($i = 1; $i < count($scripts); $i++)
@@ -737,7 +873,7 @@ class SiteDeploy
 
                 foreach ($scripts as $link)
                 {
-                    $javascript .= file_get_contents($link['location']);
+                    $javascript .= file_get_contents($link['location']).PHP_EOL;
                 }
 
                 $joinedJsLocation =  CodeGenHelpers::BuildPath('js', $jsFileBase . 'Joined.js');
@@ -789,7 +925,7 @@ class SiteDeploy
             {
                 $stylesheet = '';
                 $replace_stylesheet = '<link rel="stylesheet" href="' . ($links[0]['template'] == 'php' ? '<?= $WEB_FOLDER ?>' : '{{WEB_FOLDER}}') .
-                        '/css/' . $cssFileBase . 'Joined.css" type="text/css" media="screen" />';
+                        '/css/' . $cssFileBase . 'Joined.css?'.time().'" type="text/css" media="screen" />';
 
                 $html = str_replace($links[0]['link'], $replace_stylesheet, $html);
                 for ($i = 1; $i < count($links); $i++)
@@ -861,7 +997,9 @@ class SiteDeploy
 
         while (true)
         {
+            /** @var $stdout resource|bool */
             $stdout = false;
+            /** @var $error resource|bool */
             $error = false;
             $read = array();
 
@@ -908,6 +1046,11 @@ class SiteDeploy
 
     }
 
+    /**
+     * @param string $configDirectory
+     * @return array
+     * @throws Exception
+     */
     private function GetSqlConfigData($configDirectory)
     {
         $configFilename = CodeGenHelpers::BuildPath($configDirectory, 'KrisConfig.php');
@@ -929,6 +1072,10 @@ class SiteDeploy
 
     }
 
+    /**
+     * @param string $tmpDir
+     * @param string $destDirectory
+     */
     private function FixHtaccessFile($tmpDir, $destDirectory)
     {
         $oldRewriteBase = basename($this->_location);
@@ -940,19 +1087,23 @@ class SiteDeploy
         $this->_files['.htaccess'] = md5_file($htaccessFileLocation);
     }
 
-    private function json_encode_pretty($string)
+    /**
+     * @param string $jsonString
+     * @return string
+     */
+    private function json_encode_pretty($jsonString)
     {
         $out = '';
         $indent = 0;
         $isText = false;
 
-        for ($i = 0; $i < strlen($string); $i++)
+        for ($i = 0; $i < strlen($jsonString); $i++)
         {
-            $character = $string[$i];
+            $character = $jsonString[$i];
             $breakBefore = $breakAfter = false;
             $charBefore = $charAfter = '';
 
-            if ($character === '"' && ($i > 0 && substr($string, $i - 1, 1) !== '\\'))
+            if ($character === '"' && ($i > 0 && substr($jsonString, $i - 1, 1) !== '\\'))
             {
                 $isText = !$isText;
             }
@@ -985,22 +1136,43 @@ class SiteDeploy
         return $out;
     }
 
+    /**
+     * @param string $destPath
+     * @param resource $sftp
+     */
     private function GetDeploymentFiles($destPath, $sftp)
     {
-
-        $fp = fopen('ssh2.sftp://' . $sftp . CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($destPath, 'deploy', true), 'deployFiles.json', true), 'r');
-        if ($fp)
+        $destDir = CodeGenHelpers::BuildPath($destPath, 'deploy', true);
+        if (!$this->RemoteDirectoryExists($sftp, $destDir))
         {
-            $json = '';
-            while (($buffer = fgets($fp, 4096)) !== false)
-            {
-                $json .= $buffer;
-            }
+            ssh2_sftp_mkdir($sftp, $destDir, 0777, true);
+            $fp = fopen('ssh2.sftp://' . $sftp . CodeGenHelpers::BuildPath($destDir, '.htaccess', true), 'w');
+            fwrite($fp, 'deny from all');
             fclose($fp);
-            $this->_deploymentConfig[$this->_stageLive]['files'] = json_decode($json, true);
+
+        }
+        else
+        {
+            $fp = fopen('ssh2.sftp://' . $sftp . CodeGenHelpers::BuildPath($destDir, 'deployFiles.json', true), 'r');
+            if ($fp)
+            {
+                $json = '';
+                while (($buffer = fgets($fp, 4096)) !== false)
+                {
+                    $json .= $buffer;
+                }
+                fclose($fp);
+                $this->_deploymentConfig[$this->_stageLive]['files'] = json_decode($json, true);
+            }
         }
     }
 
+    /**
+     * @param string $tmpDir
+     * @param string $destPath
+     * @param resource $connection
+     * @param resource $sftp
+     */
     private function SaveDeploymentFiles($tmpDir, $destPath, $connection, $sftp)
     {
         $deployFileList = CodeGenHelpers::BuildPath($tmpDir, 'deployFileList.txt');

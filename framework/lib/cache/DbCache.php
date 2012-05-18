@@ -10,6 +10,8 @@
  
 
 /**
+ * @package cache
+ *
  * @property int Expiry
  * @property string Key
  * @property string Value
@@ -62,7 +64,7 @@ class DBCache extends Cache
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param string $value
      * @param int $ttl
      * @return void
      */
@@ -84,7 +86,7 @@ class DBCache extends Cache
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param string $value
      * @param int $ttl
      * @return void
      */

@@ -7,6 +7,10 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
+
+/**
+ *  @package debug
+ */
 class DebugRouter extends KrisRouter
 {
     /**
@@ -28,8 +32,11 @@ class DebugRouter extends KrisRouter
             /** @var $log DebugLog */
             $log = AutoLoader::Container()->get('Log');
             $log->Debug('Controller path: '.$controllerPath.' Controller: '.$route->Controller.' Action: '.$route->Action.' Params: ('.implode(',', $route->Params).')');
+            $message = '';
+                            
 
             $startTime = microtime(true);
+            $startMemoryUsage = memory_get_usage(true);
             ob_start();
             try
             {
@@ -38,14 +45,23 @@ class DebugRouter extends KrisRouter
             catch (Exception $ex)
             {
                 $trace = $ex->getTrace();
-                $message = '';
                 foreach ($trace as $line)
                 {
                     $message .= '&nbsp;&nbsp;'.(isset($line['file']) ? 'file: '.$line['file'].', ' : 'Anonymous: ').(isset($line['line']) ? ' line: '.$line['line'].' : ' : '').
-                            (isset($line['class']) ? $line['class'].'->' : '').
-                            $line['function'].'('.implode(',', array_map(create_function('$a', 'return gettype($a);'), $line['args'])).')'.PHP_EOL;
+                            (isset($line['class']) ? $line['class'].'->' : '').$line['function'];
+                    if (isset($line['args']))
+                    {
+                        $message .= '('.implode(',', array_map(create_function('$a', 'return gettype($a);'), $line['args'])).')';
+                    }
+                    $message .= PHP_EOL;
                 }
-                $log->Error('Uncaught exception: '.$ex->getMessage().PHP_EOL.$message);
+                $message = $ex->getMessage().PHP_EOL.$message;
+                $log->Error('Uncaught exception: '.$message);
+
+                if ($this->_request->IsJson)
+                {
+                    $this->_request->JsonResponse(array('success' => false, 'message' => $message));
+                }
             }
             $endTime = microtime(true);
             $content = ob_get_clean();
@@ -55,11 +71,16 @@ class DebugRouter extends KrisRouter
                 $elapsedTime = ($endTime - $startTime) * 1000;
                 if (strpos($content, '</body>') !== false)
                 {
-                    echo str_replace('</body>', $this->GetWebBar($elapsedTime, $log) . '</body>', $content);
+                    echo str_replace('</body>', $this->GetWebBar($elapsedTime, $startMemoryUsage, $log) . '</body>', $content);
                 }
                 else
                 {
-                    echo '<html><body>'.$content.$this->GetWebBar($elapsedTime, $log).'</body></html>';
+                    // If there is no message, we probably have BS content...
+                    if (strlen($message) > 0)
+                    {
+                        $content = '';
+                    }
+                    echo '<html><body>'.$content.$this->GetWebBar($elapsedTime, $startMemoryUsage, $log).'</body></html>';
                 }
             }
             else
@@ -72,10 +93,11 @@ class DebugRouter extends KrisRouter
 
     /**
      * @param int $elapsedTime
+     * @param int $startMemoryUsage
      * @param DebugLog $log
      * @return string
      */
-    public function GetWebBar($elapsedTime, $log)
+    public function GetWebBar($elapsedTime, $startMemoryUsage, $log)
     {
         $jsVars = '';
         $dbVars = '';
@@ -100,12 +122,15 @@ class DebugRouter extends KrisRouter
         // Get Memory Log
         $peakUsage = memory_get_peak_usage(true);
         $currentUsage = memory_get_usage(true);
-        $memory = NumberHelpers::BytesToHuman($peakUsage);
+        $diffUsage = $currentUsage - $startMemoryUsage;
+        $diffMemory = NumberHelpers::BytesToHuman($diffUsage);
+        $peakMemory = NumberHelpers::BytesToHuman($peakUsage);
         $currentMemory = NumberHelpers::BytesToHuman($currentUsage);
 
         $jsVars .= 'dbLog = [' . $this->CleanJSVar($dbVars) . '];' . PHP_EOL;
-        $jsVars .= "memoryLog = '<h2>Memory Info</h2><b>Peak Memory Usage: </b><code>$memory ($peakUsage Bytes)</code><br/>" .
-                "<b>Current Usage: </b><code>$currentMemory ($currentUsage Bytes)</code><br/>';" . PHP_EOL;
+        $jsVars .= "memoryLog = '<h2>Memory Info</h2><b>Peak Memory Usage: </b><code>$peakMemory ($peakUsage Bytes)</code><br/>" .
+                "<b>Current Usage: </b><code>$currentMemory ($currentUsage Bytes)</code><br/>" .
+                "<b>Amount Used: </b><code>$diffMemory ($diffUsage Bytes)</code><br/>';" . PHP_EOL;
 
         // Get Time Log
         $jsVars .= "timeLog = '<h2>Time Info</h2><b>Time To Create Page: </b><code>" . number_format($elapsedTime, 4) . " milliseconds</code><br/>" .
@@ -114,7 +139,7 @@ class DebugRouter extends KrisRouter
 
         $jsVars .= "debugLog = '" . $this->CleanJSVar($log->GetErrorLog()) . "';" . PHP_EOL;
 
-        $debugPrefix = KrisConfig::WEB_FOLDER . '/KrisMVCDebug/';
+        $debugPrefix = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://').KrisConfig::$SERVER_NAME.KrisConfig::WEB_FOLDER.'/KrisMVCDebug/';
 
         $webBar = '<div id="krisMvcDebugDataHolder"><div id="krisMvcDebugData"></div></div>' .
                 '<div id="krisMvcWebBarButton" style="display:none"><span class="showbar"><a href="#">show bar</a></span></div>' .
@@ -124,7 +149,7 @@ class DebugRouter extends KrisRouter
                 '<li class="debugList" id="logs"><img title="View Logs" src="' . $debugPrefix . 'page_white_text.png">Logs</li>' .
                 '<li class="debugList" id="database"><img title="Database Logs" src="' . $debugPrefix . 'database.png">Database: ' . $databaseQueryCount . '</li>' .
                 '<li class="debugList" id="time"><img title="Time Elapsed" src="' . $debugPrefix . 'clock_play.png">Time: ' . (int)($elapsedTime) . 'ms</li>' .
-                '<li class="debugList" id="memory"><img title="Peak Memory" src="' . $debugPrefix . 'chart_curve.png">Memory: ' . $memory . '</li></ul></div>' .
+                '<li class="debugList" id="memory"><img title="Peak Memory" src="' . $debugPrefix . 'chart_curve.png">Memory: ' . $diffMemory . '</li></ul></div>' .
                 '<div class="rightside"><span class="downarr"><a href="#"></a></span></div></div>' .
                 '<link rel="stylesheet" href="' . $debugPrefix . 'debug.css" type="text/css" media="screen" />' .
                 '<script type="text/javascript" src="' . $debugPrefix . 'debug.js"></script>' .
@@ -133,6 +158,10 @@ class DebugRouter extends KrisRouter
         return $webBar;
     }
 
+    /**
+     * @param string $debugLog
+     * @return string
+     */
     private function CleanJSVar($debugLog)
     {
         return str_replace(PHP_EOL, '', nl2br(str_replace("'", "\\'", str_replace('\\', '\\\\', $debugLog))));

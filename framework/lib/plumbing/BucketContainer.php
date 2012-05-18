@@ -8,18 +8,30 @@
 
 /**
  * Exceptions that are raised if the container can't fulfil a dependency during creation.
+ * @package plumbing
  */
 class BucketCreationException extends Exception
 {
 }
 
 /**
+ * BucketScope
+ * @package plumbing
  * Internally used by `bucket_Container` to hold instances.
  */
 class BucketScope
 {
+    /**
+     * @var BucketScope|null
+     */
     protected $top;
+    /**
+     * @var array
+     */
     protected $instances = array();
+    /**
+     * @var array
+     */
     protected $implementations = array();
 
     /**
@@ -81,10 +93,17 @@ class BucketScope
 
 /**
  * The main container class.
+ * @package plumbing
  */
 class BucketContainer
 {
+    /**
+     * @var array|null|StdClass
+     */
     protected $factory;
+    /**
+     * @var BucketScope
+     */
     protected $scope;
 
     /**
@@ -108,6 +127,10 @@ class BucketContainer
         $this->scope = new BucketScope($scope);
     }
 
+    /**
+     * @param $classname
+     * @param $callback
+     */
     public function RegisterFactory($classname, $callback)
     {
         $this->factory->{'new_' . strtolower($classname)} = $callback;
@@ -115,7 +138,7 @@ class BucketContainer
 
     /**
      * Clones the container, with a new sub-scope.
-     * @return \BucketContainer
+     * @return BucketContainer
      */
     function makeChildContainer()
     {
@@ -183,7 +206,7 @@ class BucketContainer
     }
 
     /**
-     * @throws bucket_CreationException
+     * @throws BucketCreationException
      * @param string $classname
      * @return object
      */
