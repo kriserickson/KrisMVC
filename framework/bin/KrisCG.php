@@ -9,7 +9,7 @@
  */
 
 require_once dirname(__FILE__) . '/../lib/plumbing/AutoLoader.php';
-require_once dirname(__FILE__) . '/../lib/plumbing/BucketContainer.php';
+require_once dirname(__FILE__) . '/../lib/plumbing/KrisDIContainer.php';
 require_once dirname(__FILE__) . '/../lib/orm/KrisDB.php';
 require_once dirname(__FILE__) . '/../lib/orm/KrisModel.php';
 require_once dirname(__FILE__) . '/../lib/debug/DebugPDO.php';
@@ -25,8 +25,7 @@ require_once dirname(__FILE__) . '/SiteDeploy.php';
 /**
  * Class that
  */
-class KrisCGCommandLineParser
-{
+class KrisCGCommandLineParser {
     /**
      * @var Args
      */
@@ -40,45 +39,36 @@ class KrisCGCommandLineParser
     /**
      * This actually does everything...  Parses the command line or gets values from stdin...
      */
-    function __construct()
-    {
+    function __construct() {
         $this->_args = new Args();
 
         $success = false;
 
         $command = $this->_args->Command();
-        if (in_array($command, array('create-table', 'table', 'create-site', 'site', 'create-scaffold', 'scaffold', 'deploy-site', 'deploy-sql')))
-        {
+        if (in_array($command, array('create-table', 'table', 'create-site', 'site', 'create-scaffold', 'scaffold', 'deploy-site', 'deploy-sql', 'backup-sql', 'backup-uploads', 'backup-all'))) {
             $location = $this->GetLocation();
-            if ($location)
-            {
-                try
-                {
-                    if ($this->_args->Command() == 'deploy-site')
-                    {
+            if ($location) {
+                try {
+                    if ($this->_args->Command() == 'deploy-site') {
                         $success = $this->DeploySite($location);
-                    }
-                    else if ($this->_args->Command() == 'deploy-sql')
-                    {
+                    } else if ($this->_args->Command() == 'deploy-sql') {
                         $success = $this->DeploySql($location);
-                    }
-                    else
-                    {
+                    } else if ($this->_args->Command() == 'backup-sql') {
+                        $success = $this->Backup($location, true, false);
+                    } else if ($this->_args->Command() == 'backup-uploads') {
+                        $success = $this->Backup($location, false, true);
+                    } else if ($this->_args->Command() == 'backup-all') {
+                        $success = $this->Backup($location, true, true);
+                    } else {
                         $this->_cg = new KrisCG($location);
 
-                        if ($this->_args->Command() == 'create-table' || $this->_args->Command() == 'table')
-                        {
+                        if ($this->_args->Command() == 'create-table' || $this->_args->Command() == 'table') {
                             $success = $this->CreateTable();
-                        }
-                        else {
-                            if ($this->_args->Command() == 'create-site' || $this->_args->Command() == 'site')
-                            {
+                        } else {
+                            if ($this->_args->Command() == 'create-site' || $this->_args->Command() == 'site') {
                                 $success = $this->CreateSite();
-                            }
-                            else
-                            {
-                                if ($this->_args->Command() == 'create-scaffold' || $this->_args->Command() == 'scaffold')
-                                {
+                            } else {
+                                if ($this->_args->Command() == 'create-scaffold' || $this->_args->Command() == 'scaffold') {
                                     $success = $this->CreateScaffold();
                                 }
                             }
@@ -86,21 +76,16 @@ class KrisCGCommandLineParser
 
                     }
                 }
-                catch (Exception $ex)
-                {
-                    echo 'Error: ' . $ex->getMessage().PHP_EOL.PHP_EOL;
+                catch (Exception $ex) {
+                    echo 'Error: ' . $ex->getMessage() . PHP_EOL . PHP_EOL;
                 }
             }
-        }
-        else
-        {
-            if (strlen($command) > 0 && $command != 'help')
-            {
+        } else {
+            if (strlen($command) > 0 && $command != 'help') {
                 echo PHP_EOL . 'Invalid Command "' . $command . '"' . PHP_EOL . PHP_EOL;
             }
         }
-        if (!$success)
-        {
+        if (!$success) {
             $this->DisplayUsage();
         }
     }
@@ -109,8 +94,7 @@ class KrisCGCommandLineParser
     /**
      * @return bool
      */
-    private function CreateSite()
-    {
+    private function CreateSite() {
         $site = $this->_args->flag(array('s', 'site'), '');
         $host = $this->_args->flag(array('h', 'host'), '');
         $database = $this->_args->flag(array('d', 'database'), '');
@@ -120,65 +104,50 @@ class KrisCGCommandLineParser
         $viewType = $this->_args->flag(array('v', 'view-type'), 'Mustache');
         $siteName = $this->_args->flag(array('a', 'site-name'), 'KrisMVC Site');
 
-        if ($this->IsCli())
-        {
-            if (strlen($site) == 0)
-            {
+        if ($this->IsCli()) {
+            if (strlen($site) == 0) {
                 $site = $this->GetInput('The base url of the site', 'localhost', true);
             }
-            if (strlen($this->_args->flag(array('a', 'site-name'))) == 0)
-            {
+            if (strlen($this->_args->flag(array('a', 'site-name'))) == 0) {
                 $siteName = $this->GetInput('Site Name', $siteName);
             }
-            if (strlen($this->_args->flag(array('v', 'view-type'))) == 0)
-            {
+            if (strlen($this->_args->flag(array('v', 'view-type'))) == 0) {
                 $viewType = $this->GetInput('View Type', $viewType);
             }
-            if (strlen($host) == 0)
-            {
+            if (strlen($host) == 0) {
                 $host = $this->GetInput('Database Host (leave blank for no database access)');
             }
-            if (strlen($host) > 0 && strlen($database) == 0)
-            {
+            if (strlen($host) > 0 && strlen($database) == 0) {
                 $database = $this->GetInput('Database Name', '', true);
             }
-            if (strlen($host) > 0 && strlen($user) == 0)
-            {
+            if (strlen($host) > 0 && strlen($user) == 0) {
                 $user = $this->GetInput('Database User');
             }
-            if (strlen($host) > 0 && strlen($password) == 0)
-            {
+            if (strlen($host) > 0 && strlen($password) == 0) {
                 $password = $this->GetInput('Database User Password');
             }
 
-        }
-        else
-        {
-            if (strlen($site) == 0)
-            {
+        } else {
+            if (strlen($site) == 0) {
                 echo 'You must set a site.' . PHP_EOL;
                 return false;
             }
-            if (strlen($host) == 0 && !$this->_args->flag(array('n', 'no-database')))
-            {
+            if (strlen($host) == 0 && !$this->_args->flag(array('n', 'no-database'))) {
                 echo 'You must set a host or set no-database.' . PHP_EOL;
                 return false;
             }
-            if (strlen($database) == 0 && !$this->_args->flag(array('n', 'no-database')))
-            {
+            if (strlen($database) == 0 && !$this->_args->flag(array('n', 'no-database'))) {
                 echo 'You must set a database or set no-database.' . PHP_EOL;
                 return false;
             }
 
         }
 
-        try
-        {
+        try {
             $this->_cg->CreateSite($site, $host, $database, $user, $password, $databaseType, $viewType, $siteName);
         }
-        catch (Exception $ex)
-        {
-            echo 'Error Creating Site: ' . $ex->getMessage().PHP_EOL.PHP_EOL;
+        catch (Exception $ex) {
+            echo 'Error Creating Site: ' . $ex->getMessage() . PHP_EOL . PHP_EOL;
         }
         return true;
     }
@@ -186,42 +155,36 @@ class KrisCGCommandLineParser
     /**
      * @return bool
      */
-    private function CreateTable()
-    {
+    private function CreateTable() {
         $table = $this->_args->flag(array('t', 'table', ''));
-        if ($this->IsCli())
-        {
-            if (strlen($table) == 0)
-            {
+        if ($this->IsCli()) {
+            if (strlen($table) == 0) {
                 $table = $this->GetInput('Please Enter Table Name', '', true);
             }
-        }
-        else
-        {
-            if (strlen($table) == 0)
-            {
+        } else {
+            if (strlen($table) == 0) {
                 echo 'Error, cannot create table because no table was specified';
                 return false;
             }
         }
 
         $this->_cg->IncludeConfigFile();
-        try
-        {
+        try {
             $this->_cg->GenerateModel($table);
         }
-        catch (Exception $ex)
-        {
-            echo 'Error Creating Table: ' . $ex->getMessage().PHP_EOL.PHP_EOL;
+        catch (Exception $ex) {
+            echo 'Error Creating Table: ' . $ex->getMessage() . PHP_EOL . PHP_EOL;
         }
         return true;
     }
 
     /**
      * @param string $location
+     * @param bool $backupSql
+     * @param bool $backupUploads
      * @return bool
      */
-    private function DeploySql($location)
+    private function Backup($location, $backupSql, $backupUploads)
     {
         $isLive = $this->_args->flag(array('L', 'live'), false);
         $userName = $this->_args->flag(array('u', 'username'));
@@ -229,24 +192,33 @@ class KrisCGCommandLineParser
         $host = $this->_args->flag(array('h', 'host'));
         $port = $this->_args->flag(array('o', 'port'));
         $destdir = $this->_args->flag(array('d', 'dest-directory'));
-        $validate  = $this->_args->flag(array('v', 'validate'));
-        $mark  = $this->_args->flag(array('m', 'mark'));
-        $clearDatabase = $this->_args->flag(array('c', 'clear'));
+        $backupDir = $this->_args->flag(array('b', 'backup-location'));
 
-
-        try
-        {
+        try {
             $deploy = new SiteDeploy($location, $isLive);
-            $deploy->Initialize($userName, $password, $host, $destdir, '', '', $port, true, $clearDatabase);
+            $deploy->Initialize($userName, $password, $host, $destdir, '', '', $port, true, false);
 
-            $deploy->DeploySql($validate, $mark);
-            echo 'Sql Deployed';
+            if ($backupSql && $backupUploads)
+            {
+                $deploy->BackupAll($backupDir);
+                echo 'Sql and Uploads Backed Up';
+            }
+            else if ($backupSql)
+            {
+                $deploy->BackupSql($backupDir);
+                echo 'Sql Backed Up';
+            }
+            else
+            {
+                $deploy->BackupUploads($backupDir);
+                echo 'Uploads Backed Up';
+            }
+
 
             return true;
         }
-        catch (Exception $ex)
-        {
-            echo 'Error: ' . $ex->getMessage().PHP_EOL.PHP_EOL;
+        catch (Exception $ex) {
+            echo 'Error: ' . $ex->getMessage() . PHP_EOL . PHP_EOL;
             $deploy->WriteDeployFile();
             return true;
         }
@@ -256,8 +228,39 @@ class KrisCGCommandLineParser
      * @param string $location
      * @return bool
      */
-    private function DeploySite($location)
-    {
+    private function DeploySql($location) {
+        $isLive = $this->_args->flag(array('L', 'live'), false);
+        $userName = $this->_args->flag(array('u', 'username'));
+        $password = $this->_args->flag(array('p', 'password'));
+        $host = $this->_args->flag(array('h', 'host'));
+        $port = $this->_args->flag(array('o', 'port'));
+        $destdir = $this->_args->flag(array('d', 'dest-directory'));
+        $validate = $this->_args->flag(array('v', 'validate'));
+        $mark = $this->_args->flag(array('m', 'mark'));
+        $clearDatabase = $this->_args->flag(array('c', 'clear'));
+
+
+        try {
+            $deploy = new SiteDeploy($location, $isLive);
+            $deploy->Initialize($userName, $password, $host, $destdir, '', '', $port, true, $clearDatabase);
+
+            $deploy->DeploySql($validate, $mark);
+            echo 'Sql Deployed';
+
+            return true;
+        }
+        catch (Exception $ex) {
+            echo 'Error: ' . $ex->getMessage() . PHP_EOL . PHP_EOL;
+            $deploy->WriteDeployFile();
+            return true;
+        }
+    }
+
+    /**
+     * @param string $location
+     * @return bool
+     */
+    private function DeploySite($location) {
         $isLive = $this->_args->flag(array('L', 'live'), false);
         $userName = $this->_args->flag(array('u', 'username'));
         $password = $this->_args->flag(array('p', 'password'));
@@ -269,17 +272,13 @@ class KrisCGCommandLineParser
         $write = $this->_args->flag(array('w', 'write'));
         $clearDatabase = $this->_args->flag(array('c', 'clear'));
 
-        try
-        {
+        try {
             $deploy = new SiteDeploy($location, $isLive);
             $deploy->Initialize($userName, $password, $host, $destdir, $temp, $yuiLocation, $port, false, $clearDatabase);
-            if ($write)
-            {
+            if ($write) {
                 $deploy->WriteDeployFile();
                 echo 'Deployment File Written..';
-            }
-            else
-            {
+            } else {
                 $deploy->Deploy($clearDatabase);
                 $deploy->WriteDeployFile();
                 echo 'Site Deployed';
@@ -287,9 +286,8 @@ class KrisCGCommandLineParser
             }
             return true;
         }
-        catch (Exception $ex)
-        {
-            echo 'Error: ' . $ex->getMessage().PHP_EOL.PHP_EOL;
+        catch (Exception $ex) {
+            echo 'Error: ' . $ex->getMessage() . PHP_EOL . PHP_EOL;
             $deploy->WriteDeployFile();
             return true;
         }
@@ -299,8 +297,7 @@ class KrisCGCommandLineParser
     /**
      * @return bool
      */
-    private function CreateScaffold()
-    {
+    private function CreateScaffold() {
         $controllerLocation = $this->_args->flag(array('c', 'scaffold-location'), 'scaffold');
         $controllerName = $this->_args->flag(array('n', 'scaffold-name'), 'Scaffold');
         $viewLocation = $this->_args->flag(array('o', 'view-location'), 'scaffold');
@@ -308,34 +305,27 @@ class KrisCGCommandLineParser
         // Currently on the KrisView PHP type is supported...
         $viewType = $this->_args->flag(array('t', 'view-type'), 'Mustache');
 
-        if ($this->IsCli())
-        {
-            if (strlen($this->_args->flag(array('L', 'scaffold-location'))) == 0)
-            {
+        if ($this->IsCli()) {
+            if (strlen($this->_args->flag(array('L', 'scaffold-location'))) == 0) {
                 $controllerLocation = $this->GetInput('Controller Location (in app/controllers)', $controllerLocation);
             }
-            if (strlen($this->_args->flag(array('n', 'scaffold-name'))) == 0)
-            {
+            if (strlen($this->_args->flag(array('n', 'scaffold-name'))) == 0) {
                 $controllerName = $this->GetInput('Controller Class Name', $controllerName);
             }
-            if (strlen($this->_args->flag(array('t', 'view-type'))) == 0)
-            {
+            if (strlen($this->_args->flag(array('t', 'view-type'))) == 0) {
                 $viewType = $this->GetInput('View Type', $viewType);
             }
-            if (strlen($this->_args->flag(array('o', 'view-location'))) == 0)
-            {
+            if (strlen($this->_args->flag(array('o', 'view-location'))) == 0) {
                 $viewLocation = $this->GetInput('Scaffold Layout Locations (in app/views)', $viewLocation);
             }
         }
 
 
         $this->_cg->IncludeConfigFile();
-        try
-        {
+        try {
             $this->_cg->CreateScaffold($controllerLocation, $controllerName, $viewType, $viewLocation);
         }
-        catch (Exception $ex)
-        {
+        catch (Exception $ex) {
             echo 'Error Creating Scaffold: ' . $ex->getMessage();
         }
         return true;
@@ -344,19 +334,14 @@ class KrisCGCommandLineParser
     /**
      * @return bool|string
      */
-    private function GetLocation()
-    {
-        if (!($this->_args->flag('l') || $this->_args->flag('location')))
-        {
+    private function GetLocation() {
+        if (!($this->_args->flag('l') || $this->_args->flag('location'))) {
             // Default location in the main directory...
             $location = dirname(dirname(__DIR__));
-            if ($this->IsCli())
-            {
+            if ($this->IsCli()) {
                 $location = $this->GetInput('Location of the project folder', $location);
             }
-        }
-        else
-        {
+        } else {
             $location = !$this->_args->flag('l') ? $this->_args->flag('location') : $this->_args->flag('l');
 
         }
@@ -368,8 +353,7 @@ class KrisCGCommandLineParser
     /**
      * @return bool
      */
-    private function IsCli()
-    {
+    private function IsCli() {
         return defined('STDIN');
     }
 
@@ -379,17 +363,14 @@ class KrisCGCommandLineParser
      * @param bool $required
      * @return string
      */
-    private function GetInput($msg, $default = '', $required = false)
-    {
+    private function GetInput($msg, $default = '', $required = false) {
         $handle = fopen('php://stdin', 'r');
-        do
-        {
+        do {
             echo $msg . (strlen($default) > 0 ? ' [' . $default . ']' : '') . ': ';
 
             // We don't want the carriage return...
             $line = rtrim(fgets($handle));
-            if (strlen($line) == 0)
-            {
+            if (strlen($line) == 0) {
                 $line = $default;
             }
         } while ($required && strlen($line) == 0);
@@ -401,8 +382,7 @@ class KrisCGCommandLineParser
     /**
      * @return void
      */
-    private function DisplayUsage()
-    {
+    private function DisplayUsage() {
         echo 'Usage KrisCG ' . PHP_EOL .
                 '   Commands:       Options ' . PHP_EOL . PHP_EOL .
                 '   create-table or table               Adds a model to the project of the table specified' . PHP_EOL .
@@ -432,17 +412,35 @@ class KrisCGCommandLineParser
                 '                   -u --username           Site username' . PHP_EOL .
                 '                   -p --password           Site password' . PHP_EOL .
                 '                   -h --host               Site host' . PHP_EOL .
+                '                   -p --port               Site SSL port' . PHP_EOL .
                 '                   -w --write              Write the deploy file (does not deploy the site, just writes defaults into' . PHP_EOL .
                 '                                           the deploy file)' . PHP_EOL .
                 '                   -t --temp               Temp location (defaults to $TEMP/$ProjectName)' . PHP_EOL .
+                '                   -d --dest-directory     Server location of the files (e.g. /srv/mysite)' . PHP_EOL .
                 '                   -c --yui-location       The location of the YUI compressor, note: Java is required to be installed ' . PHP_EOL .
                 '  deploy-sql                          Deploys the sql only for a site ' . PHP_EOL .
                 '                   -L --live               Deploys the live version of the site (the default is staging)' . PHP_EOL .
                 '                   -u --username           Site username' . PHP_EOL .
                 '                   -p --password           Site password' . PHP_EOL .
                 '                   -h --host               Site host' . PHP_EOL .
+                '                   -p --port               Site SSL port' . PHP_EOL .
                 '                   -v --validate           Validate Sql' . PHP_EOL .
-                '                   -m --mark           Mark Sql' . PHP_EOL .
+                '                   -m --mark               Mark Sql' . PHP_EOL .
+                '                   -d --dest-directory     Server location of the files (e.g. /srv/mysite)' . PHP_EOL .
+                '  backup-sql                           Backs up the sql to directory'.PHP_EOL.
+                '                   -L --live               Deploys the live version of the site (the default is staging)' . PHP_EOL .
+                '                   -u --username           Site username' . PHP_EOL .
+                '                   -p --password           Site password' . PHP_EOL .
+                '                   -h --host               Site host' . PHP_EOL .
+                '                   -p --port               Site SSL port' . PHP_EOL .
+                '                   -b --backup-location    Backup location'. PHP_EOL.
+                '  backup-uploads                       Backs up the uploads directory' . PHP_EOL .
+                '                   -u --username           Site username' . PHP_EOL .
+                '                   -p --password           Site password' . PHP_EOL .
+                '                   -h --host               Site host' . PHP_EOL .
+                '                   -p --port               Site SSL port'.PHP_EOL.
+                '                   -b --backup-location    Backup location' . PHP_EOL .
+                '                   -d --dest-directory     Server location of the files (e.g. /srv/mysite)'.PHP_EOL.
                 '  Options available for all commands:' . PHP_EOL .
                 '                   -l --location       Location of the site (required unless the site is in the default location' . PHP_EOL . PHP_EOL;
 
@@ -458,9 +456,10 @@ class KrisCGCommandLineParser
  * @param int $errorLine
  * @throws ErrorException
  */
-function exception_error_handler($errorNumber, $errorString, $errorFile, $errorLine ) {
+function exception_error_handler($errorNumber, $errorString, $errorFile, $errorLine) {
     throw new ErrorException($errorString, 0, $errorNumber, $errorFile, $errorLine);
 }
+
 set_error_handler("exception_error_handler");
 
 new KrisCGCommandLineParser();

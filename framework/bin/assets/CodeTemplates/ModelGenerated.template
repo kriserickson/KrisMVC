@@ -4,10 +4,13 @@
  */
 
 /**
-{{{properties}}}
- */
+{{{properties}}}* @method {{{className}}}View[] RetrieveMultiple(array $where = null, array $bindings = null, bool $likeQuery = false, int $count = 0, int $offset = 0, string $orderBy = '', bool $orderAscending = false)
+* @method {{{className}}}View Retrieve(string $primaryKeyOrFieldName, string $value = null)
+* @method {{{className}}}View|bool Create
+*/
 abstract class {{{className}}}Model extends KrisCrudModel
 {
+{{{constants}}}
     {{{foreignKeyString}}}
     {{{fakeFields}}}
 
@@ -24,4 +27,3 @@ abstract class {{{className}}}Model extends KrisCrudModel
         {{{initializeFields}}}
     }
 }
-?>

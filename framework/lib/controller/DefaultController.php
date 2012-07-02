@@ -17,22 +17,22 @@ abstract class DefaultController
     /**
      * @var KrisView
      */
-    protected $_view;
+    protected $view;
 
     /**
      * @var string
      */
-    protected $_error = '';
+    protected $error = '';
 
     /**
      * @var Auth
      */
-    protected $_auth;
+    protected $auth;
 
     /**
      * @var Request
      */
-    protected $_request;
+    protected $request;
 
 
     /**
@@ -42,7 +42,7 @@ abstract class DefaultController
      */
     protected function GetHtmlError()
     {
-        return nl2br($this->_error);
+        return nl2br($this->error);
     }
 
     /**
@@ -53,7 +53,7 @@ abstract class DefaultController
      */
     protected function AddError($error)
     {
-        $this->_error .= (strlen($this->_error) > 0 ? PHP_EOL : '').$error;
+        $this->error .= (strlen($this->error) > 0 ? PHP_EOL : '').$error;
     }
 
     /**
@@ -71,6 +71,6 @@ abstract class DefaultController
      */
     protected  function HasError()
     {
-        return strlen($this->_error) > 0;
+        return strlen($this->error) > 0;
     }
 }

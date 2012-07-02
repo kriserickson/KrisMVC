@@ -32,6 +32,9 @@ class KrisRouterTest extends PHPUnit_Framework_TestCase
     {
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     private function createGetControllerRequest()
     {
         $this->krisRouter->expects($this->once())->method('GetControllerRequest')->will($this->returnCallback(
@@ -77,12 +80,18 @@ class KrisRouterTest extends PHPUnit_Framework_TestCase
     }
 }
 
+/**
+ *
+ */
 class TestControllerClass
 {
+    /**
+     * @return null
+     */
     public function Index()
     {
         return null;
     }
 }
 
-?>
+

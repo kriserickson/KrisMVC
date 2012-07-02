@@ -113,13 +113,13 @@ class Mustache {
 		if ($options !== null)  $this->_setOptions($options);
 	}
 
-	/**
-	 * Helper function for setting options from constructor args.
-	 *
-	 * @access protected
-	 * @param array $options
-	 * @return void
-	 */
+    /**
+     * Helper function for setting options from constructor args.
+     *
+     * @access protected
+     * @param array $options
+     * @return void
+     */
 	protected function _setOptions(array $options) {
 		if (isset($options['charset'])) {
 			$this->_charset = $options['charset'];
@@ -461,7 +461,7 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param mixed $exception
-	 * @return void
+	 * @return bool
 	 */
 	protected function _throwsException($exception) {
 		return (isset($this->_throwsExceptions[$exception]) && $this->_throwsExceptions[$exception]);
@@ -566,11 +566,13 @@ class Mustache {
 			case '<':
 				return $this->_renderPartial($tag_name, $leading, $trailing);
 				break;
-			case '{':
+            /** @noinspection PhpMissingBreakStatementInspection */
+            case '{':
 				// strip the trailing } ...
 				if ($tag_name[(strlen($tag_name) - 1)] == '}') {
 					$tag_name = substr($tag_name, 0, -1);
 				}
+                // no break - DO NOT PUT A BREAK HERE, the fall through is intentional
 			case '&':
 				if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
 					return $this->_renderEscaped($tag_name, $leading, $trailing);

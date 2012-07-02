@@ -13,7 +13,7 @@ class PHPUnitNamer implements Namer {
     private $testDirectory;
 
     /**
-     * Constarctor
+     * Constructor
      */
     public function __construct() {
 		$stackTraceLines = debug_backtrace(false);

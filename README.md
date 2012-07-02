@@ -25,7 +25,6 @@ Included Projects
 -----------------
 
  + Portable PHP password hashing framework. -  http://www.openwall.com/phpass/
- + Bucket DI Container - https://github.com/troelskn/bucket
  + Mustache - http://defunkt.github.com/mustache
  + FamFamFam Silk Icons - http://www.famfamfam.com/lab/icons/silk/
 

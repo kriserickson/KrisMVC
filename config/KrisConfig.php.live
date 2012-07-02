@@ -1,0 +1,17 @@
+<?php
+
+/*
+class KrisConfig
+{
+
+    const FRAMEWORK_DIR = '/srv/somedir';
+
+    public static $SESSION_DOMAIN = '.example.com';
+    public static $SERVER_NAME = 'example.com';
+
+    public static $CACHE_TYPE = KrisConfig::CACHE_TYPE_APC;
+
+    const DEBUG = false;
+}
+*/
+

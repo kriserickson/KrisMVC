@@ -31,7 +31,7 @@ class FileCache extends Cache
 
     /**
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      * @param int $ttl
      * @return void
      */
@@ -39,12 +39,12 @@ class FileCache extends Cache
     {
         $file = $this->GetFilename($key);
         $expiry = time() + $ttl;
-        file_put_contents($file, $expiry.PHP_EOL.$value);
+        file_put_contents($file, $expiry.PHP_EOL.serialize($value));
     }
 
     /**
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      * @param int $ttl
      * @return void
      */
@@ -54,7 +54,7 @@ class FileCache extends Cache
         $expiry = time() + $ttl;
         if (!file_exists($file))
         {
-            file_put_contents($file, $expiry.PHP_EOL.$value);
+            file_put_contents($file, $expiry.PHP_EOL.serialize($value));
         }
         else
         {
@@ -66,15 +66,16 @@ class FileCache extends Cache
     /**
      * @param string $key
      * @param string $default
-     * @return string
+     * @return mixed
      */
     public function Fetch($key, $default = '')
     {
         $file = $this->GetFilename($key);
-        if(($fp = fopen($file, 'r')) === false)
+        if(!file_exists($file))
         {
-            return false;
+            return $default;
         }
+        $fp = fopen($file, 'r');
         $expires = (int)fgets($fp);
         if($expires > time())
         {
@@ -84,11 +85,14 @@ class FileCache extends Cache
                 $str .= $line;
             }
             fclose($fp);
-            return $str;
+            return unserialize($str);
         }
-        fclose($fp);
-        unlink($file);
-        return false;
+        else
+        {
+            fclose($fp);
+            unlink($file);
+            return $default;
+        }
     }
 
     /**
@@ -111,15 +115,14 @@ class FileCache extends Cache
      */
     public function ClearCache()
     {
-        $deleted = false;
         $files = glob($this->_tmpDir . '*.cache');
+
         foreach($files as $file)
         {
             unlink($file);
-            $deleted = true;
         }
 
-        return $deleted;
+        return count($files) > 0;
     }
 
     /**
@@ -128,6 +131,6 @@ class FileCache extends Cache
      */
     private function GetFilename($key)
     {
-        return $this->_tmpDir . md5($key) . '.cache';
+        return FileHelpers::BuildPath($this->_tmpDir, md5($key) . '.cache');
     }
 }

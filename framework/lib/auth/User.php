@@ -48,6 +48,11 @@ class User
      */
     protected $_aclChanged;
 
+    /**
+     * @var int
+     */
+    protected $_lastLoginTime;
+
 
     /**
      * @param int $userId
@@ -55,16 +60,17 @@ class User
      * @param string $email
      * @param string $data
      * @param int $acl
+     * @param int $loginTime
      * @return User
-     *
      */
-    function __construct($userId, $displayName, $email, $data, $acl)
+    function __construct($userId, $displayName, $email, $data, $acl, $loginTime)
     {
         $this->_userId = $userId;
         $this->_displayName = $displayName;
         $this->_email = $email;
         $this->_data = unserialize($data);
         $this->_acl = $acl;
+        $this->_lastLoginTime = $loginTime;
     }
 
 
@@ -98,6 +104,15 @@ class User
     {
         return $this->_email;
     }
+
+    /**
+     * @return int
+     */
+    function LastLoginTime()
+    {
+        return $this->_lastLoginTime;
+    }
+
 
     /**
      * @return string

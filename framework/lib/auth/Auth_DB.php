@@ -111,7 +111,7 @@ class Auth_DB extends Auth
 
             if ($passwordCheck->CheckPassword($password, $this->_db->PasswordHash))
             {
-                $this->_user = new User($this->_db->UserId, $this->_db->UserName, $this->_db->Email, $this->_db->Data, $this->_db->Acl);
+                $this->_user = new User($this->_db->UserId, $this->_db->UserName, $this->_db->Email, $this->_db->Data, $this->_db->Acl, time());
                 $this->_db->FailedLoginCount = 0;
                 $this->_db->Update();
                 $this->LoginUserToSession();
@@ -267,8 +267,8 @@ class Auth_DB extends Auth
     }
 
     /**
-     * @param $searchType
-     * @param $search
+     * @param string $searchType
+     * @param string $search
      * @return int
      */
     public function TotalUsers($searchType, $search)
@@ -377,6 +377,19 @@ class Auth_DB extends Auth
         return strtotime($date) > time();
 
 
+    }
+
+    /**
+     * @param int $userId
+     */
+    protected function UpdateLastLogin($userId)
+    {
+        if ($this->_db->UserId != $userId)
+        {
+            $this->_db->Retrieve('user_id', $userId);
+            $this->_db->LastLogin = date(KrisDB::ISO_DATE_STRING);
+            $this->_db->Update();
+        }
     }
 }
 

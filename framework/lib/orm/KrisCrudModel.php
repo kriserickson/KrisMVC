@@ -101,7 +101,7 @@ class KrisCrudModel extends KrisModel
      * @param int $offset
      * @param string $orderBy
      * @param bool $orderAscending
-     * @return bool|array
+     * @return array
      */
     public function RetrieveMultiple($where = null, $bindings = null, $likeQuery = false, $count = 0, $offset = 0, $orderBy = '', $orderAscending = true)
     {

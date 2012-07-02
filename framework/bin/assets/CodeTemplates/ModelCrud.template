@@ -12,5 +12,3 @@ class {{{safeClassName}}} extends {{{className}}}Model
 {
 
 }
-
-?>

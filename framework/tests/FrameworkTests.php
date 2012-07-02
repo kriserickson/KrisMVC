@@ -17,11 +17,16 @@ require __DIR__ . '/../../framework/lib/orm/KrisDB.php';
 require __DIR__ . '/../../framework/lib/orm/KrisModel.php';
 require __DIR__ . '/../../framework/lib/orm/KrisCrudModel.php';
 require __DIR__ . '/../../framework/lib/orm/KrisDBView.php';
-require __DIR__ . '/../../framework/lib/plumbing/BucketContainer.php';
+require __DIR__ . '/../../framework/lib/plumbing/KrisDIContainer.php';
 require __DIR__ . '/../../framework/lib/view/KrisView.php';
 require __DIR__ . '/../../framework/lib/view/Mustache.php';
 require __DIR__ . '/../../framework/lib/helpers/HtmlHelpers.php';
 require __DIR__ . '/../../framework/lib/helpers/NumberHelpers.php';
+require __DIR__ . '/../../framework/lib/plumbing/AutoLoader.php';
+require __DIR__ . '/../../framework/lib/plumbing/CronBase.php';
+require __DIR__ . '/../../framework/lib/plumbing/CronLogModel.php';
+require __DIR__ . '/../../framework/lib/plumbing/CronModel.php';
+require __DIR__ . '/../../framework/lib/plumbing/KrisCronManager.php';
 
 
 
@@ -48,6 +53,9 @@ class AllUnitTests extends PHPUnit_Framework_TestSuite
 	    ini_set('display_errors', 'on');
 	    ini_set('error_reporting', E_ALL);
 
+        AutoLoader::$Container = new KrisDIContainer();
+        AutoLoader::Container()->set(new ConsoleLog(), 'Log');
+
 		$suite = new self();
         $suite->addTestSuite('Auth_AllTests');
         $suite->addTestSuite('Controller_AllTests');
@@ -59,7 +67,3 @@ class AllUnitTests extends PHPUnit_Framework_TestSuite
 		return $suite;
 	}
 }
-
-
-
-?>

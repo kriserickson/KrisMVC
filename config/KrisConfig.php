@@ -27,17 +27,18 @@ class KrisConfig
     const DEFAULT_CONTROLLER = 'main';
     const DEFAULT_ACTION = 'index';
 
-
-    public static $SESSION_DOMAIN = '';
-
-    public static $SESSION_LIFETIME = 0;
-
-    // Options
-    public static $AUTH_TYPE = KrisConfig::AUTH_TYPE_DB;     // Currently only DB is implimented...
+	// Options
+    public static $AUTH_TYPE = KrisConfig::AUTH_TYPE_DB;     // Currently only DB is implemented...
 
     public static $DATABASE_TYPE = KrisConfig::DB_TYPE_MYSQL;
 
     public static $CACHE_TYPE = KrisConfig::CACHE_TYPE_DB;
+
+	public static $SERVER_NAME = 'localhost';
+
+    public static $SESSION_DOMAIN = '.localhost';
+
+    public static $SESSION_LIFETIME = 0;
 
     public static $CACHE_DSN = 'database=test;host=localhost;user=root;password=myssirk34;table=cache';
 
@@ -61,37 +62,21 @@ class KrisConfig
     const CACHE_TYPE_APC = 'APC';
     const CACHE_TYPE_MEMCACHE = 'Memcache';
 
+	const PIWIK_TOKEN =  '';
+    const PIWIK_URL = '';
+    const PIWIK_ID = 0;
+
     /**
      * @var null|string|array
      */
     static $Error404Handler = null;
-    
+    static $Error500Handler = null;
 
     /*  This can be a function, even one that calls another class...
-    static $Error404Handler = array('ErrorClass', 'Display404');
+    static $Error404Handler = array('controller' => 'system', 'action' => 'NotFound');
+	*/
 
-    this gets called like:
-    $d = new ErrorClass();
-    $d->Display404($message);
-     */
-
-
-    /**
-    * Error logging.
-    *
-    * @static
-    * @param $message
-    * @return void
-    */
-    public static function LogError($message)
-    {
-        // Default error logging action, change as necessary...
-        error_log($message);
-    }
-
-
-            }
+}
 
 
 
-?>

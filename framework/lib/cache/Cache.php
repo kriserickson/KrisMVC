@@ -13,14 +13,8 @@
  */
 abstract class Cache
 {
-    /**
-     * @var Cache
-     */
-    private static $instance;
 
     const ONE_DAY = 86400;
-
-
 
     /**
      * @abstract
@@ -57,7 +51,7 @@ abstract class Cache
 
     /**
      * @abstract
-     * @return void
+     * @return boolean
      */
     abstract public function ClearCache();
 

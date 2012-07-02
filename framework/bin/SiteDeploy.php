@@ -203,18 +203,7 @@ class SiteDeploy
             throw new Exception('Refusing to clear the live database, clear can only be performed on the staging database');
         }
 
-        $tmpDir = $this->_deploymentConfig['temp_dir'];
-
-        echo 'Clearing out old site' . PHP_EOL;
-        $this->CleanTempDirectory($tmpDir);
-
-        $configDirectory = CodeGenHelpers::BuildPath($tmpDir, 'config');
-
-        echo 'Copying Config' . PHP_EOL;
-        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_location, 'config'), $configDirectory);
-
-        echo 'Merging Config Files' . PHP_EOL;
-        $this->MergeConfigFiles($configDirectory, $tmpDir);
+        $configDirectory = $this->createConfigDirectory();
 
         $connection = ssh2_connect($this->_deploymentConfig[$this->_stageLive]['host'], $this->_deploymentConfig[$this->_stageLive]['port']);
         if (!$connection)
@@ -245,6 +234,25 @@ class SiteDeploy
 
 
 
+    }
+
+    /**
+     * @return string
+     */
+    private function createConfigDirectory() {
+        $tmpDir = $this->_deploymentConfig['temp_dir'];
+
+        echo 'Clearing out old site' . PHP_EOL;
+        $this->CleanTempDirectory($tmpDir);
+
+        $configDirectory = CodeGenHelpers::BuildPath($tmpDir, 'config');
+
+        echo 'Copying Config' . PHP_EOL;
+        $this->CopyDirectoryRecursive(CodeGenHelpers::BuildPath($this->_location, 'config'), $configDirectory);
+
+        echo 'Merging Config Files' . PHP_EOL;
+        $this->MergeConfigFiles($configDirectory, $tmpDir);
+        return $configDirectory;
     }
 
     /**
@@ -1114,8 +1122,10 @@ class SiteDeploy
                 switch ($character)
                 {
                     case '[':
+                    /** @noinspection PhpMissingBreakStatementInspection */
                     case '{':
                         $indent++;
+                    // no break - DO NOT PUT A BREAK HERE, the fall through is intentional
                     case ',':
                         $breakAfter = true;
                         break;
@@ -1178,6 +1188,139 @@ class SiteDeploy
         $deployFileList = CodeGenHelpers::BuildPath($tmpDir, 'deployFileList.txt');
         file_put_contents($deployFileList, $this->json_encode_pretty(json_encode($this->_deploymentConfig[$this->_stageLive]['files'])));
         $this->UploadFile($deployFileList, CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath($destPath, 'deploy', true), 'deployFiles.json', true), $connection, $sftp);
+    }
+
+    /**
+     * @param string $backupDir
+     * @throws Exception
+     */
+    public function BackupSql($backupDir) {
+
+
+        $connection = $this->GetConnection();
+
+        $this->backupSqlFromConnection($connection, $backupDir);
+
+    }
+
+    /**
+     * @param $backupDir
+     */
+    public function BackupAll($backupDir)
+    {
+        $connection = $this->GetConnection();
+
+        $this->backupSqlFromConnection($connection, $backupDir);
+
+        $this->backupUploadsFromConnection($connection, $backupDir);
+    }
+
+    /**
+     * @param string $backupDir
+     * @throws Exception
+     */
+    public function BackupUploads($backupDir) {
+
+
+        $connection = $this->GetConnection();
+
+        $this->backupUploadsFromConnection($connection, $backupDir);
+
+    }
+
+    /**
+     * @param resource $connection
+     * @param string $backupDir
+     */
+    private function backupSqlFromConnection($connection, $backupDir) {
+        $configDirectory = $this->createConfigDirectory();
+
+        $sqlBackupLocation = '/tmp/sql.dump.gz';
+
+        $this->remoteBackupSql($connection, $configDirectory, $sqlBackupLocation);
+
+        ssh2_scp_recv($connection, $sqlBackupLocation, CodeGenHelpers::BuildPath($backupDir, basename($this->_location) . date('-Y-m-d') . '.sql.gz'));
+
+        $this->ExecuteSSHCommand($connection, 'rm '.$sqlBackupLocation, $outputString, $errorString);
+    }
+
+    /**
+     * @return resource
+     * @throws Exception
+     */
+    private function GetConnection() {
+        $connection = ssh2_connect($this->_deploymentConfig[$this->_stageLive]['host'], $this->_deploymentConfig[$this->_stageLive]['port']);
+
+        if (!$connection) {
+            throw new Exception('Invalid host:' . $this->_deploymentConfig[$this->_stageLive]['host'] . ' nothing listening on port: ' . $this->_deploymentConfig[$this->_stageLive]['port']);
+        }
+
+        if (!ssh2_auth_password($connection, $this->_deploymentConfig[$this->_stageLive]['username'], $this->_deploymentConfig[$this->_stageLive]['password'])) {
+            throw new Exception('Invalid username password for host:' . $this->_deploymentConfig[$this->_stageLive]['host']);
+        }
+        return $connection;
+    }
+
+    /**
+     * @param resource $connection
+     * @param string $configDirectory
+     * @param $sqlBackupLocation
+     * @throws Exception
+     */
+    private function remoteBackupSql($connection, $configDirectory, $sqlBackupLocation) {
+
+
+        $sqlConfig = $this->GetSqlConfigData($configDirectory);
+
+        $cmd = 'mysqldump --user='. $sqlConfig['user'].' --password='. $sqlConfig['password'].' --host='. $sqlConfig['host'].' --opt '. $sqlConfig['database'].' | gzip > '.$sqlBackupLocation;
+
+        echo 'SQL Dump ' . $cmd . PHP_EOL;
+
+        $outputString = '';
+        $errorString = '';
+
+        $this->ExecuteSSHCommand($connection, $cmd, $outputString, $errorString);
+
+        echo $outputString;
+
+        if (strlen($errorString)) {
+            throw new Exception('SQL Dump [' . trim($errorString) . ']');
+        }
+    }
+
+    /**
+     * @param $connection
+     * @param $backupDir
+     * @throws Exception
+     */
+    private function backupUploadsFromConnection($connection, $backupDir) {
+        $uploadBackupLocation = '/tmp/uploadsBackup.tgz';
+
+
+        $cmd = 'tar --create --gzip --absolute-names --verbose --file='.$uploadBackupLocation.' --directory='. $this->_deploymentConfig[$this->_stageLive]['dest_dir'].' uploads';
+
+        echo 'Backup up  "' . $cmd .'"'. PHP_EOL;
+
+        $outputString = '';
+        $errorString = '';
+
+        $this->ExecuteSSHCommand($connection, $cmd, $outputString, $errorString);
+
+        echo $outputString;
+
+        if (strlen($errorString)) {
+            throw new Exception('Taring uploads [' . trim($errorString) . ']');
+        }
+
+        ssh2_scp_recv($connection, $uploadBackupLocation, CodeGenHelpers::BuildPath($backupDir, basename($this->_location) . date('-Y-m-d') . '-uploads.tgz'));
+
+        $this->ExecuteSSHCommand($connection, 'rm ' . $uploadBackupLocation, $outputString, $errorString);
+
+        echo $outputString;
+
+        if (strlen($errorString)) {
+            throw new Exception('Removing backed up file [' . trim($errorString) . ']');
+        }
     }
 
 }

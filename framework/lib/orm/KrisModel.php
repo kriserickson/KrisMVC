@@ -96,14 +96,13 @@ abstract class KrisModel extends KrisDB
      */
     public function Query($query)
     {
-        $dbh = $this->getDatabaseHandle();
-        return $dbh->query($query);
+        return $this->getDatabaseHandle()->query($query);
     }
 
     /**
      * Retrieves (hopefully) one record from the table based on the primary key...
      *
-     * @param $primaryKeyOrFieldName
+     * @param array|string $primaryKeyOrFieldName
      * @param null|string|array $value
      * @return bool|KrisModel
      */
@@ -132,7 +131,7 @@ abstract class KrisModel extends KrisDB
      * @param int $count
      * @param int $offset
      * @param string $orderBy
-     * @return bool|KrisModel
+     * @return array
      */
     public function RetrieveMultiple($where, $bindings, $likeQuery = false, $count = 0, $offset, $orderBy = '')
     {
@@ -158,7 +157,8 @@ abstract class KrisModel extends KrisDB
      */
     public function Update()
     {
-        if (!isset($this->_recordSet[$this->convertDBKeyToClassKey($this->_primaryKeyName)]))
+        $primaryKey = $this->convertDBKeyToClassKey($this->_primaryKeyName);
+        if (!isset($this->_recordSet[$primaryKey]) || !$this->_recordSet[$primaryKey])
         {
             return $this->Create();
         }
@@ -193,8 +193,8 @@ abstract class KrisModel extends KrisDB
             $primaryKey = $primaryKeyOrFieldName;
         }
 
-        $dbh = $this->getDatabaseHandle();
-        $stmt = $dbh->prepare($query = 'DELETE FROM ' . $this->quoteDbObject($this->_tableName) . ' WHERE ' .
+        $stmt = $this->getDatabaseHandle()->prepare($query = 'DELETE FROM ' .
+                $this->quoteDbObject($this->_tableName) . ' WHERE ' .
                 $this->quoteDbObject($this->convertClassKeyToDBKey($primaryKey)).' = ?');
         $stmt->bindValue(1, $value);
         $res = $stmt->execute();
@@ -235,7 +235,7 @@ abstract class KrisModel extends KrisDB
     {
         $res = $this->Select('count('.$this->_primaryKeyName.') AS num_records', $where, $bindings, $likeQuery);
         $row = current($res);
-        return $row['num_records'];
+        return (int)$row['num_records'];
     }
 
     /**
@@ -278,7 +278,6 @@ abstract class KrisModel extends KrisDB
      */
     protected function generateStatement($what, $where, $bindings, $likeQuery, $count = 0, $offset = 0, $order = '', $orderAscending = true)
     {
-        $dbh = $this->getDatabaseHandle();
         if (is_scalar($bindings))
         {
             $bindings = count($where) > 0 ? array($bindings) : array();
@@ -292,7 +291,7 @@ abstract class KrisModel extends KrisDB
 
         $bindings = $this->GetBindings($bindings, $likeQuery);
 
-        $stmt = $dbh->prepare($this->addLimit($this->addOrder($sql, $order, $orderAscending), $count, $offset));
+        $stmt = $this->getDatabaseHandle()->prepare($this->addLimit($this->addOrder($sql, $order, $orderAscending), $count, $offset));
 
         $stmt->execute($bindings);
 
@@ -307,7 +306,7 @@ abstract class KrisModel extends KrisDB
      */
     protected function updateFields($fields)
     {
-        $dbh = $this->getDatabaseHandle();
+
         $set = '';
         $values = array();
         foreach ($fields as $key => $value)
@@ -328,7 +327,7 @@ abstract class KrisModel extends KrisDB
             return false;
         }
 
-        $stmt = $dbh->prepare('UPDATE ' . $this->quoteDbObject($this->_tableName) . ' SET ' . $set . ' WHERE ' . $this->quoteDbObject($this->_primaryKeyName) . '=?');
+        $stmt = $this->getDatabaseHandle()->prepare('UPDATE ' . $this->quoteDbObject($this->_tableName) . ' SET ' . $set . ' WHERE ' . $this->quoteDbObject($this->_primaryKeyName) . '=?');
         $i = 1;
 
         foreach ($values as $value)

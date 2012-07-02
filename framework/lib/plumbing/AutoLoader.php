@@ -21,13 +21,13 @@ class AutoLoader
     private static $ClassLoader = array();
 
     /**
-     * @var BucketContainer
+     * @var KrisDIContainer
      */
     public static $Container;
 
     /**
      * @static
-     * @return BucketContainer
+     * @return KrisDIContainer
      */
     public static function Container()
     {
@@ -54,8 +54,22 @@ class AutoLoader
      */
     public static function Autoload($className)
     {
-        /** @noinspection PhpIncludeInspection */
-        require(self::$ClassLoader[$className]);
+        $require = self::$ClassLoader[$className];
+        $fp = false;
+        try
+        {
+            $fp = fopen($require, 'r', true);
+        } catch (Exception $ex) {}
+        if ($fp)
+        {
+            fclose($fp);
+            /** @noinspection PhpIncludeInspection */
+            require($require);
+        }
+        else
+        {
+            throw new Exception('AutoLoaded class: '.$className.' has an invalid include path: '. $require);
+        }
     }
 
     /**
@@ -71,13 +85,32 @@ class AutoLoader
      */
     public static function AddClass($className, $classLocation, $isFramework = false)
     {
-        if (!$isFramework)
+        if ($isFramework)
+        {
+            $classLocation = KrisConfig::FRAMEWORK_DIR.$classLocation;
+        }
+        else
         {
             $classLocation = KrisConfig::APP_PATH.$classLocation;
         }
+
         self::$ClassLoader[$className] = $classLocation;
     }
 
+    /**
+     * Add a bunch of classes of the same type to the Autoloader...
+     *
+     * @static
+     * @param $classes
+     * @param bool $isFramework
+     */
+    public static function AddClasses($classes, $isFramework = false)
+    {
+        foreach ($classes as $className => $classLocation)
+        {
+            self::AddClass($className, $classLocation, $isFramework);
+        }
+    }
 
 
 
@@ -107,13 +140,7 @@ function __autoload($className)
         {
             $path = 'crud/';
         }
-        if (strlen($path) > 0 && !file_exists(KrisConfig::APP_PATH . 'models/'. $path . $className . '.php'))
-        {
-            $path = '';
-        }
-
-
-        $includeFile = KrisConfig::APP_PATH . 'models/' . $path . $className . '.php';
+        $includeFile = KrisConfig::BASE_DIR.'/'. KrisConfig::APP_PATH. 'models/' . $path . $className . '.php';
         if (file_exists($includeFile))
         {
             /** @noinspection PhpIncludeInspection */

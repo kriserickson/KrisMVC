@@ -34,6 +34,9 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 
 	const TEST_CLASS = 'Mustache';
 
+    /**
+     * @var array
+     */
 	protected $knownIssues = array(
 		// Just the whitespace ones...
 	);
@@ -81,6 +84,9 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($pragmas,    $mustache->getPragmas());
 	}
 
+    /**
+     * @return array
+     */
 	public function constructorOptions() {
 		return array(
 			array(
@@ -139,6 +145,9 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foo', $m2->render());
 	}
 
+    /**
+     *
+     */
 	public function test__toStringException() {
 		$m = $this->getMock(self::TEST_CLASS, array('render'), array());
 		$m->expects($this->once())
@@ -204,6 +213,9 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $m->render());
 	}
 
+    /**
+     * @return array
+     */
 	public function interpolationData() {
 		return array(
 			array(
@@ -347,6 +359,9 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$m->render();
 	}
 
+    /**
+     * @return array
+     */
 	public function poorlyNestedSections() {
 		return array(
 			array('{{#foo}}'),
@@ -375,13 +390,27 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 }
 
+/**
+ *
+ */
 class MustacheExposedOptionsStub extends Mustache {
+    /**
+     * @return array
+     */
 	public function getPragmas() {
 		return $this->_pragmas;
 	}
+
+    /**
+     * @return string
+     */
 	public function getCharset() {
 		return $this->_charset;
 	}
+
+    /**
+     * @return array
+     */
 	public function getDelimiters() {
 		return array($this->_otag, $this->_ctag);
 	}

@@ -46,4 +46,3 @@ class ClassModelTest extends KrisCrudModel
 
     }
 }
-?>

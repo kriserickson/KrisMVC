@@ -110,9 +110,18 @@ abstract class Auth
      */
     public function IsLoggedIn()
     {
-        return !is_null($this->_user);
-    }
 
+        if (!is_null($this->_user))
+        {
+            // If last login time was more than 1 hour
+            if (time() > $this->_user->LastLoginTime() + 3600)
+            {
+                $this->UpdateLastLogin($this->_user->UserId());
+            }
+            return true;
+        }
+        return false;
+    }
 
 
     /**
@@ -280,6 +289,12 @@ abstract class Auth
     }
 
 
+    /**
+     * @abstract
+     * @param int $userId
+     * @return void
+     */
+    protected abstract function UpdateLastLogin($userId);
 
     /**
      * @abstract
@@ -388,7 +403,7 @@ abstract class Auth
      * @abstract
      * @param $searchType
      * @param $search
-     * @return void
+     * @return int
      */
     public abstract function TotalUsers($searchType, $search);
 
@@ -412,7 +427,7 @@ abstract class Auth
                 $error = 'Email Already Exists';
                 break;
             case Auth::ERROR_TOO_MANY_INVALID_LOGINS:
-                $error = 'Too many invalid logins, try again in an hour';
+                $error = 'Too many invalid login attempts, try again in an hour';
                 break;
             case Auth::ERROR_EXPIRED_RECOVERY_TOKEN:
                 $error = 'The recovery token has expired';
@@ -444,9 +459,6 @@ abstract class Auth
             case Auth::ERROR_PASSWORD_TOO_SHORT:
                 $error = 'Invalid password.  Password must be at least 8 characters';
                 break;
-            case Auth::ERROR_TOO_MANY_INVALID_LOGINS:
-                $error = 'Too many invalid logins, try again in an hour';
-                break;
             case Auth::ERROR_UNKNOWN_RECOVERY_TOKEN:
                 $error = 'Unknown recover token';
                 break;
@@ -461,4 +473,3 @@ abstract class Auth
 
 }
 
-?>

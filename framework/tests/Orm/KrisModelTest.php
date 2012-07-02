@@ -52,4 +52,4 @@ class KrisModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($multiple, $modelMock->Multiple);
     }
 }
-?>
+

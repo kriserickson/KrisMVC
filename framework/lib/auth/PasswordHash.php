@@ -319,4 +319,4 @@ class PasswordHash implements PasswordCheck
 	}
 }
 
-?>
+

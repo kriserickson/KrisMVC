@@ -84,6 +84,11 @@ class KrisView
         {
             $file = $this->_file;
         }
+        $fp = fopen($file, 'r', true);
+        if (!$fp)
+        {
+            throw new Exception('Invalid template: '.$file);
+        }
         ob_start();
         /** @noinspection PhpIncludeInspection */
         require($file);

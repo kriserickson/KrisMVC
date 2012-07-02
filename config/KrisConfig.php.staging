@@ -1,0 +1,14 @@
+<?php
+
+/*
+class KrisConfig
+{
+
+    public static $CACHE_TYPE = KrisConfig::CACHE_TYPE_APC;
+
+
+    const DEBUG = false;
+}
+*/
+
+?>

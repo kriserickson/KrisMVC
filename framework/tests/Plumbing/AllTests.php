@@ -13,7 +13,8 @@ class Plumbing_AllTests extends PHPUnit_Framework_TestSuite
 	{
 		$suite = new self();
 
-		$suite->addTestFile(__DIR__ . '/BucketContainerTest.php');
+		$suite->addTestFile(__DIR__ . '/KrisDIContainerTest.php');
+        $suite->addTestFile(__DIR__ . '/KrisCronManagerTest.php');
 
 		return $suite;
 	}

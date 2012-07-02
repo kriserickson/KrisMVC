@@ -13,12 +13,12 @@ abstract class Log
     /**
      * @var int
      */
-    protected  $_verbosity = self::WARNING;
+    protected  $verbosity = self::WARNING;
 
     /**
      * @var string
      */
-    protected  $_fatalMessage = 'An error occurred.';
+    protected  $fatalMessage = 'An error occurred.';
 
     /**
      * @param int $verbosity
@@ -27,11 +27,11 @@ abstract class Log
     {
         if ($verbosity > self::DEBUG)
         {
-            $this->_verbosity = self::DEBUG;
+            $this->verbosity = self::DEBUG;
         }
         if ($verbosity < self::FATAL)
         {
-            $this->_verbosity = self::FATAL;
+            $this->verbosity = self::FATAL;
         }
 
     }
@@ -41,7 +41,7 @@ abstract class Log
      */
     public function SetFatalMessage($msg)
     {
-        $this->_fatalMessage = $msg;
+        $this->fatalMessage = $msg;
     }
 
     /**
@@ -49,17 +49,26 @@ abstract class Log
      */
     public function GetVerbosity()
     {
-        return $this->_verbosity;
+        return $this->verbosity;
     }
+
+    /**
+     * @abstract
+     * @param $message
+     * @param $level
+     * @return mixed
+     */
+    protected abstract function doLog($message, $level);
+
 
     /**
      * @param string $msg
      */
     public function Debug($msg)
     {
-        if ($this->_verbosity >= self::DEBUG)
+        if ($this->verbosity >= self::DEBUG)
         {
-            error_log($msg);
+            $this->doLog($msg, self::DEBUG);
         }
     }
 
@@ -68,9 +77,9 @@ abstract class Log
      */
     public function Warning($msg)
     {
-        if ($this->_verbosity >= self::WARNING)
+        if ($this->verbosity >= self::WARNING)
         {
-            error_log($msg);
+            $this->doLog($msg, self::WARNING);
         }
     }
 
@@ -79,9 +88,9 @@ abstract class Log
      */
     public function Error($msg)
     {
-        if ($this->_verbosity >= self::ERROR)
+        if ($this->verbosity >= self::ERROR)
         {
-            error_log($msg);
+            $this->doLog($msg, self::ERROR);
         }
     }
 
@@ -90,17 +99,64 @@ abstract class Log
      */
     public function Fatal($msg)
     {
-        error_log($msg);
-        die($this->_fatalMessage);
+        $this->doLog($msg, self::FATAL);
+        die($this->fatalMessage);
     }
+
+    /**
+     * @param $level
+     * @return string
+     */
+    protected  function getLevelString($level)
+    {
+        switch($level)
+        {
+            case self::FATAL: return 'Fatal';
+            case self::DEBUG: return 'Debug';
+            case self::WARNING: return 'Warning';
+            case self::ERROR: default: return 'Error';
+        }
+    }
+
 
 }
 
 /**
- *
+ * Default log
  */
 class KrisLog extends Log
 {
+    /**
+     * @param $message
+     * @param $level
+     * @return void
+     */
+    protected function doLog($message, $level) {
+        $levelString = $this->getLevelString($level);
+        error_log($levelString.': '.$message);
+    }
+}
 
+/**
+ * Console log used to debug on the console...
+ */
+class ConsoleLog extends Log
+{
+    /**
+     *
+     */
+    public function __construct()
+    {
+        $this->verbosity = self::DEBUG;
+    }
 
+    /**
+     * @param $message
+     * @param $level
+     * @return void
+     */
+    protected function doLog($message, $level) {
+        $levelString = $this->getLevelString($level);
+        echo $levelString . ': ' . $message.PHP_EOL;
+    }
 }

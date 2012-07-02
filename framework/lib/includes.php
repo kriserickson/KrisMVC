@@ -11,45 +11,34 @@
 // These are the bare bones files required to run the application...
 define('KRIS_MVC_VERSION', "0.8");
 
-/** @noinspection PhpIncludeInspection */
 require KrisConfig::FRAMEWORK_DIR.'/lib/controller/KrisRouter.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/controller/DefaultController.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/controller/RouteRequest.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/controller/Request.php';
-require KrisConfig::FRAMEWORK_DIR.'/lib/plumbing/BucketContainer.php';
+require KrisConfig::FRAMEWORK_DIR.'/lib/plumbing/KrisDIContainer.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/plumbing/AutoLoader.php';
 require KrisConfig::FRAMEWORK_DIR.'/lib/view/KrisView.php';
 
 
 // This will be loaded as needed...
-AutoLoader::AddClass('KrisDB', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisDB.php', true);
-AutoLoader::AddClass('KrisModel', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisModel.php', true);
-AutoLoader::AddClass('KrisDBView', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisDBView.php', true);
-AutoLoader::AddClass('KrisCrudModel', KrisConfig::FRAMEWORK_DIR.'/lib/orm/KrisCrudModel.php', true);
-AutoLoader::AddClass('KrisLog', KrisConfig::FRAMEWORK_DIR.'/lib/log/Log.php', true);
-
-AutoLoader::AddClass('Cache', KrisConfig::FRAMEWORK_DIR.'/lib/cache/Cache.php', true);
-AutoLoader::AddClass('ApcCache', KrisConfig::FRAMEWORK_DIR.'/lib/cache/ApcCache.php', true);
-AutoLoader::AddClass('DbCache', KrisConfig::FRAMEWORK_DIR.'/lib/cache/DbCache.php', true);
-AutoLoader::AddClass('FileCache', KrisConfig::FRAMEWORK_DIR.'/lib/cache/FileCache.php', true);
-
+AutoLoader::AddClasses(array(
+    // Database
+    'KrisDB' => '/lib/orm/KrisDB.php', 'KrisModel' =>'/lib/orm/KrisModel.php',
+    'KrisDBView' => '/lib/orm/KrisDBView.php', 'KrisCrudModel' => '/lib/orm/KrisCrudModel.php',
+    // Log
+    'Log' => '/lib/log/Log.php', 'KrisLog' => '/lib/log/Log.php',
+    // Cache
+    'DbCache' => '/lib/cache/DbCache.php', 'FileCache' => '/lib/cache/FileCache.php', 'Cache' => '/lib/cache/Cache.php', 'ApcCache' => '/lib/cache/ApcCache.php',
 // Authentication
-AutoLoader::AddClass('Auth', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Auth.php', true);
-AutoLoader::AddClass('Auth_DB', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Auth_DB.php', true);
-AutoLoader::AddClass('PasswordCheck', KrisConfig::FRAMEWORK_DIR.'/lib/auth/PasswordCheck.php', true);
-AutoLoader::AddClass('PasswordHash', KrisConfig::FRAMEWORK_DIR.'/lib/auth/PasswordHash.php', true);
-AutoLoader::AddClass('Session', KrisConfig::FRAMEWORK_DIR.'/lib/auth/Session.php', true);
-AutoLoader::AddClass('User', KrisConfig::FRAMEWORK_DIR.'/lib/auth/User.php', true);
-
+    'Auth' => '/lib/auth/Auth.php', 'Auth_DB' => '/lib/auth/Auth_DB.php', 'PasswordCheck' => '/lib/auth/PasswordCheck.php',
+    'PasswordHash' => '/lib/auth/PasswordHash.php', 'Session' => '/lib/auth/Session.php', 'User' => '/lib/auth/User.php',
 // Helpers
-AutoLoader::AddClass('FileHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/FileHelpers.php', true);
-AutoLoader::AddClass('HtmlHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/HtmlHelpers.php', true);
-AutoLoader::AddClass('ImageResizer', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/ImageResizer.php', true);
-AutoLoader::AddClass('NumberHelpers', KrisConfig::FRAMEWORK_DIR.'/lib/helpers/NumberHelpers.php', true);
-
+    'FileHelpers' => '/lib/helpers/FileHelpers.php', 'HtmlHelpers' => '/lib/helpers/HtmlHelpers.php', 'ImageResizer' => '/lib/helpers/ImageResizer.php',
+    'NumberHelpers' => '/lib/helpers/NumberHelpers.php',
+    // Cron Stuff
+    'CronModel' => '/lib/plumbing/CronModel.php', 'CronLogModel' => '/lib/plumbing/CronLogModel.php', 'KrisCronManager' => '/lib/plumbing/KrisCronManager.php', 'CronBase' => '/lib/plumbing/CronBase.php',
 // Alternate Views
-AutoLoader::AddClass('MustacheView', KrisConfig::FRAMEWORK_DIR.'/lib/view/MustacheView.php', true);
-AutoLoader::AddClass('Log', KrisConfig::FRAMEWORK_DIR.'/lib/log/Log.php', true);
+    'MustacheView' => '/lib/view/MustacheView.php'), true);
 
 
 //===============================================
@@ -60,9 +49,7 @@ if (KrisConfig::DEBUG)
     // Setup debug
     ini_set('display_errors', 'On');
     error_reporting(E_ALL);
-    AutoLoader::AddClass('DebugRouter', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugRouter.php', true);
-    AutoLoader::AddClass('DebugPDO', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugPDO.php', true);
-    AutoLoader::AddClass('DebugLog', KrisConfig::FRAMEWORK_DIR.'/lib/debug/DebugLog.php', true);
+    AutoLoader::AddClasses(array('DebugRouter' => '/lib/debug/DebugRouter.php',   'DebugPDO' => '/lib/debug/DebugPDO.php', 'DebugLog' => '/lib/debug/DebugLog.php'), true);
 
     $errorHandler = E_ALL | E_STRICT;
 
@@ -90,10 +77,26 @@ $factory = array('PDO' => function() use($databaseClass) {
     },
     'Cache' => function()
     {
+        // This could be register implementation however Cache's may need to be configured...
+        if (KrisConfig::$CACHE_TYPE == KrisConfig::CACHE_TYPE_APC)
+        {
         return new ApcCache();
+        }
+        else if (KrisConfig::$CACHE_TYPE == KrisConfig::CACHE_TYPE_DB)
+        {
+            return new DBCache();
+        }
+        else if (KrisConfig::$CACHE_TYPE == KrisConfig::CACHE_TYPE_FILE)
+        {
+            return new FileCache();
+        }
+        else
+        {
+            throw new Exception('Unsupported cache type: '.KrisConfig::$CACHE_TYPE);
+        }
     });
 
-AutoLoader::$Container = new BucketContainer($factory);
+AutoLoader::$Container = new KrisDIContainer($factory);
 foreach ($classes as $interface => $useClass)
 {
     AutoLoader::Container()->registerImplementation($interface, $useClass);
@@ -123,5 +126,3 @@ function exception_error_handler($errorNumber, $errorString, $errorFile, $errorL
 }
 set_error_handler('exception_error_handler', $errorHandler );
 
-
-?>

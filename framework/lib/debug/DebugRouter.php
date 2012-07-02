@@ -19,9 +19,9 @@ class DebugRouter extends KrisRouter
     public function Route($controllerPath)
     {
 
-        $this->_controllerPath = $controllerPath;
+        $this->controllerPath = $controllerPath;
 
-        $route =  RouteRequest::CreateFromUri($this->GetRequestUri(), $this->_routeActionOnly);
+        $route =  RouteRequest::CreateFromUri($this->GetRequestUri(), $this->routeActionOnly);
 
         if ($route->Controller == 'KrisMVCDebug')
         {
@@ -33,7 +33,6 @@ class DebugRouter extends KrisRouter
             $log = AutoLoader::Container()->get('Log');
             $log->Debug('Controller path: '.$controllerPath.' Controller: '.$route->Controller.' Action: '.$route->Action.' Params: ('.implode(',', $route->Params).')');
             $message = '';
-                            
 
             $startTime = microtime(true);
             $startMemoryUsage = memory_get_usage(true);
@@ -58,15 +57,15 @@ class DebugRouter extends KrisRouter
                 $message = $ex->getMessage().PHP_EOL.$message;
                 $log->Error('Uncaught exception: '.$message);
 
-                if ($this->_request->IsJson)
+                if ($this->request->IsJson)
                 {
-                    $this->_request->JsonResponse(array('success' => false, 'message' => $message));
+                    $this->request->JsonResponse(array('success' => false, 'message' => $message));
                 }
             }
             $endTime = microtime(true);
             $content = ob_get_clean();
 
-            if ($this->_request->IsHtml)
+            if ($this->request->IsHtml)
             {
                 $elapsedTime = ($endTime - $startTime) * 1000;
                 if (strpos($content, '</body>') !== false)

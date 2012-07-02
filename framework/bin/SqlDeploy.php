@@ -11,7 +11,7 @@
 require_once dirname(__FILE__) . '/../lib/orm/KrisDB.php';
 require_once dirname(__FILE__) . '/../lib/orm/KrisModel.php';
 require_once dirname(__FILE__) . '/../lib/plumbing/AutoLoader.php';
-require_once dirname(__FILE__) . '/../lib/plumbing/BucketContainer.php';
+require_once dirname(__FILE__) . '/../lib/plumbing/KrisDIContainer.php';
 require_once dirname(__FILE__) . '/Args.php';
 require_once dirname(__FILE__) . '/CodeGenHelpers.php';
 require_once dirname(__FILE__) . '/CodeGenDB.php';
@@ -123,7 +123,7 @@ class SqlDeploy extends CodeGenDB
                     return new PDO($dsn, $options['user'], $options['password']);
                 });
 
-                AutoLoader::$Container = new BucketContainer($factory);
+                AutoLoader::$Container = new KrisDIContainer($factory);
 
                 $this->_dbh = $this->getDatabaseHandle();
 

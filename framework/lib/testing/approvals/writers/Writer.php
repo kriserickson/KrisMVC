@@ -16,5 +16,3 @@ interface Writer
      */
     public function write($receivedFilename);
 }
-
-?>

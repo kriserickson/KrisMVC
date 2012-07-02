@@ -100,8 +100,12 @@ abstract class KrisDB
             {
                 $val = $val ? '1' : '0';
             }
-            $this->_recordSet[$key] = is_null($val) ? '' : $val;
-            $this->_dirty[$key] = true;
+            $val = is_null($val) ? '' : $val;
+            if ($this->_recordSet[$key] != $val)
+            {
+                $this->_recordSet[$key] = $val;
+                $this->_dirty[$key] = true;
+            }
         }
         return $this;
     }
@@ -155,6 +159,7 @@ abstract class KrisDB
         if (is_null($this->_dbh))
         {
             $this->_dbh = AutoLoader::Container()->get('PDO');
+            $this->_dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         return $this->_dbh;
     }
@@ -193,6 +198,7 @@ abstract class KrisDB
      *
      * @param array $rs
      * @param KrisDB $bindTo
+     * @throws KrisDatabaseException
      * @return bool|KrisDB
      */
     protected function bindRecordSet($rs, $bindTo)

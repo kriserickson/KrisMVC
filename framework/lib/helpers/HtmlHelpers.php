@@ -192,7 +192,7 @@ class HtmlHelpers
      * @static
      * @param string|array $cssArray
      */
-    public static function CreateCssFiles($cssArray)
+    public static function DisplayCssFiles($cssArray)
     {
         if (!is_array($cssArray))
         {
@@ -202,5 +202,21 @@ class HtmlHelpers
         {
             echo '<link rel="stylesheet" href="'.KrisConfig::WEB_FOLDER.'/css/'.$css.'.css" type="text/css" media="screen" />';
         }
+    }
+
+    /**
+     * We should think about creating a UrlHelpers class
+     *
+     * @static
+     * @param string $url
+     * @return string
+     */
+    public static function StripSlash($url)
+    {
+        if (substr($url,-1) == '/')
+        {
+            return substr($url, 0, -1);
+        }
+        return $url;
     }
 }

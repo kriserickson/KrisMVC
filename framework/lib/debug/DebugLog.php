@@ -12,40 +12,6 @@ class DebugLog extends Log
 
     /**
      * @param string $msg
-     */
-    public function Debug($msg)
-    {
-        $this->_errorLog .= $this->AddToErrorLog($msg, 'Debug');
-    }
-
-    /**
-     * @param string $msg
-     */
-    public function Warning($msg)
-    {
-        $this->_errorLog .= $this->AddToErrorLog($msg, 'Warning');
-    }
-
-    /**
-     * @param string $msg
-     */
-    public function Error($msg)
-    {
-        $this->_errorLog .= $this->AddToErrorLog($msg, 'Error');
-    }
-
-    /**
-     * @param string $msg
-     * @throws Exception
-     */
-    public function Fatal($msg)
-    {
-        $this->_errorLog .= $this->AddToErrorLog($msg, 'Fatal');
-        throw new Exception('Fatal Error: ' . $msg);
-    }
-
-    /**
-     * @param string $msg
      * @param string $type
      * @return string
      */
@@ -62,5 +28,17 @@ class DebugLog extends Log
         return $this->_errorLog;
     }
 
+    /**
+     * @param string $message
+     * @param int $level
+     * @throws Exception
+     */
+    protected function doLog($message, $level) {
+        $this->_errorLog .= $this->AddToErrorLog($message, $this->getLevelString($level));
+        if ($level == self::FATAL)
+        {
+            throw new Exception('Fatal Error: ' . $message);
+        }
+    }
 }
 

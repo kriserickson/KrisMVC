@@ -72,7 +72,7 @@ class DBCache extends Cache
     {
         $this->_cacheDb->Key = $key;
         $this->_cacheDb->Expiry = time() + $ttl;
-        $this->_cacheDb->Value = $value;
+        $this->_cacheDb->Value = serialize($value);
 
         if ($this->_cacheDb->Exists())
         {
@@ -86,7 +86,7 @@ class DBCache extends Cache
 
     /**
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      * @param int $ttl
      * @return void
      */
@@ -101,7 +101,7 @@ class DBCache extends Cache
         else
         {
             $this->_cacheDb->Expiry = time() + $ttl;
-            $this->_cacheDb->Value = $value;
+            $this->_cacheDb->Value = serialize($value);
             $this->_cacheDb->Create();
         }
     }
@@ -109,7 +109,7 @@ class DBCache extends Cache
     /**
      * @param string $key
      * @param string $default
-     * @return string
+     * @return mixed
      */
     public function Fetch($key, $default = '')
     {
@@ -123,7 +123,7 @@ class DBCache extends Cache
                 $this->Delete($key);
                 return $default;
             }
-            return $this->_cacheDb->Value;
+            return unserialize($this->_cacheDb->Value);
         }
         else
         {

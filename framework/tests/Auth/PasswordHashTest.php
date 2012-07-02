@@ -1,7 +1,9 @@
 <?php
 
 
-
+/**
+ *
+ */
 class PasswordHashTest extends PHPUnit_Framework_TestCase
 {
     /**
@@ -83,4 +85,4 @@ class PasswordHashTest extends PHPUnit_Framework_TestCase
     }
 
 }
-?>
+

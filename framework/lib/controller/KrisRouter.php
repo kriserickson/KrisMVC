@@ -46,27 +46,27 @@ class KrisRouter implements Router
     /**
      * @var string
      */
-    protected $_controllerPath = '../app/controllers/'; //with trailing slash
+    protected $controllerPath = '../app/controllers/'; //with trailing slash
 
     /**
      * @var string
      */
-    protected $_webFolder = '/'; //with trailing slash
+    protected $webFolder = '/'; //with trailing slash
 
     /**
      * @var Request
      */
-    protected $_request;
+    protected $request;
 
     /**
      * @var
      */
-    protected  $_reroute = array();
+    protected  $reroute = array();
 
     /**
      * @var
      */
-    protected  $_routeActionOnly = array();
+    protected  $routeActionOnly = array();
 
     /**
      * @param string $controllerPath
@@ -74,8 +74,8 @@ class KrisRouter implements Router
      */
     public function Route($controllerPath)
     {
-        $this->_controllerPath = $controllerPath;
-        $route =  RouteRequest::CreateFromUri($this->GetRequestUri(), $this->_routeActionOnly);
+        $this->controllerPath = $controllerPath;
+        $route =  RouteRequest::CreateFromUri($this->GetRequestUri(), $this->routeActionOnly);
         try
         {
             $this->ParseRequest($route->Controller, $route->Action, $route->Params);
@@ -94,9 +94,9 @@ class KrisRouter implements Router
             }
             $log->Error('Uncaught exception: '.$ex->getMessage().PHP_EOL.$message);
 
-            if ($this->_request->IsJson)
+            if ($this->request->IsJson)
             {
-                $this->_request->JsonResponse(array('success' => false, 'message' => 'An error occurred, please try again later'));
+                $this->request->JsonResponse(array('success' => false, 'message' => 'An error occurred, please try again later'));
             }
             else
             {
@@ -123,7 +123,7 @@ class KrisRouter implements Router
             }
             $requestUri = substr($requestUri, strlen($webFolder));
         }
-        foreach ($this->_reroute as $originalRoute => $reRoute)
+        foreach ($this->reroute as $originalRoute => $reRoute)
         {
             if (preg_match('/^'.str_replace('/','\\/',$originalRoute).'$/', $requestUri))
             {
@@ -141,7 +141,7 @@ class KrisRouter implements Router
      */
     public function ReRoute($originalUrl, $reroutedUrl)
     {
-        $this->_reroute[$originalUrl] = $reroutedUrl;
+        $this->reroute[$originalUrl] = $reroutedUrl;
     }
 
     /**
@@ -152,13 +152,13 @@ class KrisRouter implements Router
      */
     protected function ParseRequest($controller, $action, $params)
     {
-        $this->_request = new Request($controller, $action, $params);
+        $this->request = new Request($controller, $action, $params);
 
         $error = '';
 
-        if ($this->GetControllerRequest($controller, $this->_request->Action(), $error, $controllerObj, $function))
+        if ($this->GetControllerRequest($controller, $this->request->Action(), $error, $controllerObj, $function))
         {
-            $res = call_user_func_array(array($controllerObj, $function), $this->_request->Params());
+            $res = call_user_func_array(array($controllerObj, $function), $this->request->Params());
             if (!is_null($res) && get_class($res) == 'RouteRequest')
             {
                 /** @var $res RouteRequest */
@@ -185,7 +185,7 @@ class KrisRouter implements Router
     {
         $controllerClass = ucfirst($controller) . 'Controller';
 
-        $controllerFile = $this->_controllerPath . $controller . '/' . $controllerClass . '.php';
+        $controllerFile = $this->controllerPath . $controller . '/' . $controllerClass . '.php';
 
 
 
@@ -194,7 +194,7 @@ class KrisRouter implements Router
             $action = $controller;
             $controller = KrisConfig::DEFAULT_CONTROLLER;
             $controllerClass = ucfirst($controller) . 'Controller';
-            $controllerFile = $this->_controllerPath . $controller . '/' . $controllerClass . '.php';
+            $controllerFile = $this->controllerPath . $controller . '/' . $controllerClass . '.php';
         }
 
         $function = ucfirst($action);
@@ -215,7 +215,7 @@ class KrisRouter implements Router
             else
             {
 
-                $controllerObj = new $controllerClass($this->_request);
+                $controllerObj = new $controllerClass($this->request);
 
                 if (!method_exists($controllerObj, $function))
                 {
@@ -263,7 +263,7 @@ class KrisRouter implements Router
 
         if (!$displayedError)
         {
-            $this->_request->SetError(404, '<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>' . $msg .
+            $this->request->SetError(404, '<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>' . $msg .
                     '<p>The requested URL was not found on this server.</p><p>Please go <a href="javascript: history.back(1)">back</a>' .
                     ' and try again.</p><hr /></body></html>');
         }
@@ -276,6 +276,6 @@ class KrisRouter implements Router
      */
     function SkipActionForRoute($route)
     {
-        $this->_routeActionOnly[$route] = true;
+        $this->routeActionOnly[$route] = true;
     }
 }

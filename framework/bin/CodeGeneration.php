@@ -72,7 +72,7 @@ class KrisCG extends CodeGenDB
             return new PDO('mysql:host='.KrisConfig::DB_HOST.';dbname='.KrisConfig::DB_DATABASE, KrisConfig::DB_USER, KrisConfig::DB_PASSWORD);
         });
 
-        AutoLoader::$Container = new BucketContainer($factory);
+        AutoLoader::$Container = new KrisDIContainer($factory);
 
         $this->SetupDirectories();
     }
@@ -87,6 +87,7 @@ class KrisCG extends CodeGenDB
      * @param string $databaseType     *
      * @param string $viewType
      * @param string $siteName
+     * @throws Exception
      * @return void
      */
     public function CreateSite($site, $host, $database, $user, $password, $databaseType, $viewType, $siteName)
@@ -229,13 +230,13 @@ class KrisCG extends CodeGenDB
         $safeClassName = $className.'View';
 
 
-        list($properties, $primaryKey, $initializeFields, $fakeFields, $fieldTypes) = $this->GetPropertiesPrimaryKey($columnNames, $foreignKeys);
+        list($properties, $primaryKey, $initializeFields, $fakeFields, $fieldTypes, $constants) = $this->GetPropertiesPrimaryKey($columnNames, $foreignKeys);
 
         $foreignKeyString = $this->GetForeignKeyString($foreignKeys);
 
         $filename = $safeClassName . '.php';
         
-        $this->GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields, $fakeFields, $primaryKey, $fieldTypes);
+        $this->GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields, $fakeFields, $primaryKey, $fieldTypes, $constants);
 
         // Don't overwrite a class that has changes....
         if (!file_exists(CodeGenHelpers::BuildPath($this->_crudDirectory, $filename)))
@@ -258,11 +259,13 @@ class KrisCG extends CodeGenDB
         $initializeFields = '';
         $fakeFields = '';
         $fieldTypes = '';
+        $constants = '';
 
         foreach ($columnNames as $columnName => $columnData)
         {
             $dbKey = $this->convertDBKeyToClassKey($columnName);
             $properties .= '* @property ' . $columnData['type'] . ' $' . $dbKey . ' - DBType '.$columnData['displayType'].PHP_EOL;
+            $constants .= '    const FIELD_'.strtoupper($columnName).' = \''.$dbKey.'\';'.PHP_EOL;
             $initializeFields .= (strlen($initializeFields) > 0 ? ', ' : '')."'$dbKey'";
             $fieldTypes .= (strlen($fieldTypes) > 0 ? ', ' : '')."'$dbKey' => '".$columnData['type']."'";
 
@@ -285,7 +288,7 @@ class KrisCG extends CodeGenDB
         {
             $fakeFields = 'protected $_fakeFields = array('.$fakeFields.');';
         }
-        return array($properties, $primaryKey, $initializeFields, $fakeFields, $fieldTypes);
+        return array($properties, $primaryKey, $initializeFields, $fakeFields, $fieldTypes, $constants);
     }
 
     /**
@@ -330,17 +333,18 @@ class KrisCG extends CodeGenDB
      * @param $fakeFields
      * @param $primaryKey
      * @param $fieldTypes
+     * @param $constants
      * @return void
      */
     private function GenerateBaseClass($tableName, $className, $filename, $properties, $foreignKeyString, $initializeFields,
-        $fakeFields, $primaryKey, $fieldTypes)
+        $fakeFields, $primaryKey, $fieldTypes, $constants)
     {
 
         $m = new Mustache();
         $output = $m->render(file_get_contents(CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath(CodeGenHelpers::BuildPath(__DIR__, 'assets'), 'CodeTemplates'), 'ModelGenerated.template')),
             array('BaseModelDirectory' => $this->_baseModelDirectory, 'tableName' => $tableName, 'className' => $className, 'filename' => $filename,
             'properties' => $properties, 'foreignKeyString' => $foreignKeyString, 'initializeFields' => $initializeFields, 'fakeFields' => $fakeFields,
-            'primaryKey' => $primaryKey, 'fieldTypes' => $fieldTypes));
+            'primaryKey' => $primaryKey, 'fieldTypes' => $fieldTypes, 'constants' => $constants));
 
         file_put_contents(CodeGenHelpers::BuildPath($this->_generatedDirectory, $className . 'Model' . '.php'), $output);
     }
@@ -453,4 +457,3 @@ class KrisCG extends CodeGenDB
 
 }
 
-?>

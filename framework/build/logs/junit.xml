@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="KrisMVC" tests="59" assertions="170" failures="0" errors="0" time="0.116732">
+    <testsuite name="" tests="59" assertions="170" failures="0" errors="0" time="0.116732">
+      <testsuite name="" tests="3" assertions="6" failures="0" errors="0" time="0.076556">
+        <testsuite name="PasswordHashTest" file="/srv/krismvc/framework/tests/Auth/PasswordHashTest.php" tests="3" assertions="6" failures="0" errors="0" time="0.076556">
+          <testcase name="testSystemSpecific" class="PasswordHashTest" file="/srv/krismvc/framework/tests/Auth/PasswordHashTest.php" line="39" assertions="2" time="0.056328"/>
+          <testcase name="testPortable" class="PasswordHashTest" file="/srv/krismvc/framework/tests/Auth/PasswordHashTest.php" line="53" assertions="2" time="0.017186"/>
+          <testcase name="testExternalHash" class="PasswordHashTest" file="/srv/krismvc/framework/tests/Auth/PasswordHashTest.php" line="67" assertions="2" time="0.003042"/>
+        </testsuite>
+      </testsuite>
+      <testsuite name="" tests="10" assertions="12" failures="0" errors="0" time="0.009244">
+        <testsuite name="KrisRouterTest" file="/srv/krismvc/framework/tests/Controller/KrisRouterTest.php" tests="2" assertions="2" failures="0" errors="0" time="0.008323">
+          <testcase name="testRoute" class="KrisRouterTest" file="/srv/krismvc/framework/tests/Controller/KrisRouterTest.php" line="57" assertions="1" time="0.008104"/>
+          <testcase name="testReRoute" class="KrisRouterTest" file="/srv/krismvc/framework/tests/Controller/KrisRouterTest.php" line="69" assertions="1" time="0.000219"/>
+        </testsuite>
+        <testsuite name="RequestTest" file="/srv/krismvc/framework/tests/Controller/RequestTest.php" tests="8" assertions="10" failures="0" errors="0" time="0.000921">
+          <testcase name="testParams" class="RequestTest" file="/srv/krismvc/framework/tests/Controller/RequestTest.php" line="42" assertions="1" time="0.000154"/>
+          <testcase name="testController" class="RequestTest" file="/srv/krismvc/framework/tests/Controller/RequestTest.php" line="50" assertions="1" time="0.000110"/>
+          <testcase name="testAction" class="RequestTest" file="/srv/krismvc/framework/tests/Controller/RequestTest.php" line="58" assertions="1" time="0.000099"/>
+          <testcase name="testParam" class="RequestTest" file="/srv/krismvc/framework/tests/Controller/RequestTest.php" line="66" assertions="1" time="0.000101"/>
+          <testcase name="testPostVar" class="RequestTest" file="/srv/krismvc/framework/tests/Controller/RequestTest.php" line="75" assertions="1" time="0.000110"/>
+          <testcase name="testIsPosted" class="RequestTest" file="/srv/krismvc/framework/tests/Controller/RequestTest.php" line="83" assertions="2" time="0.000095"/>
+          <testcase name="testGetVar" class="RequestTest" file="/srv/krismvc/framework/tests/Controller/RequestTest.php" line="92" assertions="1" time="0.000144"/>
+          <testcase name="testHasGet" class="RequestTest" file="/srv/krismvc/framework/tests/Controller/RequestTest.php" line="102" assertions="2" time="0.000108"/>
+        </testsuite>
+      </testsuite>
+      <testsuite name="" tests="4" assertions="12" failures="0" errors="0" time="0.000624">
+        <testsuite name="HtmlHelpersTest" file="/srv/krismvc/framework/tests/Helpers/HtmlHelpersTest.php" tests="3" assertions="8" failures="0" errors="0" time="0.000439">
+          <testcase name="testCreateButton" class="HtmlHelpersTest" file="/srv/krismvc/framework/tests/Helpers/HtmlHelpersTest.php" line="15" assertions="4" time="0.000175"/>
+          <testcase name="testCreateUnorderedListItem" class="HtmlHelpersTest" file="/srv/krismvc/framework/tests/Helpers/HtmlHelpersTest.php" line="32" assertions="2" time="0.000135"/>
+          <testcase name="testCreateLink" class="HtmlHelpersTest" file="/srv/krismvc/framework/tests/Helpers/HtmlHelpersTest.php" line="42" assertions="2" time="0.000129"/>
+        </testsuite>
+        <testsuite name="NumberHelpersTest" file="/srv/krismvc/framework/tests/Helpers/NumberHelpersTest.php" tests="1" assertions="4" failures="0" errors="0" time="0.000185">
+          <testcase name="testBytesToHuman" class="NumberHelpersTest" file="/srv/krismvc/framework/tests/Helpers/NumberHelpersTest.php" line="15" assertions="4" time="0.000185"/>
+        </testsuite>
+      </testsuite>
+      <testsuite name="" tests="13" assertions="75" failures="0" errors="0" time="0.016326">
+        <testsuite name="KrisDBTest" file="/srv/krismvc/framework/tests/Orm/KrisDBTest.php" tests="9" assertions="32" failures="0" errors="0" time="0.002680">
+          <testcase name="convertDBKeyToClassKeyTest" class="KrisDBTest" file="/srv/krismvc/framework/tests/Orm/KrisDBTest.php" line="23" assertions="4" time="0.000322"/>
+          <testcase name="convertClassKeyToDBKeyTest" class="KrisDBTest" file="/srv/krismvc/framework/tests/Orm/KrisDBTest.php" line="36" assertions="4" time="0.000316"/>
+          <testcase name="convertClassKeyToDisplayTest" class="KrisDBTest" file="/srv/krismvc/framework/tests/Orm/KrisDBTest.php" line="49" assertions="4" time="0.000203"/>
+          <testcase name="testQuoting" class="KrisDBTest" file="/srv/krismvc/framework/tests/Orm/KrisDBTest.php" line="62" assertions="4" time="0.000202"/>
+          <testcase name="testBindRecordSetNoInitialize" class="KrisDBTest" file="/srv/krismvc/framework/tests/Orm/KrisDBTest.php" line="82" assertions="6" time="0.000287"/>
+          <testcase name="testBindRecordSetInitialize" class="KrisDBTest" file="/srv/krismvc/framework/tests/Orm/KrisDBTest.php" line="104" assertions="2" time="0.000524"/>
+          <testcase name="testAddFunctions" class="KrisDBTest" file="/srv/krismvc/framework/tests/Orm/KrisDBTest.php" line="131" assertions="2" time="0.000234"/>
+          <testcase name="testGenerateWhat" class="KrisDBTest" file="/srv/krismvc/framework/tests/Orm/KrisDBTest.php" line="142" assertions="2" time="0.000257"/>
+          <testcase name="testGenerateWhere" class="KrisDBTest" file="/srv/krismvc/framework/tests/Orm/KrisDBTest.php" line="155" assertions="4" time="0.000335"/>
+        </testsuite>
+        <testsuite name="KrisDBViewTest" file="/srv/krismvc/framework/tests/Orm/KrisDBViewTest.php" tests="2" assertions="13" failures="0" errors="0" time="0.007628">
+          <testcase name="testRetrieve1" class="KrisDBViewTest" file="/srv/krismvc/framework/tests/Orm/KrisDBViewTest.php" line="16" assertions="8" time="0.003924"/>
+          <testcase name="testErrorHandling" class="KrisDBViewTest" file="/srv/krismvc/framework/tests/Orm/KrisDBViewTest.php" line="59" assertions="5" time="0.003704"/>
+        </testsuite>
+        <testsuite name="KrisModelTest" file="/srv/krismvc/framework/tests/Orm/KrisModelTest.php" tests="1" assertions="8" failures="0" errors="0" time="0.002324">
+          <testcase name="testModelRetrieveOne" class="KrisModelTest" file="/srv/krismvc/framework/tests/Orm/KrisModelTest.php" line="20" assertions="8" time="0.002324"/>
+        </testsuite>
+        <testsuite name="KrisCrudModelTest" file="/srv/krismvc/framework/tests/Orm/KrisCrudModelTest.php" tests="1" assertions="22" failures="0" errors="0" time="0.003694">
+          <testcase name="testGetOne" class="KrisCrudModelTest" file="/srv/krismvc/framework/tests/Orm/KrisCrudModelTest.php" line="16" assertions="22" time="0.003694"/>
+        </testsuite>
+      </testsuite>
+      <testsuite name="" tests="3" assertions="5" failures="0" errors="0" time="0.001098">
+        <testsuite name="bucket_ContainerTest" file="/srv/krismvc/framework/tests/Plumbing/BucketContainerTest.php" fullPackage="bucket" tests="3" assertions="5" failures="0" errors="0" time="0.001098">
+          <testcase name="testMakeChildContainer" class="bucket_ContainerTest" file="/srv/krismvc/framework/tests/Plumbing/BucketContainerTest.php" line="34" assertions="3" time="0.000510"/>
+          <testcase name="testGet" class="bucket_ContainerTest" file="/srv/krismvc/framework/tests/Plumbing/BucketContainerTest.php" line="49" assertions="1" time="0.000182"/>
+          <testcase name="testCreate" class="bucket_ContainerTest" file="/srv/krismvc/framework/tests/Plumbing/BucketContainerTest.php" line="62" assertions="1" time="0.000406"/>
+        </testsuite>
+      </testsuite>
+      <testsuite name="" tests="26" assertions="60" failures="0" errors="0" time="0.012885">
+        <testsuite name="KrisViewTest" file="/srv/krismvc/framework/tests/View/KrisViewTest.php" tests="1" assertions="1" failures="0" errors="0" time="0.000140">
+          <testcase name="testFetchFromString" class="KrisViewTest" file="/srv/krismvc/framework/tests/View/KrisViewTest.php" line="27" assertions="1" time="0.000140"/>
+        </testsuite>
+        <testsuite name="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" tests="25" assertions="59" failures="0" errors="0" time="0.012745">
+          <testcase name="test__construct" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="47" assertions="4" time="0.004323"/>
+          <testsuite name="MustacheTest::testConstructorOptions" tests="3" assertions="9" failures="0" errors="0" time="0.000896">
+            <testcase name="testConstructorOptions with data set #0" assertions="3" time="0.000352"/>
+            <testcase name="testConstructorOptions with data set #1" assertions="3" time="0.000273"/>
+            <testcase name="testConstructorOptions with data set #2" assertions="3" time="0.000271"/>
+          </testsuite>
+          <testcase name="testConstructorInvalidPragmaOptionsThrowExceptions" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="118" assertions="1" time="0.000211"/>
+          <testcase name="test__toString" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="128" assertions="4" time="0.000956"/>
+          <testcase name="test__toStringException" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="142" assertions="1" time="0.000100"/>
+          <testcase name="testRender" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="161" assertions="6" time="0.000279"/>
+          <testcase name="testRenderWithData" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="183" assertions="2" time="0.000284"/>
+          <testcase name="testRenderWithPartials" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="192" assertions="2" time="0.000367"/>
+          <testsuite name="MustacheTest::testDoubleRenderMustacheTags" tests="2" assertions="2" failures="0" errors="0" time="0.000527">
+            <testcase name="testDoubleRenderMustacheTags with data set #0" assertions="1" time="0.000315"/>
+            <testcase name="testDoubleRenderMustacheTags with data set #1" assertions="1" time="0.000212"/>
+          </testsuite>
+          <testcase name="testNewlinesInComments" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="227" assertions="1" time="0.000339"/>
+          <testcase name="testMultipleInvocations" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="235" assertions="2" time="0.000139"/>
+          <testcase name="testMultipleInvocationsWithTags" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="249" assertions="2" time="0.000272"/>
+          <testcase name="testResetTemplateForMultipleInvocations" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="261" assertions="4" time="0.000235"/>
+          <testcase name="testCrazyDelimiters" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="308" assertions="6" time="0.000973"/>
+          <testcase name="testResetDelimiters" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="321" assertions="3" time="0.000438"/>
+          <testcase name="testStickyDelimiters" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="331" assertions="4" time="0.000827"/>
+          <testsuite name="MustacheTest::testPoorlyNestedSections" tests="5" assertions="5" failures="0" errors="0" time="0.001355">
+            <testcase name="testPoorlyNestedSections with data set #0" assertions="1" time="0.000326"/>
+            <testcase name="testPoorlyNestedSections with data set #1" assertions="1" time="0.000279"/>
+            <testcase name="testPoorlyNestedSections with data set #2" assertions="1" time="0.000231"/>
+            <testcase name="testPoorlyNestedSections with data set #3" assertions="1" time="0.000280"/>
+            <testcase name="testPoorlyNestedSections with data set #4" assertions="1" time="0.000239"/>
+          </testsuite>
+          <testcase name="testMustacheInjection" class="MustacheTest" file="/srv/krismvc/framework/tests/View/MustacheTest.php" line="365" assertions="1" time="0.000224"/>
+        </testsuite>
+      </testsuite>
+    </testsuite>
+    <testsuite name="" tests="0" assertions="0" failures="0" errors="0" time="0.000000"/>
+    <testsuite name="" tests="0" assertions="0" failures="0" errors="0" time="0.000000"/>
+    <testsuite name="" tests="0" assertions="0" failures="0" errors="0" time="0.000000"/>
+    <testsuite name="" tests="0" assertions="0" failures="0" errors="0" time="0.000000"/>
+    <testsuite name="" tests="0" assertions="0" failures="0" errors="0" time="0.000000"/>
+    <testsuite name="" tests="0" assertions="0" failures="0" errors="0" time="0.000000"/>
+  </testsuite>
+</testsuites>

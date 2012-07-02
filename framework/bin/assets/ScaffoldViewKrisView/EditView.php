@@ -9,6 +9,7 @@
 /** @var $change_href string */
 /** @var $enctype string */
 /** @var $show_apply bool */
+/** @var $web_folder string */
 ?>
 <link href="<?= $web_folder ?>/css/jquery.wysiwyg.css" rel="stylesheet" type="text/css" />
 

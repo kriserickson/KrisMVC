@@ -28,7 +28,7 @@ class ApcCache extends Cache
 
     /**
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      * @param int $ttl
      * @return void
      */
@@ -38,15 +38,16 @@ class ApcCache extends Cache
     }
 
 
-
     /**
-     * @param string $key
+     * @param mixed $key
      * @param string $default
-     * @return object
+     * @return mixed
      */
     public function Fetch($key, $default = '')
     {
-        return apc_fetch($key);
+        $res = apc_fetch($key, $success);
+        return $success ? $res : $default;
+
     }
 
     /**
